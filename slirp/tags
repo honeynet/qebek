@@ -1,0 +1,1190 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+ADDCARRY	.\cksum.c	48;"	d	file:
+ARPOP_REPLY	.\slirp.c	531;"	d	file:
+ARPOP_REQUEST	.\slirp.c	530;"	d	file:
+BAD_SPRINTF	.\slirp_config.h	92;"	d
+BOOTPClient	.\bootp.c	/^} BOOTPClient;$/;"	t	typeref:struct:__anon1	file:
+BOOTP_CLIENT	.\bootp.h	4;"	d
+BOOTP_REPLY	.\bootp.h	7;"	d
+BOOTP_REQUEST	.\bootp.h	6;"	d
+BOOTP_SERVER	.\bootp.h	3;"	d
+BOOTP_VENDOR_LEN	.\bootp.h	90;"	d
+CONFIG_QEMU	.\slirp.h	4;"	d
+CONN_CANFRCV	.\slirp.c	173;"	d	file:
+CONN_CANFSEND	.\slirp.c	172;"	d	file:
+COPY_MSG	.\udp.c	457;"	d	file:
+CTL_ALIAS	.\ctl.h	3;"	d
+CTL_CMD	.\ctl.h	1;"	d
+CTL_DNS	.\ctl.h	4;"	d
+CTL_EXEC	.\ctl.h	2;"	d
+CTL_LOCAL	.\ctl.h	7;"	d
+CTL_SPECIAL	.\ctl.h	6;"	d
+DBG_CALL	.\debug.h	16;"	d
+DBG_ERROR	.\debug.h	18;"	d
+DBG_MISC	.\debug.h	17;"	d
+DEBUG_ARG	.\debug.h	23;"	d
+DEBUG_ARG	.\debug.h	32;"	d
+DEBUG_ARGS	.\debug.h	24;"	d
+DEBUG_ARGS	.\debug.h	33;"	d
+DEBUG_CALL	.\debug.h	22;"	d
+DEBUG_CALL	.\debug.h	31;"	d
+DEBUG_DEFAULT	.\debug.h	19;"	d
+DEBUG_ERROR	.\debug.h	26;"	d
+DEBUG_ERROR	.\debug.h	35;"	d
+DEBUG_MISC	.\debug.h	25;"	d
+DEBUG_MISC	.\debug.h	34;"	d
+DECLARE_IOVEC	.\slirp_config.h	100;"	d
+DECLARE_IOVEC	.\slirp_config.h	98;"	d
+DECLARE_SPRINTF	.\slirp_config.h	104;"	d
+DEFAULT_BAUD	.\slirp.h	280;"	d
+DHCPACK	.\bootp.h	73;"	d
+DHCPDISCOVER	.\bootp.h	70;"	d
+DHCPOFFER	.\bootp.h	71;"	d
+DHCPREQUEST	.\bootp.h	72;"	d
+DHCP_OPT_LEN	.\bootp.h	91;"	d
+DO_CFSETSPEED	.\slirp_config.h	26;"	d
+DO_KEEPALIVE	.\slirp_config.h	13;"	d
+DUMMY_PPP	.\slirp_config.h	55;"	d
+ECONNREFUSED	.\slirp.h	43;"	d
+EHOSTUNREACH	.\slirp.h	41;"	d
+EINPROGRESS	.\slirp.h	39;"	d
+EMULATE_TALK	.\slirp_config.h	6;"	d
+EMU_CTL	.\misc.h	35;"	d
+EMU_CUSEEME	.\misc.h	49;"	d
+EMU_FTP	.\misc.h	36;"	d
+EMU_IDENT	.\misc.h	41;"	d
+EMU_IRC	.\misc.h	38;"	d
+EMU_KSH	.\misc.h	37;"	d
+EMU_NOCONNECT	.\misc.h	44;"	d
+EMU_NONE	.\misc.h	32;"	d
+EMU_NTALK	.\misc.h	48;"	d
+EMU_REALAUDIO	.\misc.h	39;"	d
+EMU_RLOGIN	.\misc.h	40;"	d
+EMU_RSH	.\misc.h	42;"	d
+EMU_TALK	.\misc.h	47;"	d
+ENETUNREACH	.\slirp.h	42;"	d
+ENOTCONN	.\slirp.h	40;"	d
+ETH_ALEN	.\slirp.c	524;"	d	file:
+ETH_HLEN	.\slirp.c	525;"	d	file:
+ETH_P_ARP	.\slirp.c	528;"	d	file:
+ETH_P_IP	.\slirp.c	527;"	d	file:
+EWOULDBLOCK	.\slirp.h	38;"	d
+FULL_BOLT	.\slirp_config.h	33;"	d
+GETTIMEOFDAY_ONE_ARG	.\slirp_config.h	194;"	d
+HAVE_ARPA_INET_H	.\slirp_config.h	119;"	d
+HAVE_ARPA_INET_H	.\slirp_config.h	121;"	d
+HAVE_BCMP	.\slirp_config.h	176;"	d
+HAVE_DRAND48	.\slirp_config.h	179;"	d
+HAVE_FCHMOD	.\slirp_config.h	203;"	d
+HAVE_GETHOSTID	.\slirp_config.h	185;"	d
+HAVE_GRANTPT	.\slirp_config.h	200;"	d
+HAVE_INDEX	.\slirp_config.h	173;"	d
+HAVE_INET_ATON	.\slirp_config.h	164;"	d
+HAVE_INET_ATON	.\slirp_config.h	166;"	d
+HAVE_MEMMOVE	.\slirp_config.h	182;"	d
+HAVE_RANDOM	.\slirp_config.h	158;"	d
+HAVE_READV	.\slirp_config.h	95;"	d
+HAVE_REVOKE	.\slirp_config.h	197;"	d
+HAVE_SETENV	.\slirp_config.h	170;"	d
+HAVE_SRANDOM	.\slirp_config.h	161;"	d
+HAVE_STDLIB_H	.\slirp_config.h	61;"	d
+HAVE_STRDUP	.\slirp_config.h	79;"	d
+HAVE_STRERROR	.\slirp_config.h	76;"	d
+HAVE_STRING_H	.\slirp_config.h	116;"	d
+HAVE_SYS_BITYPES_H	.\slirp_config.h	86;"	d
+HAVE_SYS_FILIO_H	.\slirp_config.h	70;"	d
+HAVE_SYS_FILIO_H	.\slirp_config.h	72;"	d
+HAVE_SYS_IOCTL_H	.\slirp_config.h	64;"	d
+HAVE_SYS_IOCTL_H	.\slirp_config.h	66;"	d
+HAVE_SYS_SELECT_H	.\slirp_config.h	110;"	d
+HAVE_SYS_SELECT_H	.\slirp_config.h	112;"	d
+HAVE_SYS_SIGNAL_H	.\slirp_config.h	125;"	d
+HAVE_SYS_STROPTS_H	.\slirp_config.h	128;"	d
+HAVE_SYS_TIME_H	.\slirp_config.h	83;"	d
+HAVE_SYS_TYPES32_H	.\slirp_config.h	206;"	d
+HAVE_SYS_WAIT_H	.\slirp_config.h	107;"	d
+HAVE_UNISTD_H	.\slirp_config.h	58;"	d
+HTONL	.\ip.h	48;"	d
+HTONL	.\ip.h	61;"	d
+HTONS	.\ip.h	51;"	d
+HTONS	.\ip.h	64;"	d
+ICMPCTL_MASKREPL	.\icmp_var.h	57;"	d
+ICMPCTL_MAXID	.\icmp_var.h	59;"	d
+ICMPCTL_NAMES	.\icmp_var.h	61;"	d
+ICMPCTL_STATS	.\icmp_var.h	58;"	d
+ICMP_ADVLEN	.\ip_icmp.h	109;"	d
+ICMP_ADVLENMIN	.\ip_icmp.h	108;"	d
+ICMP_ECHO	.\ip_icmp.h	136;"	d
+ICMP_ECHOREPLY	.\ip_icmp.h	115;"	d
+ICMP_INFOTYPE	.\ip_icmp.h	153;"	d
+ICMP_IREQ	.\ip_icmp.h	146;"	d
+ICMP_IREQREPLY	.\ip_icmp.h	147;"	d
+ICMP_MASKLEN	.\ip_icmp.h	107;"	d
+ICMP_MASKREPLY	.\ip_icmp.h	149;"	d
+ICMP_MASKREQ	.\ip_icmp.h	148;"	d
+ICMP_MAXDATALEN	.\ip_icmp.c	208;"	d	file:
+ICMP_MAXDATALEN	.\ip_icmp.c	324;"	d	file:
+ICMP_MAXTYPE	.\ip_icmp.h	151;"	d
+ICMP_MINLEN	.\ip_icmp.h	105;"	d
+ICMP_PARAMPROB	.\ip_icmp.h	142;"	d
+ICMP_PARAMPROB_OPTABSENT	.\ip_icmp.h	143;"	d
+ICMP_REDIRECT	.\ip_icmp.h	131;"	d
+ICMP_REDIRECT_HOST	.\ip_icmp.h	133;"	d
+ICMP_REDIRECT_NET	.\ip_icmp.h	132;"	d
+ICMP_REDIRECT_TOSHOST	.\ip_icmp.h	135;"	d
+ICMP_REDIRECT_TOSNET	.\ip_icmp.h	134;"	d
+ICMP_ROUTERADVERT	.\ip_icmp.h	137;"	d
+ICMP_ROUTERSOLICIT	.\ip_icmp.h	138;"	d
+ICMP_SOURCEQUENCH	.\ip_icmp.h	130;"	d
+ICMP_TIMXCEED	.\ip_icmp.h	139;"	d
+ICMP_TIMXCEED_INTRANS	.\ip_icmp.h	140;"	d
+ICMP_TIMXCEED_REASS	.\ip_icmp.h	141;"	d
+ICMP_TSLEN	.\ip_icmp.h	106;"	d
+ICMP_TSTAMP	.\ip_icmp.h	144;"	d
+ICMP_TSTAMPREPLY	.\ip_icmp.h	145;"	d
+ICMP_UNREACH	.\ip_icmp.h	116;"	d
+ICMP_UNREACH_HOST	.\ip_icmp.h	118;"	d
+ICMP_UNREACH_HOST_PROHIB	.\ip_icmp.h	127;"	d
+ICMP_UNREACH_HOST_UNKNOWN	.\ip_icmp.h	124;"	d
+ICMP_UNREACH_ISOLATED	.\ip_icmp.h	125;"	d
+ICMP_UNREACH_NEEDFRAG	.\ip_icmp.h	121;"	d
+ICMP_UNREACH_NET	.\ip_icmp.h	117;"	d
+ICMP_UNREACH_NET_PROHIB	.\ip_icmp.h	126;"	d
+ICMP_UNREACH_NET_UNKNOWN	.\ip_icmp.h	123;"	d
+ICMP_UNREACH_PORT	.\ip_icmp.h	120;"	d
+ICMP_UNREACH_PROTOCOL	.\ip_icmp.h	119;"	d
+ICMP_UNREACH_SRCFAIL	.\ip_icmp.h	122;"	d
+ICMP_UNREACH_TOSHOST	.\ip_icmp.h	129;"	d
+ICMP_UNREACH_TOSNET	.\ip_icmp.h	128;"	d
+IF_AUTOCOMP	.\if.h	13;"	d
+IF_COMP	.\if.h	18;"	d
+IF_COMPRESS	.\if.h	11;"	d
+IF_MAXLINKHDR	.\if.h	32;"	d
+IF_MRU	.\if.h	17;"	d
+IF_MTU	.\if.h	16;"	d
+IF_NOCIDCOMP	.\if.h	14;"	d
+IF_NOCOMPRESS	.\if.h	12;"	d
+IF_THRESH	.\ip_output.c	51;"	d	file:
+INA	.\ip_input.c	558;"	d	file:
+IPDEFTTL	.\ip.h	180;"	d
+IPFRAGTTL	.\ip.h	181;"	d
+IPOPT_CLASS	.\ip.h	113;"	d
+IPOPT_CONTROL	.\ip.h	116;"	d
+IPOPT_COPIED	.\ip.h	112;"	d
+IPOPT_DEBMEAS	.\ip.h	118;"	d
+IPOPT_EOL	.\ip.h	121;"	d
+IPOPT_LSRR	.\ip.h	127;"	d
+IPOPT_MINOFF	.\ip.h	137;"	d
+IPOPT_NOP	.\ip.h	122;"	d
+IPOPT_NUMBER	.\ip.h	114;"	d
+IPOPT_OFFSET	.\ip.h	136;"	d
+IPOPT_OLEN	.\ip.h	135;"	d
+IPOPT_OPTVAL	.\ip.h	134;"	d
+IPOPT_RESERVED1	.\ip.h	117;"	d
+IPOPT_RESERVED2	.\ip.h	119;"	d
+IPOPT_RR	.\ip.h	124;"	d
+IPOPT_SATID	.\ip.h	128;"	d
+IPOPT_SECURITY	.\ip.h	126;"	d
+IPOPT_SECUR_CONFID	.\ip.h	169;"	d
+IPOPT_SECUR_EFTO	.\ip.h	170;"	d
+IPOPT_SECUR_MMMM	.\ip.h	171;"	d
+IPOPT_SECUR_RESTR	.\ip.h	172;"	d
+IPOPT_SECUR_SECRET	.\ip.h	173;"	d
+IPOPT_SECUR_TOPSECRET	.\ip.h	174;"	d
+IPOPT_SECUR_UNCLASS	.\ip.h	168;"	d
+IPOPT_SSRR	.\ip.h	129;"	d
+IPOPT_TS	.\ip.h	125;"	d
+IPOPT_TS_PRESPEC	.\ip.h	165;"	d
+IPOPT_TS_TSANDADDR	.\ip.h	164;"	d
+IPOPT_TS_TSONLY	.\ip.h	163;"	d
+IPTOS_LOWDELAY	.\ip.h	105;"	d
+IPTOS_RELIABILITY	.\ip.h	107;"	d
+IPTOS_THROUGHPUT	.\ip.h	106;"	d
+IPTTLDEC	.\ip.h	182;"	d
+IPVERSION	.\ip.h	74;"	d
+IP_DF	.\ip.h	91;"	d
+IP_MAXPACKET	.\ip.h	100;"	d
+IP_MF	.\ip.h	92;"	d
+IP_MSS	.\ip.h	184;"	d
+IP_OFFMASK	.\ip.h	93;"	d
+IS_OLD	.\udp.c	455;"	d	file:
+LEASE_TIME	.\bootp.c	32;"	d	file:
+MAXTTL	.\ip.h	179;"	d
+MAX_INTERFACES	.\slirp_config.h	18;"	d
+MAX_IPOPTLEN	.\ip.h	268;"	d
+MAX_MRU	.\slirp.h	326;"	d
+MAX_MRU	.\slirp.h	329;"	d
+MAX_PPP_INTERFACES	.\slirp_config.h	19;"	d
+MAX_TCPOPTLEN	.\tcp_output.c	65;"	d	file:
+MBUF_THRESH	.\mbuf.c	24;"	d	file:
+MINCSIZE	.\mbuf.h	43;"	d
+MIN_MRU	.\slirp.h	325;"	d
+MIN_MRU	.\slirp.h	328;"	d
+MSIZE	.\mbuf.c	31;"	d	file:
+M_DOFREE	.\mbuf.h	120;"	d
+M_EXT	.\mbuf.h	117;"	d
+M_FREELIST	.\mbuf.h	118;"	d
+M_FREEROOM	.\mbuf.h	88;"	d
+M_ROOM	.\mbuf.h	80;"	d
+M_TRAILINGSPACE	.\mbuf.h	89;"	d
+M_USEDLIST	.\mbuf.h	119;"	d
+M_dat	.\mbuf.h	/^	union M_dat {$/;"	u	struct:mbuf
+M_dat	.\mbuf.h	/^	} M_dat;$/;"	m	struct:mbuf	typeref:union:mbuf::M_dat
+NB_ADDR	.\bootp.c	28;"	d	file:
+NEED_TYPEDEFS	.\slirp_config.h	140;"	d
+NEED_TYPEDEFS	.\slirp_config.h	142;"	d
+NO_PROTOTYPES	.\slirp_config.h	137;"	d
+NO_PROTOTYPES	.\slirp_config.h	45;"	d
+NO_UNIX_SOCKETS	.\slirp_config.h	188;"	d
+NO_UNIX_SOCKETS	.\slirp_config.h	190;"	d
+NTOHL	.\ip.h	42;"	d
+NTOHL	.\ip.h	55;"	d
+NTOHS	.\ip.h	45;"	d
+NTOHS	.\ip.h	58;"	d
+NULL	.\slirp.h	231;"	d
+OTOSIN	.\udp.c	466;"	d	file:
+O_BINARY	.\slirp.h	47;"	d
+PRN_SPRINTF	.\debug.h	9;"	d
+PRN_STDERR	.\debug.h	8;"	d
+PROBE_CONN	.\slirp_config.h	10;"	d
+PROTO_PPP	.\main.h	50;"	d
+PROTO_SLIP	.\main.h	48;"	d
+PR_FASTHZ	.\tcp.h	43;"	d
+PR_SLOWHZ	.\tcp.h	42;"	d
+REASS_MBUF	.\tcp_var.h	186;"	d
+REDUCE	.\cksum.c	49;"	d	file:
+RFC1533_BOOTFILESIZE	.\bootp.h	23;"	d
+RFC1533_COOKIE	.\bootp.h	9;"	d
+RFC1533_COOKIESERVER	.\bootp.h	18;"	d
+RFC1533_DNS	.\bootp.h	16;"	d
+RFC1533_DOMAINNAME	.\bootp.h	25;"	d
+RFC1533_END	.\bootp.h	89;"	d
+RFC1533_EXTENSIONPATH	.\bootp.h	28;"	d
+RFC1533_GATEWAY	.\bootp.h	13;"	d
+RFC1533_HOSTNAME	.\bootp.h	22;"	d
+RFC1533_IEN116NS	.\bootp.h	15;"	d
+RFC1533_IMPRESSSERVER	.\bootp.h	20;"	d
+RFC1533_INTBROADCAST	.\bootp.h	38;"	d
+RFC1533_INTICMPDISCOVER	.\bootp.h	39;"	d
+RFC1533_INTICMPRESPOND	.\bootp.h	40;"	d
+RFC1533_INTLOCALSUBNETS	.\bootp.h	37;"	d
+RFC1533_INTMTU	.\bootp.h	36;"	d
+RFC1533_INTROUTEDISCOVER	.\bootp.h	41;"	d
+RFC1533_INTROUTESOLICIT	.\bootp.h	42;"	d
+RFC1533_INTSTATICROUTES	.\bootp.h	43;"	d
+RFC1533_IPFORWARDING	.\bootp.h	29;"	d
+RFC1533_IPMAXREASSEMBLY	.\bootp.h	32;"	d
+RFC1533_IPMTU	.\bootp.h	34;"	d
+RFC1533_IPMTUPLATEAU	.\bootp.h	35;"	d
+RFC1533_IPPOLICYFILTER	.\bootp.h	31;"	d
+RFC1533_IPSOURCEROUTING	.\bootp.h	30;"	d
+RFC1533_IPTTL	.\bootp.h	33;"	d
+RFC1533_LLARPCACHETMO	.\bootp.h	45;"	d
+RFC1533_LLETHERNETENCAP	.\bootp.h	46;"	d
+RFC1533_LLTRAILERENCAP	.\bootp.h	44;"	d
+RFC1533_LOGSERVER	.\bootp.h	17;"	d
+RFC1533_LPRSERVER	.\bootp.h	19;"	d
+RFC1533_MERITDUMPFILE	.\bootp.h	24;"	d
+RFC1533_NBDD	.\bootp.h	55;"	d
+RFC1533_NBNS	.\bootp.h	54;"	d
+RFC1533_NBNT	.\bootp.h	56;"	d
+RFC1533_NBSCOPE	.\bootp.h	57;"	d
+RFC1533_NETMASK	.\bootp.h	11;"	d
+RFC1533_NISDOMAIN	.\bootp.h	50;"	d
+RFC1533_NISSERVER	.\bootp.h	51;"	d
+RFC1533_NTPSERVER	.\bootp.h	52;"	d
+RFC1533_PAD	.\bootp.h	10;"	d
+RFC1533_RESOURCESERVER	.\bootp.h	21;"	d
+RFC1533_ROOTPATH	.\bootp.h	27;"	d
+RFC1533_SWAPSERVER	.\bootp.h	26;"	d
+RFC1533_TCPKEEPALIVEGB	.\bootp.h	49;"	d
+RFC1533_TCPKEEPALIVETMO	.\bootp.h	48;"	d
+RFC1533_TCPTTL	.\bootp.h	47;"	d
+RFC1533_TIMEOFFSET	.\bootp.h	12;"	d
+RFC1533_TIMESERVER	.\bootp.h	14;"	d
+RFC1533_VENDOR	.\bootp.h	53;"	d
+RFC1533_VENDOR_ADDPARM	.\bootp.h	79;"	d
+RFC1533_VENDOR_ETHDEV	.\bootp.h	80;"	d
+RFC1533_VENDOR_HOWTO	.\bootp.h	81;"	d
+RFC1533_VENDOR_IMG	.\bootp.h	86;"	d
+RFC1533_VENDOR_MAGIC	.\bootp.h	78;"	d
+RFC1533_VENDOR_MAJOR	.\bootp.h	75;"	d
+RFC1533_VENDOR_MINOR	.\bootp.h	76;"	d
+RFC1533_VENDOR_MNUOPTS	.\bootp.h	82;"	d
+RFC1533_VENDOR_MOTD	.\bootp.h	84;"	d
+RFC1533_VENDOR_NUMOFIMG	.\bootp.h	87;"	d
+RFC1533_VENDOR_NUMOFMOTD	.\bootp.h	85;"	d
+RFC1533_VENDOR_SELECTION	.\bootp.h	83;"	d
+RFC1533_XDM	.\bootp.h	59;"	d
+RFC1533_XFS	.\bootp.h	58;"	d
+RFC2132_LEASE_TIME	.\bootp.h	62;"	d
+RFC2132_MAX_SIZE	.\bootp.h	66;"	d
+RFC2132_MSG_TYPE	.\bootp.h	63;"	d
+RFC2132_PARAM_LIST	.\bootp.h	65;"	d
+RFC2132_REBIND_TIME	.\bootp.h	68;"	d
+RFC2132_RENEWAL_TIME	.\bootp.h	67;"	d
+RFC2132_REQ_ADDR	.\bootp.h	61;"	d
+RFC2132_SRV_ID	.\bootp.h	64;"	d
+SA	.\ip_input.c	559;"	d	file:
+SEQ_GEQ	.\tcp.h	156;"	d
+SEQ_GT	.\tcp.h	155;"	d
+SEQ_LEQ	.\tcp.h	154;"	d
+SEQ_LT	.\tcp.h	153;"	d
+SIZEOF_CHAR	.\slirp_config.h	146;"	d
+SIZEOF_CHAR_P	.\slirp_config.h	155;"	d
+SIZEOF_INT	.\slirp_config.h	152;"	d
+SIZEOF_SHORT	.\slirp_config.h	149;"	d
+SO_EXPIRE	.\socket.h	13;"	d
+SO_EXPIREFAST	.\socket.h	14;"	d
+SO_OPTIONS	.\slirp.h	282;"	d
+SS_CTL	.\socket.h	70;"	d
+SS_FACCEPTCONN	.\socket.h	71;"	d
+SS_FACCEPTONCE	.\socket.h	72;"	d
+SS_FCANTRCVMORE	.\socket.h	65;"	d
+SS_FCANTSENDMORE	.\socket.h	66;"	d
+SS_FWDRAIN	.\socket.h	68;"	d
+SS_ISFCONNECTED	.\socket.h	64;"	d
+SS_ISFCONNECTING	.\socket.h	63;"	d
+SS_NOFDREF	.\socket.h	61;"	d
+START_ADDR	.\bootp.c	30;"	d	file:
+STAT	.\slirp.h	12;"	d
+STAT	.\slirp.h	14;"	d
+TCPOLEN_MAXSEG	.\tcp.h	83;"	d
+TCPOLEN_SACK_PERMITTED	.\tcp.h	87;"	d
+TCPOLEN_TIMESTAMP	.\tcp.h	90;"	d
+TCPOLEN_TSTAMP_APPA	.\tcp.h	91;"	d
+TCPOLEN_WINDOW	.\tcp.h	85;"	d
+TCPOOB_HADDATA	.\tcp_var.h	127;"	d
+TCPOOB_HAVEDATA	.\tcp_var.h	126;"	d
+TCPOPT_EOL	.\tcp.h	80;"	d
+TCPOPT_MAXSEG	.\tcp.h	82;"	d
+TCPOPT_NOP	.\tcp.h	81;"	d
+TCPOPT_SACK	.\tcp.h	88;"	d
+TCPOPT_SACK_PERMITTED	.\tcp.h	86;"	d
+TCPOPT_TIMESTAMP	.\tcp.h	89;"	d
+TCPOPT_TSTAMP_HDR	.\tcp.h	93;"	d
+TCPOPT_WINDOW	.\tcp.h	84;"	d
+TCPREXMTTHRESH	.\tcp_input.c	50;"	d	file:
+TCPS_CLOSED	.\tcp.h	129;"	d
+TCPS_CLOSE_WAIT	.\tcp.h	135;"	d
+TCPS_CLOSING	.\tcp.h	138;"	d
+TCPS_ESTABLISHED	.\tcp.h	134;"	d
+TCPS_FIN_WAIT_1	.\tcp.h	137;"	d
+TCPS_FIN_WAIT_2	.\tcp.h	141;"	d
+TCPS_HAVEESTABLISHED	.\tcp.h	145;"	d
+TCPS_HAVERCVDFIN	.\tcp.h	146;"	d
+TCPS_HAVERCVDSYN	.\tcp.h	144;"	d
+TCPS_LAST_ACK	.\tcp.h	139;"	d
+TCPS_LISTEN	.\tcp.h	130;"	d
+TCPS_SYN_RECEIVED	.\tcp.h	132;"	d
+TCPS_SYN_SENT	.\tcp.h	131;"	d
+TCPS_TIME_WAIT	.\tcp.h	142;"	d
+TCPTV_KEEPCNT	.\tcp_timer.h	102;"	d
+TCPTV_KEEPINTVL	.\tcp_timer.h	101;"	d
+TCPTV_KEEP_IDLE	.\tcp_timer.h	100;"	d
+TCPTV_KEEP_INIT	.\tcp_timer.h	99;"	d
+TCPTV_MIN	.\tcp_timer.h	104;"	d
+TCPTV_MSL	.\tcp_timer.h	90;"	d
+TCPTV_PERSMAX	.\tcp_timer.h	97;"	d
+TCPTV_PERSMIN	.\tcp_timer.h	96;"	d
+TCPTV_REXMTMAX	.\tcp_timer.h	106;"	d
+TCPTV_SRTTBASE	.\tcp_timer.h	92;"	d
+TCPTV_SRTTDFLT	.\tcp_timer.h	94;"	d
+TCPT_2MSL	.\tcp_timer.h	49;"	d
+TCPT_KEEP	.\tcp_timer.h	48;"	d
+TCPT_NTIMERS	.\tcp_timer.h	44;"	d
+TCPT_PERSIST	.\tcp_timer.h	47;"	d
+TCPT_RANGESET	.\tcp_timer.h	121;"	d
+TCPT_REXMT	.\tcp_timer.h	46;"	d
+TCP_DO_RFC1323	.\tcp_subr.c	50;"	d	file:
+TCP_ISSINCR	.\tcp.h	169;"	d
+TCP_LINGERTIME	.\tcp_timer.h	108;"	d
+TCP_MAXIDLE	.\slirp.h	283;"	d
+TCP_MAXRXTSHIFT	.\tcp_timer.h	110;"	d
+TCP_MAXSEG	.\tcp.h	119;"	d
+TCP_MAXWIN	.\tcp.h	106;"	d
+TCP_MAX_WINSHIFT	.\tcp.h	108;"	d
+TCP_MSS	.\tcp.h	104;"	d
+TCP_NODELAY	.\tcp.h	117;"	d
+TCP_NODELAY	.\tcp.h	118;"	d
+TCP_NSTATES	.\tcp.h	127;"	d
+TCP_PAWS_IDLE	.\tcp_input.c	55;"	d	file:
+TCP_RCVSPACE	.\tcp.h	48;"	d
+TCP_REASS	.\tcp_input.c	72;"	d	file:
+TCP_REASS	.\tcp_input.c	95;"	d	file:
+TCP_REXMTVAL	.\tcp_var.h	170;"	d
+TCP_RTTVAR_SCALE	.\tcp_var.h	154;"	d
+TCP_RTTVAR_SHIFT	.\tcp_var.h	155;"	d
+TCP_RTT_SCALE	.\tcp_var.h	152;"	d
+TCP_RTT_SHIFT	.\tcp_var.h	153;"	d
+TCP_SNDSPACE	.\tcp.h	47;"	d
+TFTP_ACK	.\tftp.h	10;"	d
+TFTP_DATA	.\tftp.h	9;"	d
+TFTP_ERROR	.\tftp.h	11;"	d
+TFTP_FILENAME_MAX	.\tftp.h	14;"	d
+TFTP_OACK	.\tftp.h	12;"	d
+TFTP_RRQ	.\tftp.h	7;"	d
+TFTP_SERVER	.\tftp.h	5;"	d
+TFTP_SESSIONS_MAX	.\tftp.h	3;"	d
+TFTP_WRQ	.\tftp.h	8;"	d
+TF_ACKNOW	.\tcp_var.h	63;"	d
+TF_DELACK	.\tcp_var.h	64;"	d
+TF_NODELAY	.\tcp_var.h	65;"	d
+TF_NOOPT	.\tcp_var.h	66;"	d
+TF_RCVD_SCALE	.\tcp_var.h	69;"	d
+TF_RCVD_TSTMP	.\tcp_var.h	71;"	d
+TF_REQ_SCALE	.\tcp_var.h	68;"	d
+TF_REQ_TSTMP	.\tcp_var.h	70;"	d
+TF_SACK_PERMIT	.\tcp_var.h	72;"	d
+TF_SENTFIN	.\tcp_var.h	67;"	d
+TH_ACK	.\tcp.h	71;"	d
+TH_FIN	.\tcp.h	67;"	d
+TH_PUSH	.\tcp.h	70;"	d
+TH_RST	.\tcp.h	69;"	d
+TH_SYN	.\tcp.h	68;"	d
+TH_URG	.\tcp.h	72;"	d
+TIME_DIFF	.\main.h	29;"	d
+TIME_WITH_SYS_TIME	.\slirp_config.h	82;"	d
+TOWRITEMAX	.\main.h	12;"	d
+TSTMP_GEQ	.\tcp_input.c	59;"	d	file:
+TSTMP_LT	.\tcp_input.c	58;"	d	file:
+UDPCKSUM	.\udp.c	62;"	d	file:
+UDPCKSUM	.\udp.c	64;"	d	file:
+UDPCTL_CHECKSUM	.\udp.h	94;"	d
+UDPCTL_MAXID	.\udp.h	95;"	d
+UDP_TTL	.\udp.h	40;"	d
+UDP_UDPDATALEN	.\udp.h	41;"	d
+UPD_NFDS	.\slirp.c	174;"	d	file:
+USE_LOWCPU	.\slirp_config.h	41;"	d
+USE_TMPSOCKET	.\slirp_config.h	23;"	d
+WANT_SYS_IOCTL_H	.\misc.c	8;"	d	file:
+WANT_SYS_IOCTL_H	.\socket.c	8;"	d	file:
+WANT_SYS_IOCTL_H	.\tcp_subr.c	45;"	d	file:
+WIN32_LEAN_AND_MEAN	.\slirp.h	32;"	d
+_IF_H_	.\if.h	9;"	d
+_IP_H_	.\ip.h	38;"	d
+_LIBSLIRP_H	.\libslirp.h	2;"	d
+_MBUF_H_	.\mbuf.h	38;"	d
+_MISC_H_	.\misc.h	9;"	d
+_NETINET_ICMP_VAR_H_	.\icmp_var.h	38;"	d
+_NETINET_IP_ICMP_H_	.\ip_icmp.h	38;"	d
+_P	.\slirp.h	124;"	d
+_P	.\slirp.h	126;"	d
+_SBUF_H_	.\sbuf.h	9;"	d
+_SLIRP_SOCKET_H_	.\socket.h	11;"	d
+_TCPIP_H_	.\tcpip.h	38;"	d
+_TCP_H_	.\tcp.h	38;"	d
+_TCP_TIMER_H_	.\tcp_timer.h	38;"	d
+_TCP_VAR_H_	.\tcp_var.h	38;"	d
+_UDP_H_	.\udp.h	38;"	d
+__COMMON_H__	.\slirp.h	2;"	d
+add_emu	.\misc.c	/^add_emu(buff)$/;"	f
+add_exec	.\misc.c	/^add_exec(ex_ptr, do_pty, exec, addr, port)$/;"	f
+alias_addr	.\slirp.c	/^struct in_addr alias_addr;$/;"	v	typeref:struct:in_addr
+allocated	.\bootp.c	/^    uint8_t allocated;$/;"	m	struct:__anon1	file:
+ar_hln	.\slirp.c	/^	unsigned char	ar_hln;		\/* length of hardware address	*\/$/;"	m	struct:arphdr	file:
+ar_hrd	.\slirp.c	/^	unsigned short	ar_hrd;		\/* format of hardware address	*\/$/;"	m	struct:arphdr	file:
+ar_op	.\slirp.c	/^	unsigned short	ar_op;		\/* ARP opcode (command)		*\/$/;"	m	struct:arphdr	file:
+ar_pln	.\slirp.c	/^	unsigned char	ar_pln;		\/* length of protocol address	*\/$/;"	m	struct:arphdr	file:
+ar_pro	.\slirp.c	/^	unsigned short	ar_pro;		\/* format of protocol address	*\/$/;"	m	struct:arphdr	file:
+ar_sha	.\slirp.c	/^	unsigned char		ar_sha[ETH_ALEN];	\/* sender hardware address	*\/$/;"	m	struct:arphdr	file:
+ar_sip	.\slirp.c	/^	unsigned char		ar_sip[4];		\/* sender IP address		*\/$/;"	m	struct:arphdr	file:
+ar_tha	.\slirp.c	/^	unsigned char		ar_tha[ETH_ALEN];	\/* target hardware address	*\/$/;"	m	struct:arphdr	file:
+ar_tip	.\slirp.c	/^	unsigned char		ar_tip[4];		\/* target IP address		*\/$/;"	m	struct:arphdr	file:
+arp_input	.\slirp.c	/^void arp_input(const uint8_t *pkt, int pkt_len)$/;"	f
+arphdr	.\slirp.c	/^struct arphdr$/;"	s	file:
+bootp_clients	.\bootp.c	/^BOOTPClient bootp_clients[NB_ADDR];$/;"	v
+bootp_filename	.\bootp.c	/^const char *bootp_filename;$/;"	v
+bootp_input	.\bootp.c	/^void bootp_input(struct mbuf *m)$/;"	f
+bootp_reply	.\bootp.c	/^static void bootp_reply(struct bootp_t *bp)$/;"	f	file:
+bootp_t	.\bootp.h	/^struct bootp_t {$/;"	s
+bp_ciaddr	.\bootp.h	/^    struct in_addr bp_ciaddr;$/;"	m	struct:bootp_t	typeref:struct:bootp_t::in_addr
+bp_file	.\bootp.h	/^    uint8_t bp_file[128];$/;"	m	struct:bootp_t
+bp_giaddr	.\bootp.h	/^    struct in_addr bp_giaddr;$/;"	m	struct:bootp_t	typeref:struct:bootp_t::in_addr
+bp_hlen	.\bootp.h	/^    uint8_t bp_hlen;$/;"	m	struct:bootp_t
+bp_hops	.\bootp.h	/^    uint8_t bp_hops;$/;"	m	struct:bootp_t
+bp_htype	.\bootp.h	/^    uint8_t bp_htype;$/;"	m	struct:bootp_t
+bp_hwaddr	.\bootp.h	/^    uint8_t bp_hwaddr[16];$/;"	m	struct:bootp_t
+bp_op	.\bootp.h	/^    uint8_t bp_op;$/;"	m	struct:bootp_t
+bp_secs	.\bootp.h	/^    uint16_t bp_secs;$/;"	m	struct:bootp_t
+bp_siaddr	.\bootp.h	/^    struct in_addr bp_siaddr;$/;"	m	struct:bootp_t	typeref:struct:bootp_t::in_addr
+bp_sname	.\bootp.h	/^    uint8_t bp_sname[64];$/;"	m	struct:bootp_t
+bp_vend	.\bootp.h	/^    uint8_t bp_vend[DHCP_OPT_LEN];$/;"	m	struct:bootp_t
+bp_xid	.\bootp.h	/^    uint32_t bp_xid;$/;"	m	struct:bootp_t
+bp_yiaddr	.\bootp.h	/^    struct in_addr bp_yiaddr;$/;"	m	struct:bootp_t	typeref:struct:bootp_t::in_addr
+bytes_saved	.\if.h	/^	u_int bytes_saved;	\/* Number of bytes that compression "saved" *\/$/;"	m	struct:slirp_ifstats
+caddr32_t	.\ip.h	/^typedef caddr_t caddr32_t;$/;"	t
+caddr32_t	.\ip.h	/^typedef u_int32_t caddr32_t;$/;"	t
+caddr_t	.\slirp.h	/^typedef char *caddr_t;$/;"	t
+cksum	.\cksum.c	/^int cksum(struct mbuf *m, int len)$/;"	f
+client_ethaddr	.\slirp.c	/^uint8_t client_ethaddr[6];$/;"	v
+client_ip	.\tftp.c	/^    struct in_addr client_ip;$/;"	m	struct:tftp_session	typeref:struct:tftp_session::in_addr	file:
+client_port	.\tftp.c	/^    u_int16_t client_port;$/;"	m	struct:tftp_session	file:
+closesocket	.\slirp.h	46;"	d
+const	.\slirp_config.h	134;"	d
+curtime	.\misc.c	/^u_int curtime, time_fasttimo, last_slowtimo;$/;"	v
+debug_init	.\debug.c	/^debug_init(file, dbg)$/;"	f
+dfd	.\debug.c	/^FILE *dfd = NULL;$/;"	v
+dhcp_decode	.\bootp.c	/^static void dhcp_decode(const uint8_t *buf, int size,$/;"	f	file:
+dns_addr	.\slirp.c	/^struct in_addr dns_addr;$/;"	v	typeref:struct:in_addr
+do_slowtimo	.\slirp.c	/^int do_slowtimo;$/;"	v
+dostats	.\debug.c	/^int dostats = 0;$/;"	v
+dostats	.\debug.c	/^int dostats = 1;$/;"	v
+dprintf	.\bootp.c	46;"	d	file:
+dprintf	.\bootp.c	49;"	d	file:
+dtom	.\mbuf.c	/^dtom(dat)$/;"	f
+dummy	.\tcpip.h	/^	struct tcpiphdr dummy;$/;"	m	struct:tcpiphdr_2	typeref:struct:tcpiphdr_2::tcpiphdr
+dump_packet	.\debug.c	/^dump_packet(dat, n)$/;"	f
+emu	.\misc.h	/^	u_int8_t emu;$/;"	m	struct:emu_t
+emu	.\misc.h	/^	u_int8_t emu;$/;"	m	struct:tos_t
+emu_t	.\misc.h	/^struct emu_t {$/;"	s
+errno	.\slirp.h	338;"	d
+errno	.\slirp.h	339;"	d
+ethhdr	.\slirp.c	/^struct ethhdr$/;"	s	file:
+ex_addr	.\misc.h	/^	int ex_addr;			\/* The last byte of the address *\/$/;"	m	struct:ex_list
+ex_exec	.\misc.h	/^	const char *ex_exec;            \/* Command line of what to exec *\/$/;"	m	struct:ex_list
+ex_fport	.\misc.h	/^	int ex_fport;                   \/* Port to telnet to *\/$/;"	m	struct:ex_list
+ex_list	.\misc.h	/^struct ex_list {$/;"	s
+ex_next	.\misc.h	/^	struct ex_list *ex_next;$/;"	m	struct:ex_list	typeref:struct:ex_list::ex_list
+ex_pty	.\misc.h	/^	int ex_pty;			\/* Do we want a pty? *\/$/;"	m	struct:ex_list
+exec_list	.\slirp.c	/^struct ex_list *exec_list;$/;"	v	typeref:struct:ex_list
+extra	.\socket.h	/^  void * extra;			\/* Extra pointer *\/$/;"	m	struct:socket
+fd_block	.\misc.c	/^fd_block(fd)$/;"	f
+fd_nonblock	.\misc.c	/^fd_nonblock(fd)$/;"	f
+filename	.\tftp.c	/^    unsigned char filename[TFTP_FILENAME_MAX];$/;"	m	struct:tftp_session	file:
+find_addr	.\bootp.c	/^static BOOTPClient *find_addr(struct in_addr *paddr, const uint8_t *macaddr)$/;"	f	file:
+first_char	.\tcpip.h	/^	char first_char;$/;"	m	struct:tcpiphdr_2
+fork_exec	.\misc.c	/^fork_exec(struct socket *so, const char *ex, int do_pty)$/;"	f
+fport	.\misc.h	/^	u_int16_t fport;$/;"	m	struct:emu_t
+fport	.\misc.h	/^	u_int16_t fport;$/;"	m	struct:tos_t
+get_dns_addr	.\slirp.c	/^static int get_dns_addr(struct in_addr *pdns_addr)$/;"	f	file:
+get_new_addr	.\bootp.c	/^static BOOTPClient *get_new_addr(struct in_addr *paddr)$/;"	f	file:
+getouraddr	.\misc.c	/^getouraddr()$/;"	f
+gettimeofday	.\slirp.h	136;"	d
+global_readfds	.\slirp.c	/^fd_set *global_readfds, *global_writefds, *global_xfds;$/;"	v
+global_writefds	.\slirp.c	/^fd_set *global_readfds, *global_writefds, *global_xfds;$/;"	v
+global_xfds	.\slirp.c	/^fd_set *global_readfds, *global_writefds, *global_xfds;$/;"	v
+h_dest	.\slirp.c	/^	unsigned char	h_dest[ETH_ALEN];	\/* destination eth addr	*\/$/;"	m	struct:ethhdr	file:
+h_proto	.\slirp.c	/^	unsigned short	h_proto;		\/* packet type ID field	*\/$/;"	m	struct:ethhdr	file:
+h_source	.\slirp.c	/^	unsigned char	h_source[ETH_ALEN];	\/* source ether addr	*\/$/;"	m	struct:ethhdr	file:
+icd_id	.\ip_icmp.h	/^			u_short	icd_id;$/;"	m	struct:icmp::__anon2::ih_idseq
+icd_seq	.\ip_icmp.h	/^			u_short	icd_seq;$/;"	m	struct:icmp::__anon2::ih_idseq
+icmp	.\ip_icmp.h	/^struct icmp {$/;"	s
+icmp_cksum	.\ip_icmp.h	/^	u_short	icmp_cksum;		\/* ones complement cksum of struct *\/$/;"	m	struct:icmp
+icmp_code	.\ip_icmp.h	/^	u_char	icmp_code;		\/* type sub code *\/$/;"	m	struct:icmp
+icmp_data	.\ip_icmp.h	94;"	d
+icmp_dun	.\ip_icmp.h	/^	} icmp_dun;$/;"	m	struct:icmp	typeref:union:icmp::__anon3
+icmp_error	.\ip_icmp.c	/^icmp_error(msrc, type, code, minsize, message)$/;"	f
+icmp_flush	.\ip_icmp.c	/^static const int icmp_flush[19] = {$/;"	v	file:
+icmp_gwaddr	.\ip_icmp.h	70;"	d
+icmp_hun	.\ip_icmp.h	/^	} icmp_hun;$/;"	m	struct:icmp	typeref:union:icmp::__anon2
+icmp_id	.\ip_icmp.h	71;"	d
+icmp_input	.\ip_icmp.c	/^icmp_input(m, hlen)$/;"	f
+icmp_ip	.\ip_icmp.h	92;"	d
+icmp_mask	.\ip_icmp.h	93;"	d
+icmp_nextmtu	.\ip_icmp.h	75;"	d
+icmp_otime	.\ip_icmp.h	89;"	d
+icmp_ping_msg	.\ip_icmp.c	/^const char icmp_ping_msg[] = "This is a pseudo-PING packet used by Slirp to emulate ICMP ECHO-REQUEST packets.\\n";$/;"	v
+icmp_pmvoid	.\ip_icmp.h	74;"	d
+icmp_pptr	.\ip_icmp.h	69;"	d
+icmp_reflect	.\ip_icmp.c	/^icmp_reflect(m)$/;"	f
+icmp_rtime	.\ip_icmp.h	90;"	d
+icmp_seq	.\ip_icmp.h	72;"	d
+icmp_ttime	.\ip_icmp.h	91;"	d
+icmp_type	.\ip_icmp.h	/^	u_char	icmp_type;		\/* type of message, see below *\/$/;"	m	struct:icmp
+icmp_void	.\ip_icmp.h	73;"	d
+icmpstat	.\icmp_var.h	/^struct icmpstat {$/;"	s
+icmpstat	.\ip_icmp.c	/^struct icmpstat icmpstat;$/;"	v	typeref:struct:icmpstat
+icmpstats	.\debug.c	/^icmpstats(void)$/;"	f	file:
+icps_badtype	.\icmp_var.h	/^	u_long  icps_badtype;		\/* #with bad type feild *\/$/;"	m	struct:icmpstat
+icps_checksum	.\icmp_var.h	/^	u_long	icps_checksum;		\/* bad checksum *\/$/;"	m	struct:icmpstat
+icps_notsupp	.\icmp_var.h	/^	u_long	icps_notsupp;		\/* #ICMP packets not supported *\/$/;"	m	struct:icmpstat
+icps_received	.\icmp_var.h	/^	u_long  icps_received;		\/* #ICMP packets received *\/$/;"	m	struct:icmpstat
+icps_reflect	.\icmp_var.h	/^	u_long	icps_reflect;		\/* number of responses *\/$/;"	m	struct:icmpstat
+icps_tooshort	.\icmp_var.h	/^	u_long	icps_tooshort;		\/* packet < ICMP_MINLEN *\/$/;"	m	struct:icmpstat
+id_data	.\ip_icmp.h	/^		char		id_data[1];$/;"	m	union:icmp::__anon3
+id_ip	.\ip_icmp.h	/^		struct id_ip  {$/;"	s	union:icmp::__anon3
+id_ip	.\ip_icmp.h	/^		} id_ip;$/;"	m	union:icmp::__anon3	typeref:struct:icmp::__anon3::id_ip
+id_mask	.\ip_icmp.h	/^		uint32_t	id_mask;$/;"	m	union:icmp::__anon3
+id_ts	.\ip_icmp.h	/^		struct id_ts {$/;"	s	union:icmp::__anon3
+id_ts	.\ip_icmp.h	/^		} id_ts;$/;"	m	union:icmp::__anon3	typeref:struct:icmp::__anon3::id_ts
+idi_ip	.\ip_icmp.h	/^			struct ip idi_ip;$/;"	m	struct:icmp::__anon3::id_ip	typeref:struct:icmp::__anon3::id_ip::ip
+if_batchq	.\if.c	/^struct  mbuf if_batchq;                 \/* queue for non-interactive data *\/$/;"	v	typeref:struct:mbuf
+if_encap	.\slirp.c	/^void if_encap(const uint8_t *ip_data, int ip_data_len)$/;"	f
+if_fastq	.\if.c	/^struct  mbuf if_fastq;                  \/* fast queue (for interactive data) *\/$/;"	v	typeref:struct:mbuf
+if_init	.\if.c	/^if_init()$/;"	f
+if_output	.\if.c	/^if_output(so, ifm)$/;"	f
+if_queued	.\if.c	/^int     if_queued = 0;                  \/* Number of packets queued so far *\/$/;"	v
+if_start	.\if.c	/^if_start(void)$/;"	f
+ifq_next	.\mbuf.h	112;"	d
+ifq_prev	.\mbuf.h	111;"	d
+ifq_so	.\mbuf.h	115;"	d
+ifs_init	.\if.c	16;"	d	file:
+ifs_init	.\if.h	41;"	d
+ifs_insque	.\if.c	/^ifs_insque(ifm, ifmhead)$/;"	f
+ifs_next	.\mbuf.h	114;"	d
+ifs_prev	.\mbuf.h	113;"	d
+ifs_remque	.\if.c	/^ifs_remque(ifm)$/;"	f
+ih_dst	.\ip.h	/^	struct	in_addr ih_dst;		\/* destination internet address *\/$/;"	m	struct:ipovly	typeref:struct:ipovly::in_addr
+ih_gwaddr	.\ip_icmp.h	/^		struct in_addr ih_gwaddr;	\/* ICMP_REDIRECT *\/$/;"	m	union:icmp::__anon2	typeref:struct:icmp::__anon2::in_addr
+ih_idseq	.\ip_icmp.h	/^		struct ih_idseq {$/;"	s	union:icmp::__anon2
+ih_idseq	.\ip_icmp.h	/^		} ih_idseq;$/;"	m	union:icmp::__anon2	typeref:struct:icmp::__anon2::ih_idseq
+ih_len	.\ip.h	/^	u_int16_t	ih_len;			\/* protocol length *\/$/;"	m	struct:ipovly
+ih_next	.\ip.h	/^	caddr32_t	ih_next, ih_prev;	\/* for protocol sequence q's *\/$/;"	m	struct:ipovly
+ih_pmtu	.\ip_icmp.h	/^		struct ih_pmtu {$/;"	s	union:icmp::__anon2
+ih_pmtu	.\ip_icmp.h	/^		} ih_pmtu;$/;"	m	union:icmp::__anon2	typeref:struct:icmp::__anon2::ih_pmtu
+ih_pptr	.\ip_icmp.h	/^		u_char ih_pptr;			\/* ICMP_PARAMPROB *\/$/;"	m	union:icmp::__anon2
+ih_pr	.\ip.h	/^	u_int8_t	ih_pr;			\/* protocol *\/$/;"	m	struct:ipovly
+ih_prev	.\ip.h	/^	caddr32_t	ih_next, ih_prev;	\/* for protocol sequence q's *\/$/;"	m	struct:ipovly
+ih_src	.\ip.h	/^	struct	in_addr ih_src;		\/* source internet address *\/$/;"	m	struct:ipovly	typeref:struct:ipovly::in_addr
+ih_void	.\ip_icmp.h	/^		int ih_void;$/;"	m	union:icmp::__anon2
+ih_x1	.\ip.h	/^	u_int8_t	ih_x1;			\/* (unused) *\/$/;"	m	struct:ipovly
+in_bytes	.\if.h	/^	u_int in_bytes;		\/* Input bytes *\/$/;"	m	struct:slirp_ifstats
+in_errbytes	.\if.h	/^	u_int in_errbytes;	\/* Input Error Bytes *\/$/;"	m	struct:slirp_ifstats
+in_errpkts	.\if.h	/^	u_int in_errpkts;		\/* Input Error Packets *\/$/;"	m	struct:slirp_ifstats
+in_mbad	.\if.h	/^	u_int in_mbad;		\/* Bad incoming packets *\/$/;"	m	struct:slirp_ifstats
+in_pkts	.\if.h	/^	u_int in_pkts;		\/* Input packets *\/$/;"	m	struct:slirp_ifstats
+in_use	.\tftp.c	/^    int in_use;$/;"	m	struct:tftp_session	file:
+inet_aton	.\misc.c	/^inet_aton(cp, ia)$/;"	f
+inline	.\slirp_config.h	131;"	d
+insque	.\misc.c	/^insque(a, b)$/;"	f
+insque	.\slirp.h	196;"	d
+insque_32	.\misc.c	/^insque_32(a, b)$/;"	f
+insque_32	.\slirp.h	269;"	d
+int16_t	.\slirp.h	/^    typedef int int16_t;$/;"	t
+int16_t	.\slirp.h	/^    typedef short int16_t;$/;"	t
+int32_t	.\slirp.h	/^    typedef int int32_t;$/;"	t
+int32_t	.\slirp.h	/^   typedef short int32_t;$/;"	t
+int8_t	.\slirp.h	/^typedef char int8_t;$/;"	t
+ioctlsocket	.\slirp.h	45;"	d
+iov_base	.\socket.h	/^	char *iov_base;$/;"	m	struct:iovec
+iov_len	.\socket.h	/^	size_t iov_len;$/;"	m	struct:iovec
+iovec	.\socket.h	/^struct iovec {$/;"	s
+ip	.\bootp.h	/^    struct ip ip;$/;"	m	struct:bootp_t	typeref:struct:bootp_t::ip
+ip	.\ip.h	/^struct ip {$/;"	s
+ip	.\tftp.h	/^  struct ip ip;$/;"	m	struct:tftp_t	typeref:struct:tftp_t::ip
+ip_deq	.\ip_input.c	/^ip_deq(register struct ipasfrag *p)$/;"	f	file:
+ip_dooptions	.\ip_input.c	/^ip_dooptions(m)$/;"	f
+ip_dst	.\ip.h	/^	struct	in_addr ip_src,ip_dst;	\/* source and dest address *\/$/;"	m	struct:ip	typeref:struct:ip::
+ip_enq	.\ip_input.c	/^ip_enq(register struct ipasfrag *p, register struct ipasfrag *prev)$/;"	f	file:
+ip_freef	.\ip_input.c	/^ip_freef(struct ipq *fp)$/;"	f	file:
+ip_hl	.\ip.h	/^		ip_hl:4;		\/* header length *\/$/;"	m	struct:ip
+ip_hl	.\ip.h	/^ 		ip_hl:4;$/;"	m	struct:ipasfrag
+ip_id	.\ip.h	/^	u_int16_t	ip_id;			\/* identification *\/$/;"	m	struct:ip
+ip_id	.\ip.h	/^	u_int16_t	ip_id;$/;"	m	struct:ipasfrag
+ip_id	.\ip_output.c	/^u_int16_t ip_id;$/;"	v
+ip_init	.\ip_input.c	/^ip_init()$/;"	f
+ip_input	.\ip_input.c	/^ip_input(m)$/;"	f
+ip_len	.\ip.h	/^	u_int16_t	ip_len;			\/* total length *\/$/;"	m	struct:ip
+ip_len	.\ip.h	/^	u_int16_t	ip_len;$/;"	m	struct:ipasfrag
+ip_off	.\ip.h	/^	u_int16_t	ip_off;			\/* fragment offset field *\/$/;"	m	struct:ip
+ip_off	.\ip.h	/^	u_int16_t	ip_off;$/;"	m	struct:ipasfrag
+ip_output	.\ip_output.c	/^ip_output(so, m0)$/;"	f
+ip_p	.\ip.h	/^	u_int8_t	ip_p;$/;"	m	struct:ipasfrag
+ip_p	.\ip.h	/^	u_int8_t ip_p;			\/* protocol *\/$/;"	m	struct:ip
+ip_reass	.\ip_input.c	/^ip_reass(register struct ipasfrag *ip, register struct ipq *fp)$/;"	f	file:
+ip_slowtimo	.\ip_input.c	/^ip_slowtimo()$/;"	f
+ip_src	.\ip.h	/^	struct	in_addr ip_src,ip_dst;	\/* source and dest address *\/$/;"	m	struct:ip	typeref:struct:ip::in_addr
+ip_sum	.\ip.h	/^	u_int16_t	ip_sum;			\/* checksum *\/$/;"	m	struct:ip
+ip_sum	.\ip.h	/^	u_int16_t	ip_sum;$/;"	m	struct:ipasfrag
+ip_timestamp	.\ip.h	/^struct	ip_timestamp {$/;"	s
+ip_tos	.\ip.h	/^	u_int8_t ip_tos;			\/* type of service *\/$/;"	m	struct:ip
+ip_ttl	.\ip.h	/^	u_int8_t	ip_ttl;$/;"	m	struct:ipasfrag
+ip_ttl	.\ip.h	/^	u_int8_t ip_ttl;			\/* time to live *\/$/;"	m	struct:ip
+ip_v	.\ip.h	/^	u_int	ip_v:4,$/;"	m	struct:ipasfrag
+ip_v	.\ip.h	/^	u_int ip_v:4,			\/* version *\/$/;"	m	struct:ip
+ipasfrag	.\ip.h	/^struct	ipasfrag {$/;"	s
+ipasfragp_32	.\ip.h	/^typedef caddr32_t ipasfragp_32;$/;"	t
+ipasfragp_32	.\ip.h	/^typedef struct ipasfrag *ipasfragp_32;$/;"	t	typeref:struct:ipasfrag
+ipf_mff	.\ip.h	/^        u_int8_t ipf_mff;		\/* XXX overlays ip_tos: use low bit$/;"	m	struct:ipasfrag
+ipf_next	.\ip.h	/^	ipasfragp_32 ipf_next;		\/* next fragment *\/$/;"	m	struct:ipasfrag
+ipf_prev	.\ip.h	/^	ipasfragp_32 ipf_prev;		\/* previous fragment *\/$/;"	m	struct:ipasfrag
+ipm_nextmtu	.\ip_icmp.h	/^			u_short ipm_nextmtu;$/;"	m	struct:icmp::__anon2::ih_pmtu
+ipm_void	.\ip_icmp.h	/^			u_short ipm_void;$/;"	m	struct:icmp::__anon2::ih_pmtu
+ipopt_dst	.\ip.h	/^	struct	in_addr ipopt_dst;	\/* first-hop dst if source routed *\/$/;"	m	struct:ipoption	typeref:struct:ipoption::in_addr
+ipopt_list	.\ip.h	/^	int8_t	ipopt_list[MAX_IPOPTLEN];	\/* options proper *\/$/;"	m	struct:ipoption
+ipoption	.\ip.h	/^struct ipoption {$/;"	s
+ipovly	.\ip.h	/^struct ipovly {$/;"	s
+ipq	.\ip.h	/^struct ipq {$/;"	s
+ipq	.\ip_input.c	/^struct ipq ipq;$/;"	v	typeref:struct:ipq
+ipq_dst	.\ip.h	/^	struct	in_addr ipq_src,ipq_dst;$/;"	m	struct:ipq	typeref:struct:ipq::
+ipq_id	.\ip.h	/^	u_int16_t	ipq_id;			\/* sequence id for reassembly *\/$/;"	m	struct:ipq
+ipq_next	.\ip.h	/^	ipasfragp_32 ipq_next,ipq_prev;$/;"	m	struct:ipq
+ipq_p	.\ip.h	/^	u_int8_t	ipq_p;			\/* protocol of this fragment *\/$/;"	m	struct:ipq
+ipq_prev	.\ip.h	/^	ipasfragp_32 ipq_next,ipq_prev;$/;"	m	struct:ipq
+ipq_src	.\ip.h	/^	struct	in_addr ipq_src,ipq_dst;$/;"	m	struct:ipq	typeref:struct:ipq::in_addr
+ipq_ttl	.\ip.h	/^	u_int8_t	ipq_ttl;		\/* time for reass q to live *\/$/;"	m	struct:ipq
+ipqp_32	.\ip.h	/^typedef caddr32_t ipqp_32;$/;"	t
+ipqp_32	.\ip.h	/^typedef struct ipq *ipqp_32;$/;"	t	typeref:struct:ipq
+ips_badhlen	.\ip.h	/^	u_long	ips_badhlen;		\/* ip header length < data size *\/$/;"	m	struct:ipstat
+ips_badlen	.\ip.h	/^	u_long	ips_badlen;		\/* ip length < ip header length *\/$/;"	m	struct:ipstat
+ips_badoptions	.\ip.h	/^	u_long	ips_badoptions;		\/* error in option processing *\/$/;"	m	struct:ipstat
+ips_badsum	.\ip.h	/^	u_long	ips_badsum;		\/* checksum bad *\/$/;"	m	struct:ipstat
+ips_badvers	.\ip.h	/^	u_long	ips_badvers;		\/* ip version != 4 *\/$/;"	m	struct:ipstat
+ips_cantforward	.\ip.h	/^	u_long	ips_cantforward;	\/* packets rcvd for unreachable dest *\/$/;"	m	struct:ipstat
+ips_cantfrag	.\ip.h	/^	u_long	ips_cantfrag;		\/* don't fragment flag was set, etc. *\/$/;"	m	struct:ipstat
+ips_delivered	.\ip.h	/^	u_long	ips_delivered;		\/* datagrams delivered to upper level*\/$/;"	m	struct:ipstat
+ips_forward	.\ip.h	/^	u_long	ips_forward;		\/* packets forwarded *\/$/;"	m	struct:ipstat
+ips_fragdropped	.\ip.h	/^	u_long	ips_fragdropped;	\/* frags dropped (dups, out of space) *\/$/;"	m	struct:ipstat
+ips_fragmented	.\ip.h	/^	u_long	ips_fragmented;		\/* datagrams successfully fragmented *\/$/;"	m	struct:ipstat
+ips_fragments	.\ip.h	/^	u_long	ips_fragments;		\/* fragments received *\/$/;"	m	struct:ipstat
+ips_fragtimeout	.\ip.h	/^	u_long	ips_fragtimeout;	\/* fragments timed out *\/$/;"	m	struct:ipstat
+ips_localout	.\ip.h	/^	u_long	ips_localout;		\/* total ip packets generated here *\/$/;"	m	struct:ipstat
+ips_noproto	.\ip.h	/^	u_long	ips_noproto;		\/* unknown or unsupported protocol *\/$/;"	m	struct:ipstat
+ips_noroute	.\ip.h	/^	u_long	ips_noroute;		\/* packets discarded due to no route *\/$/;"	m	struct:ipstat
+ips_odropped	.\ip.h	/^	u_long	ips_odropped;		\/* lost packets due to nobufs, etc. *\/$/;"	m	struct:ipstat
+ips_ofragments	.\ip.h	/^	u_long	ips_ofragments;		\/* output fragments created *\/$/;"	m	struct:ipstat
+ips_rawout	.\ip.h	/^	u_long	ips_rawout;		\/* total raw ip packets generated *\/$/;"	m	struct:ipstat
+ips_reassembled	.\ip.h	/^	u_long	ips_reassembled;	\/* total packets reassembled ok *\/$/;"	m	struct:ipstat
+ips_redirectsent	.\ip.h	/^	u_long	ips_redirectsent;	\/* packets forwarded on same net *\/$/;"	m	struct:ipstat
+ips_tooshort	.\ip.h	/^	u_long	ips_tooshort;		\/* packet too short *\/$/;"	m	struct:ipstat
+ips_toosmall	.\ip.h	/^	u_long	ips_toosmall;		\/* not enough data *\/$/;"	m	struct:ipstat
+ips_total	.\ip.h	/^	u_long	ips_total;		\/* total packets received *\/$/;"	m	struct:ipstat
+ips_unaligned	.\ip.h	/^	u_long	ips_unaligned;		\/* times the ip packet was not aligned *\/$/;"	m	struct:ipstat
+ipstat	.\ip.h	/^struct	ipstat {$/;"	s
+ipstat	.\ip_input.c	/^struct ipstat ipstat;$/;"	v	typeref:struct:ipstat
+ipstats	.\debug.c	/^ipstats(void)$/;"	f	file:
+ipt_addr	.\ip.h	/^			struct in_addr ipt_addr;$/;"	m	struct:ip_timestamp::ipt_timestamp::ipt_ta	typeref:struct:ip_timestamp::ipt_timestamp::ipt_ta::in_addr
+ipt_code	.\ip.h	/^	u_int8_t	ipt_code;		\/* IPOPT_TS *\/$/;"	m	struct:ip_timestamp
+ipt_flg	.\ip.h	/^		ipt_flg:4;		\/* flags, see below *\/$/;"	m	struct:ip_timestamp
+ipt_flg	.\ip.h	/^	u_int	ipt_flg:4,		\/* flags, see below *\/$/;"	m	struct:ip_timestamp
+ipt_len	.\ip.h	/^	u_int8_t	ipt_len;		\/* size of structure (variable) *\/$/;"	m	struct:ip_timestamp
+ipt_oflw	.\ip.h	/^		ipt_oflw:4;		\/* overflow counter *\/$/;"	m	struct:ip_timestamp
+ipt_oflw	.\ip.h	/^	u_int	ipt_oflw:4,		\/* overflow counter *\/$/;"	m	struct:ip_timestamp
+ipt_ptr	.\ip.h	/^	u_int8_t	ipt_ptr;		\/* index of current entry *\/$/;"	m	struct:ip_timestamp
+ipt_ta	.\ip.h	/^		struct	ipt_ta {$/;"	s	union:ip_timestamp::ipt_timestamp
+ipt_ta	.\ip.h	/^		} ipt_ta[1];$/;"	m	union:ip_timestamp::ipt_timestamp	typeref:struct:ip_timestamp::ipt_timestamp::ipt_ta
+ipt_time	.\ip.h	/^			n_long ipt_time;$/;"	m	struct:ip_timestamp::ipt_timestamp::ipt_ta
+ipt_time	.\ip.h	/^		n_long	ipt_time[1];$/;"	m	union:ip_timestamp::ipt_timestamp
+ipt_timestamp	.\ip.h	/^	union ipt_timestamp {$/;"	u	struct:ip_timestamp
+ipt_timestamp	.\ip.h	/^	} ipt_timestamp;$/;"	m	struct:ip_timestamp	typeref:union:ip_timestamp::ipt_timestamp
+irs	.\tcp_var.h	/^	tcp_seq	irs;			\/* initial receive sequence number *\/$/;"	m	struct:tcpcb
+iss	.\tcp_var.h	/^	tcp_seq	iss;			\/* initial send sequence number *\/$/;"	m	struct:tcpcb
+its_otime	.\ip_icmp.h	/^			n_time its_otime;$/;"	m	struct:icmp::__anon3::id_ts
+its_rtime	.\ip_icmp.h	/^			n_time its_rtime;$/;"	m	struct:icmp::__anon3::id_ts
+its_ttime	.\ip_icmp.h	/^			n_time its_ttime;$/;"	m	struct:icmp::__anon3::id_ts
+last_ack_sent	.\tcp_var.h	/^	tcp_seq	last_ack_sent;$/;"	m	struct:tcpcb
+last_slowtimo	.\misc.c	/^u_int curtime, time_fasttimo, last_slowtimo;$/;"	v
+lfd	.\slirp.c	/^FILE *lfd;$/;"	v
+link_up	.\slirp.c	/^int link_up;$/;"	v
+loopback_addr	.\slirp.c	/^struct in_addr loopback_addr;$/;"	v	typeref:struct:in_addr
+lport	.\misc.h	/^	u_int16_t lport;$/;"	m	struct:emu_t
+lport	.\misc.h	/^	u_int16_t lport;$/;"	m	struct:tos_t
+lprint	.\misc.c	/^lprint(const char *format, ...)$/;"	f
+lprint	.\misc.c	/^void lprint(const char *format, ...)$/;"	f
+lprint_arg	.\misc.c	/^char *lprint_ptr, *lprint_ptr2, **lprint_arg;$/;"	v
+lprint_print	.\misc.c	/^int (*lprint_print) _P((void *, const char *, va_list));$/;"	v
+lprint_ptr	.\misc.c	/^char *lprint_ptr, *lprint_ptr2, **lprint_arg;$/;"	v
+lprint_ptr2	.\misc.c	/^char *lprint_ptr, *lprint_ptr2, **lprint_arg;$/;"	v
+m_adj	.\mbuf.c	/^m_adj(m, len)$/;"	f
+m_cat	.\mbuf.c	/^m_cat(m, n)$/;"	f
+m_copy	.\mbuf.c	/^m_copy(n, m, off, len)$/;"	f
+m_dat	.\mbuf.h	107;"	d
+m_dat_	.\mbuf.h	/^		char	m_dat_[1]; \/* ANSI don't like 0 sized arrays *\/$/;"	m	union:mbuf::M_dat
+m_data	.\mbuf.h	105;"	d
+m_ext	.\mbuf.h	108;"	d
+m_ext_	.\mbuf.h	/^		char	*m_ext_;$/;"	m	union:mbuf::M_dat
+m_flags	.\mbuf.h	103;"	d
+m_free	.\mbuf.c	/^m_free(m)$/;"	f
+m_freelist	.\mbuf.c	/^struct mbuf m_freelist, m_usedlist;$/;"	v	typeref:struct:mbuf
+m_freem	.\mbuf.h	40;"	d
+m_get	.\mbuf.c	/^m_get()$/;"	f
+m_hdr	.\mbuf.h	/^	struct	m_hdr m_hdr;$/;"	m	struct:mbuf	typeref:struct:mbuf::m_hdr
+m_hdr	.\mbuf.h	/^struct m_hdr {$/;"	s
+m_inc	.\mbuf.c	/^m_inc(m, size)$/;"	f
+m_init	.\mbuf.c	/^m_init()$/;"	f
+m_len	.\mbuf.h	104;"	d
+m_next	.\mbuf.h	99;"	d
+m_nextpkt	.\mbuf.h	101;"	d
+m_prev	.\mbuf.h	100;"	d
+m_prevpkt	.\mbuf.h	102;"	d
+m_size	.\mbuf.h	106;"	d
+m_so	.\mbuf.h	109;"	d
+m_usedlist	.\mbuf.c	/^struct mbuf m_freelist, m_usedlist;$/;"	v	typeref:struct:
+macaddr	.\bootp.c	/^    uint8_t macaddr[6];$/;"	m	struct:__anon1	file:
+max	.\slirp.h	334;"	d
+max_sndwnd	.\tcp_var.h	/^	u_int32_t max_sndwnd;		\/* largest window peer has offered *\/$/;"	m	struct:tcpcb
+mbs_alloced	.\mbuf.h	/^	int mbs_alloced;		\/* Number of mbufs allocated *\/$/;"	m	struct:mbstat
+mbstat	.\mbuf.h	/^struct mbstat {$/;"	s
+mbuf	.\mbuf.h	/^struct mbuf {$/;"	s
+mbuf_alloced	.\mbuf.c	/^int mbuf_alloced = 0;$/;"	v
+mbuf_max	.\mbuf.c	/^int mbuf_max = 0;$/;"	v
+mbufp_32	.\tcp_var.h	/^typedef struct mbuf *mbufp_32;$/;"	t	typeref:struct:mbuf
+mbufp_32	.\tcp_var.h	/^typedef u_int32_t mbufp_32;$/;"	t
+mbufstats	.\debug.c	/^mbufstats(void)$/;"	f	file:
+mbutl	.\mbuf.c	/^struct	mbuf *mbutl;$/;"	v	typeref:struct:mbuf
+mclrefcnt	.\mbuf.c	/^char	*mclrefcnt;$/;"	v
+memmove	.\slirp.h	98;"	d
+mh_data	.\mbuf.h	/^	caddr_t	mh_data;		\/* Location of data *\/$/;"	m	struct:m_hdr
+mh_flags	.\mbuf.h	/^	int	mh_flags;	  \/* Misc flags *\/$/;"	m	struct:m_hdr
+mh_len	.\mbuf.h	/^	int	mh_len;			\/* Amount of data in this mbuf *\/$/;"	m	struct:m_hdr
+mh_next	.\mbuf.h	/^	struct	mbuf *mh_next;		\/* Linked list of mbufs *\/$/;"	m	struct:m_hdr	typeref:struct:m_hdr::mbuf
+mh_nextpkt	.\mbuf.h	/^	struct	mbuf *mh_nextpkt;	\/* Next packet in queue\/record *\/$/;"	m	struct:m_hdr	typeref:struct:m_hdr::mbuf
+mh_prev	.\mbuf.h	/^	struct	mbuf *mh_prev;$/;"	m	struct:m_hdr	typeref:struct:m_hdr::mbuf
+mh_prevpkt	.\mbuf.h	/^	struct	mbuf *mh_prevpkt; \/* Flags aren't used in the output queue *\/$/;"	m	struct:m_hdr	typeref:struct:m_hdr::mbuf
+mh_size	.\mbuf.h	/^	int	mh_size;		\/* Size of data *\/$/;"	m	struct:m_hdr
+mh_so	.\mbuf.h	/^	struct	socket *mh_so;$/;"	m	struct:m_hdr	typeref:struct:m_hdr::socket
+min	.\slirp.h	333;"	d
+mtod	.\mbuf.h	50;"	d
+n_long	.\ip.h	/^typedef u_int32_t n_long;                 \/* long as received from the net *\/$/;"	t
+n_time	.\ip_icmp.h	/^typedef u_int32_t n_time;$/;"	t
+next	.\ip.h	/^	ipqp_32 next,prev;	\/* to other reass headers *\/$/;"	m	struct:ipq
+next	.\misc.h	/^	struct emu_t *next;$/;"	m	struct:emu_t	typeref:struct:emu_t::emu_t
+next_m	.\if.c	/^struct	mbuf *next_m;			\/* Pointer to next mbuf to output *\/$/;"	v	typeref:struct:mbuf
+our_addr	.\slirp.c	/^struct in_addr our_addr;$/;"	v	typeref:struct:in_addr
+out_bytes	.\if.h	/^	u_int out_bytes;		\/* Output bytes *\/$/;"	m	struct:slirp_ifstats
+out_errbytes	.\if.h	/^	u_int out_errbytes;	\/* Output Error Bytes *\/$/;"	m	struct:slirp_ifstats
+out_errpkts	.\if.h	/^	u_int out_errpkts;	\/* Output Error Packets *\/$/;"	m	struct:slirp_ifstats
+out_pkts	.\if.h	/^	u_int out_pkts;		\/* Output packets *\/$/;"	m	struct:slirp_ifstats
+prev	.\ip.h	/^	ipqp_32 next,prev;	\/* to other reass headers *\/$/;"	m	struct:ipq
+qh_link	.\misc.c	/^	struct quehead *qh_link;$/;"	m	struct:quehead	typeref:struct:quehead::quehead	file:
+qh_link	.\misc.c	/^	u_int32_t qh_link;$/;"	m	struct:quehead_32	file:
+qh_rlink	.\misc.c	/^	struct quehead *qh_rlink;$/;"	m	struct:quehead	typeref:struct:quehead::quehead	file:
+qh_rlink	.\misc.c	/^	u_int32_t qh_rlink;$/;"	m	struct:quehead_32	file:
+quehead	.\misc.c	/^struct quehead {$/;"	s	file:
+quehead_32	.\misc.c	/^struct quehead_32 {$/;"	s	file:
+rcv_adv	.\tcp_var.h	/^	tcp_seq	rcv_adv;		\/* advertised window *\/$/;"	m	struct:tcpcb
+rcv_nxt	.\tcp_var.h	/^	tcp_seq	rcv_nxt;		\/* receive next *\/$/;"	m	struct:tcpcb
+rcv_scale	.\tcp_var.h	/^	u_char	rcv_scale;		\/* window scaling for recv window *\/$/;"	m	struct:tcpcb
+rcv_up	.\tcp_var.h	/^	tcp_seq	rcv_up;			\/* receive urgent pointer *\/$/;"	m	struct:tcpcb
+rcv_wnd	.\tcp_var.h	/^	u_int32_t rcv_wnd;		\/* receive window *\/$/;"	m	struct:tcpcb
+remque	.\misc.c	/^remque(a)$/;"	f
+remque	.\slirp.h	197;"	d
+remque_32	.\misc.c	/^remque_32(a)$/;"	f
+remque_32	.\slirp.h	270;"	d
+request_r_scale	.\tcp_var.h	/^	u_char	request_r_scale;	\/* pending window scaling *\/$/;"	m	struct:tcpcb
+requested_s_scale	.\tcp_var.h	/^	u_char	requested_s_scale;$/;"	m	struct:tcpcb
+rfc1533_cookie	.\bootp.c	/^static const uint8_t rfc1533_cookie[] = { RFC1533_COOKIE };$/;"	v	file:
+s	.\socket.h	/^  int s;                           \/* The actual socket *\/$/;"	m	struct:socket
+sb_cc	.\sbuf.h	/^	u_int	sb_cc;		\/* actual chars in buffer *\/$/;"	m	struct:sbuf
+sb_data	.\sbuf.h	/^	char	*sb_data;	\/* Actual data *\/$/;"	m	struct:sbuf
+sb_datalen	.\sbuf.h	/^	u_int	sb_datalen;	\/* Length of data  *\/$/;"	m	struct:sbuf
+sb_rptr	.\sbuf.h	/^	char	*sb_rptr;	\/* read pointer. points to where the next$/;"	m	struct:sbuf
+sb_wptr	.\sbuf.h	/^	char	*sb_wptr;	\/* write pointer. points to where the next$/;"	m	struct:sbuf
+sbappend	.\sbuf.c	/^sbappend(so, m)$/;"	f
+sbappendsb	.\sbuf.c	/^sbappendsb(struct sbuf *sb, struct mbuf *m)$/;"	f	file:
+sbcopy	.\sbuf.c	/^sbcopy(sb, off, len, to)$/;"	f
+sbdrop	.\sbuf.c	/^sbdrop(sb, num)$/;"	f
+sbflush	.\sbuf.h	11;"	d
+sbfree	.\sbuf.c	/^sbfree(sb)$/;"	f
+sbreserve	.\sbuf.c	/^sbreserve(sb, size)$/;"	f
+sbspace	.\sbuf.h	12;"	d
+sbuf	.\sbuf.h	/^struct sbuf {$/;"	s
+seg_next	.\tcp_var.h	/^	tcpiphdrp_32 seg_next;	\/* sequencing queue *\/$/;"	m	struct:tcpcb
+seg_prev	.\tcp_var.h	/^	tcpiphdrp_32 seg_prev;$/;"	m	struct:tcpcb
+slirp_add_exec	.\slirp.c	/^int slirp_add_exec(int do_pty, const char *args, int addr_low_byte,$/;"	f
+slirp_cleanup	.\slirp.c	/^static void slirp_cleanup(void)$/;"	f	file:
+slirp_debug	.\debug.c	/^int slirp_debug = 0;$/;"	v
+slirp_exit	.\debug.c	/^slirp_exit(exit_status)$/;"	f
+slirp_hostname	.\slirp.c	/^char slirp_hostname[33];$/;"	v
+slirp_ifstats	.\if.h	/^struct slirp_ifstats {$/;"	s
+slirp_init	.\slirp.c	/^void slirp_init(void)$/;"	f
+slirp_input	.\slirp.c	/^void slirp_input(const uint8_t *pkt, int pkt_len)$/;"	f
+slirp_openpty	.\misc.c	/^slirp_openpty(amaster, aslave)$/;"	f
+slirp_redir	.\slirp.c	/^int slirp_redir(int is_udp, int host_port,$/;"	f
+slirp_select_fill	.\slirp.c	/^void slirp_select_fill(int *pnfds,$/;"	f
+slirp_select_poll	.\slirp.c	/^void slirp_select_poll(fd_set *readfds, fd_set *writefds, fd_set *xfds)$/;"	f
+slirp_stats	.\debug.c	/^slirp_stats(void)$/;"	f
+snd_cwnd	.\tcp_var.h	/^	u_int32_t snd_cwnd;		\/* congestion-controlled window *\/$/;"	m	struct:tcpcb
+snd_max	.\tcp_var.h	/^	tcp_seq	snd_max;		\/* highest sequence number sent;$/;"	m	struct:tcpcb
+snd_nxt	.\tcp_var.h	/^	tcp_seq	snd_nxt;		\/* send next *\/$/;"	m	struct:tcpcb
+snd_scale	.\tcp_var.h	/^	u_char	snd_scale;		\/* window scaling for send window *\/$/;"	m	struct:tcpcb
+snd_ssthresh	.\tcp_var.h	/^	u_int32_t snd_ssthresh;		\/* snd_cwnd size threshold for$/;"	m	struct:tcpcb
+snd_una	.\tcp_var.h	/^	tcp_seq	snd_una;		\/* send unacknowledged *\/$/;"	m	struct:tcpcb
+snd_up	.\tcp_var.h	/^	tcp_seq	snd_up;			\/* send urgent pointer *\/$/;"	m	struct:tcpcb
+snd_wl1	.\tcp_var.h	/^	tcp_seq	snd_wl1;		\/* window update seg seq number *\/$/;"	m	struct:tcpcb
+snd_wl2	.\tcp_var.h	/^	tcp_seq	snd_wl2;		\/* window update seg ack number *\/$/;"	m	struct:tcpcb
+snd_wnd	.\tcp_var.h	/^	u_int32_t snd_wnd;		\/* send window *\/$/;"	m	struct:tcpcb
+so_emu	.\socket.h	/^  u_int8_t	so_emu;		\/* Is the socket emulated? *\/$/;"	m	struct:socket
+so_expire	.\socket.h	/^  u_int	so_expire;		\/* When the socket will expire *\/$/;"	m	struct:socket
+so_faddr	.\socket.h	/^  struct in_addr so_faddr;	   \/* foreign host table entry *\/$/;"	m	struct:socket	typeref:struct:socket::in_addr
+so_fport	.\socket.h	/^  u_int16_t so_fport;		   \/* foreign port *\/$/;"	m	struct:socket
+so_iptos	.\socket.h	/^  u_int8_t	so_iptos;	\/* Type of service *\/$/;"	m	struct:socket
+so_laddr	.\socket.h	/^  struct in_addr so_laddr;	   \/* local host table entry *\/$/;"	m	struct:socket	typeref:struct:socket::in_addr
+so_lport	.\socket.h	/^  u_int16_t so_lport;		   \/* local port *\/$/;"	m	struct:socket
+so_m	.\socket.h	/^  struct mbuf *so_m;	           \/* Pointer to the original SYN packet,$/;"	m	struct:socket	typeref:struct:socket::mbuf
+so_next	.\socket.h	/^  struct socket *so_next,*so_prev;      \/* For a linked list of sockets *\/$/;"	m	struct:socket	typeref:struct:socket::socket
+so_nqueued	.\socket.h	/^  int	so_nqueued;		\/* Number of packets queued in a row$/;"	m	struct:socket
+so_prev	.\socket.h	/^  struct socket *so_next,*so_prev;      \/* For a linked list of sockets *\/$/;"	m	struct:socket	typeref:struct:socket::
+so_queued	.\socket.h	/^  int	so_queued;		\/* Number of packets queued from this socket *\/$/;"	m	struct:socket
+so_rcv	.\socket.h	/^  struct sbuf so_rcv;		\/* Receive buffer *\/$/;"	m	struct:socket	typeref:struct:socket::sbuf
+so_snd	.\socket.h	/^  struct sbuf so_snd;		\/* Send buffer *\/$/;"	m	struct:socket	typeref:struct:socket::sbuf
+so_state	.\socket.h	/^  int	so_state;		\/* internal state flags SS_*, below *\/$/;"	m	struct:socket
+so_tcpcb	.\socket.h	/^  struct 	tcpcb *so_tcpcb;	\/* pointer to TCP protocol control block *\/$/;"	m	struct:socket	typeref:struct:socket::tcpcb
+so_ti	.\socket.h	/^  struct tcpiphdr *so_ti;	   \/* Pointer to the original ti within$/;"	m	struct:socket	typeref:struct:socket::tcpiphdr
+so_type	.\socket.h	/^  u_char	so_type;		\/* Type of socket, UDP or TCP *\/$/;"	m	struct:socket
+so_urgc	.\socket.h	/^  int so_urgc;$/;"	m	struct:socket
+socket	.\socket.h	/^struct socket {$/;"	s
+sockstats	.\debug.c	/^sockstats(void)$/;"	f	file:
+socreate	.\socket.c	/^socreate()$/;"	f
+sofcantrcvmore	.\socket.c	/^sofcantrcvmore(struct socket *so)$/;"	f	file:
+sofcantsendmore	.\socket.c	/^sofcantsendmore(struct socket *so)$/;"	f	file:
+sofree	.\socket.c	/^sofree(so)$/;"	f
+sofwdrain	.\socket.c	/^sofwdrain(so)$/;"	f
+soisfconnected	.\socket.c	/^soisfconnected(so)$/;"	f
+soisfconnecting	.\socket.c	/^soisfconnecting(so)$/;"	f
+soisfdisconnected	.\socket.c	/^soisfdisconnected(so)$/;"	f
+solisten	.\socket.c	/^solisten(port, laddr, lport, flags)$/;"	f
+solookup	.\socket.c	/^solookup(head, laddr, lport, faddr, fport)$/;"	f
+soread	.\socket.c	/^soread(so)$/;"	f
+sorecvfrom	.\socket.c	/^sorecvfrom(so)$/;"	f
+sorecvoob	.\socket.c	/^sorecvoob(so)$/;"	f
+sosendoob	.\socket.c	/^sosendoob(so)$/;"	f
+sosendto	.\socket.c	/^sosendto(so, m)$/;"	f
+sototcpcb	.\tcp_var.h	141;"	d
+sowrite	.\socket.c	/^sowrite(so)$/;"	f
+special_addr	.\slirp.c	/^struct in_addr special_addr;$/;"	v	typeref:struct:in_addr
+special_ethaddr	.\slirp.c	/^static const uint8_t special_ethaddr[6] = {$/;"	v	file:
+sprintf	.\misc.c	773;"	d	file:
+sprintf	.\slirp.h	242;"	d
+sprintf_len	.\misc.c	/^sprintf_len(char *string, const char *format, ...)$/;"	f
+strdup	.\misc.c	/^strdup(str)$/;"	f
+strerror	.\misc.c	/^strerror(error)$/;"	f
+t_dupacks	.\tcp_var.h	/^	short	t_dupacks;		\/* consecutive dup acks recd *\/$/;"	m	struct:tcpcb
+t_flags	.\tcp_var.h	/^	u_short	t_flags;$/;"	m	struct:tcpcb
+t_force	.\tcp_var.h	/^	char	t_force;		\/* 1 if forcing out a byte *\/$/;"	m	struct:tcpcb
+t_idle	.\tcp_var.h	/^	short	t_idle;			\/* inactivity time *\/$/;"	m	struct:tcpcb
+t_iobc	.\tcp_var.h	/^	char	t_iobc;			\/* input character *\/$/;"	m	struct:tcpcb
+t_maxseg	.\tcp_var.h	/^	u_short	t_maxseg;		\/* maximum segment size *\/$/;"	m	struct:tcpcb
+t_oobflags	.\tcp_var.h	/^	char	t_oobflags;		\/* have some *\/$/;"	m	struct:tcpcb
+t_rtseq	.\tcp_var.h	/^	tcp_seq	t_rtseq;		\/* sequence number being timed *\/$/;"	m	struct:tcpcb
+t_rtt	.\tcp_var.h	/^	short	t_rtt;			\/* round trip time *\/$/;"	m	struct:tcpcb
+t_rttmin	.\tcp_var.h	/^	u_short	t_rttmin;		\/* minimum rtt allowed *\/$/;"	m	struct:tcpcb
+t_rttvar	.\tcp_var.h	/^	short	t_rttvar;		\/* variance in round-trip time *\/$/;"	m	struct:tcpcb
+t_rxtcur	.\tcp_var.h	/^	short	t_rxtcur;		\/* current retransmit value *\/$/;"	m	struct:tcpcb
+t_rxtshift	.\tcp_var.h	/^	short	t_rxtshift;		\/* log(2) of rexmt exp. backoff *\/$/;"	m	struct:tcpcb
+t_socket	.\tcp_var.h	/^	struct	socket *t_socket;		\/* back pointer to socket *\/$/;"	m	struct:tcpcb	typeref:struct:tcpcb::socket
+t_softerror	.\tcp_var.h	/^	short	t_softerror;		\/* possible error not yet reported *\/$/;"	m	struct:tcpcb
+t_srtt	.\tcp_var.h	/^	short	t_srtt;			\/* smoothed round-trip time *\/$/;"	m	struct:tcpcb
+t_state	.\tcp_var.h	/^	short	t_state;		\/* state of this connection *\/$/;"	m	struct:tcpcb
+t_template	.\tcp_var.h	/^	struct	tcpiphdr t_template;$/;"	m	struct:tcpcb	typeref:struct:tcpcb::tcpiphdr
+t_timer	.\tcp_var.h	/^	short	t_timer[TCPT_NTIMERS];	\/* tcp timers *\/$/;"	m	struct:tcpcb
+tcb	.\tcp_input.c	/^struct socket tcb;$/;"	v	typeref:struct:socket
+tcp_attach	.\tcp_subr.c	/^tcp_attach(so)$/;"	f
+tcp_backoff	.\tcp_timer.c	/^const int tcp_backoff[TCP_MAXRXTSHIFT + 1] =$/;"	v
+tcp_canceltimers	.\tcp_timer.c	/^tcp_canceltimers(tp)$/;"	f
+tcp_close	.\tcp_subr.c	/^tcp_close(tp)$/;"	f
+tcp_connect	.\tcp_subr.c	/^tcp_connect(inso)$/;"	f
+tcp_ctl	.\tcp_subr.c	/^tcp_ctl(so)$/;"	f
+tcp_dooptions	.\tcp_input.c	/^tcp_dooptions(struct tcpcb *tp, u_char *cp, int cnt, struct tcpiphdr *ti)$/;"	f	file:
+tcp_drain	.\tcp_subr.c	/^tcp_drain()$/;"	f
+tcp_drop	.\tcp_subr.c	/^struct tcpcb *tcp_drop(struct tcpcb *tp, int err)$/;"	f
+tcp_emu	.\tcp_subr.c	/^tcp_emu(so, m)$/;"	f
+tcp_fasttimo	.\tcp_timer.c	/^tcp_fasttimo()$/;"	f
+tcp_fconnect	.\tcp_subr.c	/^int tcp_fconnect(so)$/;"	f
+tcp_init	.\tcp_subr.c	/^tcp_init()$/;"	f
+tcp_input	.\tcp_input.c	/^tcp_input(m, iphlen, inso)$/;"	f
+tcp_iss	.\tcp_input.c	/^tcp_seq tcp_iss;                \/* tcp initial send seq # *\/$/;"	v
+tcp_last_so	.\tcp_input.c	/^struct	socket *tcp_last_so = &tcb;$/;"	v	typeref:struct:socket
+tcp_mss	.\tcp_input.c	/^tcp_mss(tp, offer)$/;"	f
+tcp_newtcpcb	.\tcp_subr.c	/^tcp_newtcpcb(so)$/;"	f
+tcp_now	.\tcp_timer.c	/^u_int32_t        tcp_now;                \/* for RFC 1323 timestamps *\/$/;"	v
+tcp_outflags	.\tcp_output.c	/^static const u_char  tcp_outflags[TCP_NSTATES] = {$/;"	v	file:
+tcp_output	.\tcp_output.c	/^tcp_output(tp)$/;"	f
+tcp_pulloutofband	.\tcp_input.c	/^tcp_pulloutofband(so, ti, m)$/;"	f
+tcp_quench	.\tcp_subr.c	/^tcp_quench(i, errno)$/;"	f
+tcp_rcvseqinit	.\tcp.h	163;"	d
+tcp_reass	.\tcp_input.c	/^tcp_reass(register struct tcpcb *tp, register struct tcpiphdr *ti,$/;"	f	file:
+tcp_respond	.\tcp_subr.c	/^tcp_respond(tp, ti, m, ack, seq, flags)$/;"	f
+tcp_sendseqinit	.\tcp.h	166;"	d
+tcp_seq	.\tcp.h	/^typedef	u_int32_t	tcp_seq;$/;"	t
+tcp_setpersist	.\tcp_output.c	/^tcp_setpersist(tp)$/;"	f
+tcp_slowtimo	.\tcp_timer.c	/^tcp_slowtimo()$/;"	f
+tcp_sockclosed	.\tcp_subr.c	/^tcp_sockclosed(tp)$/;"	f
+tcp_template	.\tcp_subr.c	/^tcp_template(tp)$/;"	f
+tcp_timers	.\tcp_timer.c	/^tcp_timers(register struct tcpcb *tp, int timer)$/;"	f	file:
+tcp_tos	.\tcp_subr.c	/^tcp_tos(so)$/;"	f
+tcp_xmit_timer	.\tcp_input.c	/^tcp_xmit_timer(register struct tcpcb *tp, int rtt)$/;"	f	file:
+tcpcb	.\tcp_var.h	/^struct tcpcb {$/;"	s
+tcpemu	.\tcp_subr.c	/^struct emu_t *tcpemu = 0;$/;"	v	typeref:struct:emu_t	file:
+tcphdr	.\tcp.h	/^struct tcphdr {$/;"	s
+tcpiphdr	.\tcpip.h	/^struct tcpiphdr {$/;"	s
+tcpiphdr_2	.\tcpip.h	/^struct tcpiphdr_2 {$/;"	s
+tcpiphdrp_32	.\tcp_var.h	/^ typedef struct tcpiphdr *tcpiphdrp_32;$/;"	t	typeref:struct:tcpiphdr
+tcpiphdrp_32	.\tcp_var.h	/^ typedef u_int32_t tcpiphdrp_32;$/;"	t
+tcps_accepts	.\tcp_var.h	/^	u_long	tcps_accepts;		\/* connections accepted *\/$/;"	m	struct:tcpstat
+tcps_closed	.\tcp_var.h	/^	u_long	tcps_closed;		\/* conn. closed (includes drops) *\/$/;"	m	struct:tcpstat
+tcps_connattempt	.\tcp_var.h	/^	u_long	tcps_connattempt;	\/* connections initiated *\/$/;"	m	struct:tcpstat
+tcps_conndrops	.\tcp_var.h	/^	u_long	tcps_conndrops;		\/* embryonic connections dropped *\/$/;"	m	struct:tcpstat
+tcps_connects	.\tcp_var.h	/^	u_long	tcps_connects;		\/* connections established *\/$/;"	m	struct:tcpstat
+tcps_delack	.\tcp_var.h	/^	u_long	tcps_delack;		\/* delayed acks sent *\/$/;"	m	struct:tcpstat
+tcps_didnuttin	.\tcp_var.h	/^	u_long	tcps_didnuttin;		\/* Times tcp_output didn't do anything XXX *\/$/;"	m	struct:tcpstat
+tcps_drops	.\tcp_var.h	/^	u_long	tcps_drops;		\/* connections dropped *\/$/;"	m	struct:tcpstat
+tcps_keepdrops	.\tcp_var.h	/^	u_long	tcps_keepdrops;		\/* connections dropped in keepalive *\/$/;"	m	struct:tcpstat
+tcps_keepprobe	.\tcp_var.h	/^	u_long	tcps_keepprobe;		\/* keepalive probes sent *\/$/;"	m	struct:tcpstat
+tcps_keeptimeo	.\tcp_var.h	/^	u_long	tcps_keeptimeo;		\/* keepalive timeouts *\/$/;"	m	struct:tcpstat
+tcps_persisttimeo	.\tcp_var.h	/^	u_long	tcps_persisttimeo;	\/* persist timeouts *\/$/;"	m	struct:tcpstat
+tcps_predack	.\tcp_var.h	/^	u_long	tcps_predack;		\/* times hdr predict ok for acks *\/$/;"	m	struct:tcpstat
+tcps_preddat	.\tcp_var.h	/^	u_long	tcps_preddat;		\/* times hdr predict ok for data pkts *\/$/;"	m	struct:tcpstat
+tcps_rcvackbyte	.\tcp_var.h	/^	u_long	tcps_rcvackbyte;	\/* bytes acked by rcvd acks *\/$/;"	m	struct:tcpstat
+tcps_rcvackpack	.\tcp_var.h	/^	u_long	tcps_rcvackpack;	\/* rcvd ack packets *\/$/;"	m	struct:tcpstat
+tcps_rcvacktoomuch	.\tcp_var.h	/^	u_long	tcps_rcvacktoomuch;	\/* rcvd acks for unsent data *\/$/;"	m	struct:tcpstat
+tcps_rcvafterclose	.\tcp_var.h	/^	u_long	tcps_rcvafterclose;	\/* packets rcvd after "close" *\/$/;"	m	struct:tcpstat
+tcps_rcvbadoff	.\tcp_var.h	/^	u_long	tcps_rcvbadoff;		\/* packets received with bad offset *\/$/;"	m	struct:tcpstat
+tcps_rcvbadsum	.\tcp_var.h	/^	u_long	tcps_rcvbadsum;		\/* packets received with ccksum errs *\/$/;"	m	struct:tcpstat
+tcps_rcvbyte	.\tcp_var.h	/^	u_long	tcps_rcvbyte;		\/* bytes received in sequence *\/$/;"	m	struct:tcpstat
+tcps_rcvbyteafterwin	.\tcp_var.h	/^	u_long	tcps_rcvbyteafterwin;	\/* bytes rcvd after window *\/$/;"	m	struct:tcpstat
+tcps_rcvdupack	.\tcp_var.h	/^	u_long	tcps_rcvdupack;		\/* rcvd duplicate acks *\/$/;"	m	struct:tcpstat
+tcps_rcvdupbyte	.\tcp_var.h	/^	u_long	tcps_rcvdupbyte;	\/* duplicate-only bytes received *\/$/;"	m	struct:tcpstat
+tcps_rcvduppack	.\tcp_var.h	/^	u_long	tcps_rcvduppack;	\/* duplicate-only packets received *\/$/;"	m	struct:tcpstat
+tcps_rcvoobyte	.\tcp_var.h	/^	u_long	tcps_rcvoobyte;		\/* out-of-order bytes received *\/$/;"	m	struct:tcpstat
+tcps_rcvoopack	.\tcp_var.h	/^	u_long	tcps_rcvoopack;		\/* out-of-order packets received *\/$/;"	m	struct:tcpstat
+tcps_rcvpack	.\tcp_var.h	/^	u_long	tcps_rcvpack;		\/* packets received in sequence *\/$/;"	m	struct:tcpstat
+tcps_rcvpackafterwin	.\tcp_var.h	/^	u_long	tcps_rcvpackafterwin;	\/* packets with data after window *\/$/;"	m	struct:tcpstat
+tcps_rcvpartdupbyte	.\tcp_var.h	/^	u_long	tcps_rcvpartdupbyte;	\/* dup. bytes in part-dup. packets *\/$/;"	m	struct:tcpstat
+tcps_rcvpartduppack	.\tcp_var.h	/^	u_long	tcps_rcvpartduppack;	\/* packets with some duplicate data *\/$/;"	m	struct:tcpstat
+tcps_rcvtotal	.\tcp_var.h	/^	u_long	tcps_rcvtotal;		\/* total packets received *\/$/;"	m	struct:tcpstat
+tcps_rcvwinprobe	.\tcp_var.h	/^	u_long	tcps_rcvwinprobe;	\/* rcvd window probe packets *\/$/;"	m	struct:tcpstat
+tcps_rcvwinupd	.\tcp_var.h	/^	u_long	tcps_rcvwinupd;		\/* rcvd window update packets *\/$/;"	m	struct:tcpstat
+tcps_rexmttimeo	.\tcp_var.h	/^	u_long	tcps_rexmttimeo;	\/* retransmit timeouts *\/$/;"	m	struct:tcpstat
+tcps_rttupdated	.\tcp_var.h	/^	u_long	tcps_rttupdated;	\/* times we succeeded *\/$/;"	m	struct:tcpstat
+tcps_segstimed	.\tcp_var.h	/^	u_long	tcps_segstimed;		\/* segs where we tried to get rtt *\/$/;"	m	struct:tcpstat
+tcps_sndacks	.\tcp_var.h	/^	u_long	tcps_sndacks;		\/* ack-only packets sent *\/$/;"	m	struct:tcpstat
+tcps_sndbyte	.\tcp_var.h	/^	u_long	tcps_sndbyte;		\/* data bytes sent *\/$/;"	m	struct:tcpstat
+tcps_sndctrl	.\tcp_var.h	/^	u_long	tcps_sndctrl;		\/* control (SYN|FIN|RST) packets sent *\/$/;"	m	struct:tcpstat
+tcps_sndpack	.\tcp_var.h	/^	u_long	tcps_sndpack;		\/* data packets sent *\/$/;"	m	struct:tcpstat
+tcps_sndprobe	.\tcp_var.h	/^	u_long	tcps_sndprobe;		\/* window probes sent *\/$/;"	m	struct:tcpstat
+tcps_sndrexmitbyte	.\tcp_var.h	/^	u_long	tcps_sndrexmitbyte;	\/* data bytes retransmitted *\/$/;"	m	struct:tcpstat
+tcps_sndrexmitpack	.\tcp_var.h	/^	u_long	tcps_sndrexmitpack;	\/* data packets retransmitted *\/$/;"	m	struct:tcpstat
+tcps_sndtotal	.\tcp_var.h	/^	u_long	tcps_sndtotal;		\/* total packets sent *\/$/;"	m	struct:tcpstat
+tcps_sndurg	.\tcp_var.h	/^	u_long	tcps_sndurg;		\/* packets sent with URG only *\/$/;"	m	struct:tcpstat
+tcps_sndwinup	.\tcp_var.h	/^	u_long	tcps_sndwinup;		\/* window update-only packets sent *\/$/;"	m	struct:tcpstat
+tcps_socachemiss	.\tcp_var.h	/^	u_long	tcps_socachemiss;	\/* tcp_last_so misses *\/$/;"	m	struct:tcpstat
+tcps_timeoutdrop	.\tcp_var.h	/^	u_long	tcps_timeoutdrop;	\/* conn. dropped in rxmt timeout *\/$/;"	m	struct:tcpstat
+tcpstat	.\tcp_timer.c	/^struct   tcpstat tcpstat;        \/* tcp statistics *\/$/;"	v	typeref:struct:tcpstat
+tcpstat	.\tcp_var.h	/^struct tcpstat {$/;"	s
+tcpstates	.\tcp_output.c	/^const char * const tcpstates[] = {$/;"	v
+tcpstats	.\debug.c	/^tcpstats(void)$/;"	f	file:
+tcptimers	.\tcp_timer.h	/^char *tcptimers[] =$/;"	v
+tcptos	.\tcp_subr.c	/^static const struct tos_t tcptos[] = {$/;"	v	typeref:struct:tos_t	file:
+tftp_handle_ack	.\tftp.c	/^static void tftp_handle_ack(struct tftp_t *tp, int pktlen)$/;"	f	file:
+tftp_handle_rrq	.\tftp.c	/^static void tftp_handle_rrq(struct tftp_t *tp, int pktlen)$/;"	f	file:
+tftp_input	.\tftp.c	/^void tftp_input(struct mbuf *m)$/;"	f
+tftp_prefix	.\tftp.c	/^const char *tftp_prefix;$/;"	v
+tftp_read_data	.\tftp.c	/^static int tftp_read_data(struct tftp_session *spt, u_int16_t block_nr,$/;"	f	file:
+tftp_send_data	.\tftp.c	/^static int tftp_send_data(struct tftp_session *spt,$/;"	f	file:
+tftp_send_error	.\tftp.c	/^static int tftp_send_error(struct tftp_session *spt,$/;"	f	file:
+tftp_send_oack	.\tftp.c	/^static int tftp_send_oack(struct tftp_session *spt,$/;"	f	file:
+tftp_session	.\tftp.c	/^struct tftp_session {$/;"	s	file:
+tftp_session_allocate	.\tftp.c	/^static int tftp_session_allocate(struct tftp_t *tp)$/;"	f	file:
+tftp_session_find	.\tftp.c	/^static int tftp_session_find(struct tftp_t *tp)$/;"	f	file:
+tftp_session_terminate	.\tftp.c	/^static void tftp_session_terminate(struct tftp_session *spt)$/;"	f	file:
+tftp_session_update	.\tftp.c	/^static void tftp_session_update(struct tftp_session *spt)$/;"	f	file:
+tftp_sessions	.\tftp.c	/^static struct tftp_session tftp_sessions[TFTP_SESSIONS_MAX];$/;"	v	typeref:struct:tftp_session	file:
+tftp_t	.\tftp.h	/^struct tftp_t {$/;"	s
+th_ack	.\tcp.h	/^	tcp_seq	th_ack;			\/* acknowledgement number *\/$/;"	m	struct:tcphdr
+th_dport	.\tcp.h	/^	u_int16_t	th_dport;		\/* destination port *\/$/;"	m	struct:tcphdr
+th_flags	.\tcp.h	/^	u_int8_t	th_flags;$/;"	m	struct:tcphdr
+th_off	.\tcp.h	/^		th_off:4;		\/* data offset *\/$/;"	m	struct:tcphdr
+th_off	.\tcp.h	/^	u_int	th_off:4,		\/* data offset *\/$/;"	m	struct:tcphdr
+th_seq	.\tcp.h	/^	tcp_seq	th_seq;			\/* sequence number *\/$/;"	m	struct:tcphdr
+th_sport	.\tcp.h	/^	u_int16_t	th_sport;		\/* source port *\/$/;"	m	struct:tcphdr
+th_sum	.\tcp.h	/^	u_int16_t	th_sum;			\/* checksum *\/$/;"	m	struct:tcphdr
+th_urp	.\tcp.h	/^	u_int16_t	th_urp;			\/* urgent pointer *\/$/;"	m	struct:tcphdr
+th_win	.\tcp.h	/^	u_int16_t	th_win;			\/* window *\/$/;"	m	struct:tcphdr
+th_x2	.\tcp.h	/^		th_x2:4;		\/* (unused) *\/$/;"	m	struct:tcphdr
+th_x2	.\tcp.h	/^	u_int	th_x2:4,		\/* (unused) *\/$/;"	m	struct:tcphdr
+ti_ack	.\tcpip.h	57;"	d
+ti_dport	.\tcpip.h	55;"	d
+ti_dst	.\tcpip.h	53;"	d
+ti_flags	.\tcpip.h	60;"	d
+ti_i	.\tcpip.h	/^	struct 	ipovly ti_i;		\/* overlaid ip structure *\/$/;"	m	struct:tcpiphdr	typeref:struct:tcpiphdr::ipovly
+ti_len	.\tcpip.h	51;"	d
+ti_next	.\tcpip.h	47;"	d
+ti_off	.\tcpip.h	59;"	d
+ti_pr	.\tcpip.h	50;"	d
+ti_prev	.\tcpip.h	48;"	d
+ti_seq	.\tcpip.h	56;"	d
+ti_sport	.\tcpip.h	54;"	d
+ti_src	.\tcpip.h	52;"	d
+ti_sum	.\tcpip.h	62;"	d
+ti_t	.\tcpip.h	/^	struct	tcphdr ti_t;		\/* tcp header *\/$/;"	m	struct:tcpiphdr	typeref:struct:tcpiphdr::tcphdr
+ti_urp	.\tcpip.h	63;"	d
+ti_win	.\tcpip.h	61;"	d
+ti_x1	.\tcpip.h	49;"	d
+ti_x2	.\tcpip.h	58;"	d
+time_fasttimo	.\misc.c	/^u_int curtime, time_fasttimo, last_slowtimo;$/;"	v
+timestamp	.\tftp.c	/^    int timestamp;$/;"	m	struct:tftp_session	file:
+tos	.\misc.h	/^	u_int8_t tos;$/;"	m	struct:emu_t
+tos	.\misc.h	/^	u_int8_t tos;$/;"	m	struct:tos_t
+tos_t	.\misc.h	/^struct tos_t {$/;"	s
+tp_block_nr	.\tftp.h	/^      u_int16_t tp_block_nr;$/;"	m	struct:tftp_t::__anon4::__anon5
+tp_buf	.\tftp.h	/^      u_int8_t tp_buf[512];$/;"	m	struct:tftp_t::__anon4::__anon5
+tp_buf	.\tftp.h	/^    u_int8_t tp_buf[512 + 2];$/;"	m	union:tftp_t::__anon4
+tp_data	.\tftp.h	/^    } tp_data;$/;"	m	union:tftp_t::__anon4	typeref:struct:tftp_t::__anon4::__anon5
+tp_error	.\tftp.h	/^    } tp_error;$/;"	m	union:tftp_t::__anon4	typeref:struct:tftp_t::__anon4::__anon6
+tp_error_code	.\tftp.h	/^      u_int16_t tp_error_code;$/;"	m	struct:tftp_t::__anon4::__anon6
+tp_msg	.\tftp.h	/^      u_int8_t tp_msg[512];$/;"	m	struct:tftp_t::__anon4::__anon6
+tp_op	.\tftp.h	/^  u_int16_t tp_op;$/;"	m	struct:tftp_t
+ts_recent	.\tcp_var.h	/^	u_int32_t	ts_recent;		\/* timestamp echo data *\/$/;"	m	struct:tcpcb
+ts_recent_age	.\tcp_var.h	/^	u_int32_t	ts_recent_age;		\/* when last updated *\/$/;"	m	struct:tcpcb
+tt	.\slirp.c	/^struct timeval tt;$/;"	v	typeref:struct:timeval
+u_int16_t	.\slirp.h	/^    typedef unsigned int u_int16_t;$/;"	t
+u_int16_t	.\slirp.h	/^    typedef unsigned short u_int16_t;$/;"	t
+u_int16_t	.\slirp.h	/^typedef uint16_t u_int16_t;$/;"	t
+u_int32_t	.\slirp.h	/^    typedef unsigned int u_int32_t;$/;"	t
+u_int32_t	.\slirp.h	/^   typedef unsigned short u_int32_t;$/;"	t
+u_int32_t	.\slirp.h	/^typedef uint32_t u_int32_t;$/;"	t
+u_int64_t	.\slirp.h	/^typedef uint64_t u_int64_t;$/;"	t
+u_int8_t	.\slirp.h	/^typedef uint8_t u_int8_t;$/;"	t
+u_int8_t	.\slirp.h	/^typedef unsigned char u_int8_t;$/;"	t
+u_sleep	.\misc.c	/^u_sleep(usec)$/;"	f
+udb	.\udp.c	/^struct socket udb;$/;"	v	typeref:struct:socket
+udp	.\bootp.h	/^    struct udphdr udp;$/;"	m	struct:bootp_t	typeref:struct:bootp_t::udphdr
+udp	.\tftp.h	/^  struct udphdr udp;$/;"	m	struct:tftp_t	typeref:struct:tftp_t::udphdr
+udp_attach	.\udp.c	/^udp_attach(so)$/;"	f
+udp_detach	.\udp.c	/^udp_detach(so)$/;"	f
+udp_emu	.\udp.c	/^udp_emu(struct socket *so, struct mbuf *m)$/;"	f	file:
+udp_init	.\udp.c	/^udp_init()$/;"	f
+udp_input	.\udp.c	/^udp_input(m, iphlen)$/;"	f
+udp_last_so	.\udp.c	/^struct	socket *udp_last_so = &udb;$/;"	v	typeref:struct:socket
+udp_listen	.\udp.c	/^udp_listen(port, laddr, lport, flags)$/;"	f
+udp_output	.\udp.c	/^int udp_output(struct socket *so, struct mbuf *m,$/;"	f
+udp_output2	.\udp.c	/^int udp_output2(struct socket *so, struct mbuf *m,$/;"	f
+udp_tos	.\udp.c	/^udp_tos(struct socket *so)$/;"	f	file:
+udphdr	.\udp.h	/^struct udphdr {$/;"	s
+udpiphdr	.\udp.h	/^struct udpiphdr {$/;"	s
+udpps_pcbcachemiss	.\udp.h	/^	        u_long  udpps_pcbcachemiss;     \/* input packets missing pcb cache *\/$/;"	m	struct:udpstat
+udps_badlen	.\udp.h	/^	        u_long  udps_badlen;            \/* data length larger than packet *\/$/;"	m	struct:udpstat
+udps_badsum	.\udp.h	/^	        u_long  udps_badsum;            \/* checksum error *\/$/;"	m	struct:udpstat
+udps_fullsock	.\udp.h	/^	        u_long  udps_fullsock;          \/* not delivered, input socket full *\/$/;"	m	struct:udpstat
+udps_hdrops	.\udp.h	/^	        u_long  udps_hdrops;            \/* packet shorter than header *\/$/;"	m	struct:udpstat
+udps_ipackets	.\udp.h	/^	        u_long  udps_ipackets;          \/* total input packets *\/$/;"	m	struct:udpstat
+udps_noport	.\udp.h	/^	        u_long  udps_noport;            \/* no socket on port *\/$/;"	m	struct:udpstat
+udps_noportbcast	.\udp.h	/^	        u_long  udps_noportbcast;       \/* of above, arrived as broadcast *\/$/;"	m	struct:udpstat
+udps_opackets	.\udp.h	/^	        u_long  udps_opackets;          \/* total output packets *\/$/;"	m	struct:udpstat
+udpstat	.\udp.c	/^struct udpstat udpstat;$/;"	v	typeref:struct:udpstat
+udpstat	.\udp.h	/^struct udpstat {$/;"	s
+udpstats	.\debug.c	/^udpstats(void)$/;"	f	file:
+udptos	.\udp.c	/^static const struct tos_t udptos[] = {$/;"	v	typeref:struct:tos_t	file:
+uh_dport	.\udp.h	/^	u_int16_t	uh_dport;		\/* destination port *\/$/;"	m	struct:udphdr
+uh_sport	.\udp.h	/^	u_int16_t	uh_sport;		\/* source port *\/$/;"	m	struct:udphdr
+uh_sum	.\udp.h	/^	u_int16_t	uh_sum;			\/* udp checksum *\/$/;"	m	struct:udphdr
+uh_ulen	.\udp.h	/^	int16_t	uh_ulen;		\/* udp length *\/$/;"	m	struct:udphdr
+ui_dport	.\udp.h	71;"	d
+ui_dst	.\udp.h	69;"	d
+ui_i	.\udp.h	/^	        struct  ipovly ui_i;            \/* overlaid ip structure *\/$/;"	m	struct:udpiphdr	typeref:struct:udpiphdr::ipovly
+ui_len	.\udp.h	67;"	d
+ui_next	.\udp.h	63;"	d
+ui_pr	.\udp.h	66;"	d
+ui_prev	.\udp.h	64;"	d
+ui_sport	.\udp.h	70;"	d
+ui_src	.\udp.h	68;"	d
+ui_sum	.\udp.h	73;"	d
+ui_u	.\udp.h	/^	        struct  udphdr ui_u;            \/* udp header *\/$/;"	m	struct:udpiphdr	typeref:struct:udpiphdr::udphdr
+ui_ulen	.\udp.h	72;"	d
+ui_x1	.\udp.h	65;"	d
+unused	.\bootp.h	/^    uint16_t unused;$/;"	m	struct:bootp_t
+updtime	.\slirp.c	/^static void updtime(void)$/;"	f	file:
+vjstats	.\debug.c	/^vjstats(void)$/;"	f	file:
+vsprintf	.\misc.c	772;"	d	file:
+vsprintf	.\slirp.h	241;"	d
+vsprintf_len	.\misc.c	/^vsprintf_len(string, format, args)$/;"	f
+x	.\tftp.h	/^  } x;$/;"	m	struct:tftp_t	typeref:union:tftp_t::__anon4
+xchg	.\tcp_subr.c	150;"	d	file:
+xchg	.\tcp_subr.c	153;"	d	file:
