@@ -20,6 +20,7 @@
 
 #define ASM_SOFTMMU
 #include "exec.h"
+#include "qebek-op.h"
 
 /* n must be a constant to be efficient */
 static inline target_long lshift(target_long x, int n)
@@ -978,6 +979,7 @@ void OPPROTO op_enter64_level(void)
 void OPPROTO op_sysenter(void)
 {
     helper_sysenter();
+	qebek_get_service_address(env);
 }
 
 void OPPROTO op_sysexit(void)
