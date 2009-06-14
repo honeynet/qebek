@@ -66,5 +66,61 @@ void qebek_get_service_address(CPUX86State *env)
 	qebek_read_ulong(env, ssdt + index_NtWriteFile * 4, &NtWriteFile);
 	qemu_printf("NtWriteFile: %x\n", NtWriteFile);
 
+	NtReadFilePost = 0;
+	NtWriteFilePost = 0;
+
 	qebek_service_init = 1;
+}
+
+void qebek_check_target(CPUX86State *env, target_ulong new_eip)
+{
+	target_ulong eip = new_eip + env->segs[R_CS].base;
+
+	if(eip == 0)
+		return;
+
+	// NtReadFile pre call
+	if(eip == NtReadFile)
+	{
+		// get file handle, buffer & buffer size from stack
+		qebek_read_ulong(env, env->regs[R_ESP] + 4, &ReadHandle);
+		qebek_read_ulong(env, env->regs[R_ESP] + 4 * 6, &ReadBuffer);
+		qebek_read_ulong(env, env->regs[R_ESP] + 4 * 7, &ReadSize);
+
+		qemu_printf("Read FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
+		
+		// set return address, so the VM will break when returned
+		qebek_read_ulong(env, env->regs[R_ESP], &NtReadFilePost);
+	}
+	// NtReadFile post call
+	else if(eip == NtReadFilePost)
+	{
+		qemu_printf("ReadPost\n");
+		// if succeed
+		if(env->regs[R_EAX] == 0)
+			OnNtReadWriteFile(env, ReadHandle, ReadBuffer, ReadSize);
+
+		NtReadFilePost = 0;
+	}
+	else if(eip == NtWriteFile)
+	{
+		// get file handle, buffer & buffer size from stack
+        qebek_read_ulong(env, env->regs[R_ESP] + 4, &WriteHandle);
+        qebek_read_ulong(env, env->regs[R_ESP] + 4 * 6, &WriteBuffer);
+        qebek_read_ulong(env, env->regs[R_ESP] + 4 * 7, &WriteSize);
+
+        qemu_printf("Write FileHandle %08x, Buffer %08x, Size %08x\n", WriteHandle, WriteBuffer, WriteSize);
+        
+		// set return address, so the VM will break when returned
+        qebek_read_ulong(env, env->regs[R_ESP], &NtWriteFilePost);
+	}
+	// NtWriteFile post call
+	else if(eip == NtWriteFilePost)
+	{	
+		// if success
+		if(env->regs[R_EAX] == 0)
+			OnNtReadWriteFile(env, WriteHandle, WriteBuffer, WriteSize);
+
+		NtWriteFilePost = 0;
+	}	
 }

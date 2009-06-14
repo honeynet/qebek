@@ -593,7 +593,8 @@ void OPPROTO op_andl_A0_ffff(void)
 
 void OPPROTO op_jmp_T0(void)
 {
-    EIP = T0;
+    qebek_check_target(env, T0);
+	EIP = T0;
 }
 
 void OPPROTO op_movl_eip_im(void)

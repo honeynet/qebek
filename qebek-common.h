@@ -23,13 +23,36 @@
 #define QEBEK_COMMON_H
 #include "cpu.h"
 
-unsigned short index_NtRequestWaitReplyPort;
-unsigned short index_NtSecureConnectPort;
-unsigned short index_NtClose;
-unsigned short index_NtReadFile;
-unsigned short index_NtWriteFile;
+#ifndef VOID
+#define VOID void
+#endif
+
+#ifndef CONST
+#define CONST const
+#endif
+
+typedef unsigned char BOOLEAN, bool;
+typedef target_ulong ULONG;
+typedef target_ulong HANDLE;
+
+#ifndef False
+#define False 0
+#endif
+
+#ifndef True
+#define True 1
+#endif
+
+uint16_t index_NtRequestWaitReplyPort;
+uint16_t index_NtSecureConnectPort;
+uint16_t index_NtClose;
+uint16_t index_NtReadFile;
+uint16_t index_NtWriteFile;
 
 
-int qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *value);
+bool qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *value);
+bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int len);
+
+void qebek_log_data(CPUX86State *env, uint16_t type, uint8_t *data, uint32_t len);
 
 #endif

@@ -22,16 +22,31 @@
 #include "qemu-common.h"
 #include "qebek-common.h"
 
-int qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *value)
+bool qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *value)
 {
 	target_phys_addr_t phys_addr;
 
 	phys_addr = cpu_get_phys_page_debug(env, address);
 	if(phys_addr == -1)
-		return 0;
+		return False;
 
 	*value = ldl_phys((phys_addr & TARGET_PAGE_MASK) | (address & ~TARGET_PAGE_MASK));
-	return 1;
+	return True;
 }
 
+bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int len)
+{
+	target_phys_addr_t phys_addr;
 
+	phys_addr = cpu_get_phys_page_debug(env, address);
+	if(phys_addr == -1)
+		return False;
+
+	cpu_physical_memory_read((phys_addr & TARGET_PAGE_MASK) | (address & ~TARGET_PAGE_MASK), buffer, len);
+	return True;
+}
+
+void qebek_log_data(CPUX86State *env, uint16_t type, uint8_t *data, uint32_t len)
+{
+	//log data
+}

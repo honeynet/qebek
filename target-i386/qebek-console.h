@@ -22,11 +22,25 @@
 #ifndef QEBEK_CONSOLESPY_H
 #define QEBEK_CONSOLESPY_H
 
-unsigned int NtRequestWaitReplyPort;
-unsigned int NtSecureConnectPort;
-unsigned int NtClose;
-unsigned int NtWriteFile;
-unsigned int NtReadFile;
+uint32_t NtRequestWaitReplyPort;
+uint32_t NtSecureConnectPort;
+uint32_t NtClose;
+uint32_t NtWriteFile;
+uint32_t NtReadFile;
 
+uint32_t NtWriteFilePost;
+uint32_t NtReadFilePost;
+
+HANDLE ReadHandle;
+ULONG ReadBuffer;
+ULONG ReadSize;
+
+HANDLE WriteHandle;
+ULONG WriteBuffer;
+ULONG WriteSize;
+
+BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle);
+
+VOID OnNtReadWriteFile(CPUX86State *env, HANDLE Handle, ULONG Buffer, ULONG BufferSize);
 
 #endif
