@@ -28,19 +28,18 @@ uint32_t NtClose;
 uint32_t NtWriteFile;
 uint32_t NtReadFile;
 
-uint32_t NtWriteFilePost;
-uint32_t NtReadFilePost;
-
-HANDLE ReadHandle;
-ULONG ReadBuffer;
-ULONG ReadSize;
-
-HANDLE WriteHandle;
-ULONG WriteBuffer;
-ULONG WriteSize;
-
 BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle);
-
 VOID OnNtReadWriteFile(CPUX86State *env, HANDLE Handle, ULONG Buffer, ULONG BufferSize);
+
+void preNtRequestReplyPort(CPUX86State *env, void* user_data);
+void postNtRequestReplyPort(CPUX86State *env, void* user_data);
+void preNtSecureConnectPort(CPUX86State *env, void* user_data);
+void postNtSecureConnectPort(CPUX86State *env, void* user_data);
+void preNtClose(CPUX86State *env, void* user_data);
+void postNtClose(CPUX86State *env, void* user_data);
+void preNtReadFile(CPUX86State *env, void* user_data);
+void postNtReadFile(CPUX86State *env, void* user_data);
+void preNtWriteFile(CPUX86State *env, void* user_data);
+void postNtWriteFile(CPUX86State *env, void* user_data);
 
 #endif
