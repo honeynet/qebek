@@ -131,6 +131,10 @@ int inet_aton(const char *cp, struct in_addr *ia);
 
 #include "exec-all.h"
 
+/* qebek specific */
+#include "qebek-os.h"
+#include "qebek-bp.h"
+
 #define DEFAULT_NETWORK_SCRIPT "/etc/qemu-ifup"
 #define DEFAULT_NETWORK_DOWN_SCRIPT "/etc/qemu-ifdown"
 #ifdef __sun__
@@ -7719,6 +7723,15 @@ enum {
     QEMU_OPTION_old_param,
     QEMU_OPTION_clock,
     QEMU_OPTION_startdate,
+
+	/* qebek OS options */
+    QEBEK_OPTION_win2k,
+    QEBEK_OPTION_winxp,
+    QEBEK_OPTION_win2k3,
+    QEBEK_OPTION_vista,
+    QEBEK_OPTION_win2k8,
+    QEBEK_OPTION_win7,
+
 };
 
 typedef struct QEMUOption {
@@ -7827,6 +7840,15 @@ const QEMUOption qemu_options[] = {
 #endif
     { "clock", HAS_ARG, QEMU_OPTION_clock },
     { "startdate", HAS_ARG, QEMU_OPTION_startdate },
+
+	/* qebek OS options */
+    { "win2k", 0, QEBEK_OPTION_win2k },
+    { "winxp", 0, QEBEK_OPTION_winxp },
+    { "win2k3", 0, QEBEK_OPTION_win2k3 },
+    { "vista", 0, QEBEK_OPTION_vista },
+    { "win2k8", 0, QEBEK_OPTION_win2k8 },
+    { "win7", 0, QEBEK_OPTION_win7 },
+
     { NULL },
 };
 
@@ -8661,9 +8683,41 @@ int main(int argc, char **argv)
                     }
                 }
                 break;
+			
+			/* qebek os options */
+			case QEBEK_OPTION_win2k:
+				qebek_os_major = QEBEK_OS_windows;
+				qebek_os_minor = QEBEK_OS_win2k;
+				break;
+			case QEBEK_OPTION_winxp:
+				qebek_os_major = QEBEK_OS_windows;
+				qebek_os_minor = QEBEK_OS_winxp;
+				break;
+			case QEBEK_OPTION_win2k3:
+				qebek_os_major = QEBEK_OS_windows;
+				qebek_os_minor = QEBEK_OS_win2k3;
+				break;
+			case QEBEK_OPTION_vista:
+				qebek_os_major = QEBEK_OS_windows;
+				qebek_os_minor = QEBEK_OS_vista;
+				break;
+			case QEBEK_OPTION_win2k8:
+				qebek_os_major = QEBEK_OS_windows;
+				qebek_os_minor = QEBEK_OS_win2k8;
+				break;
+			case QEBEK_OPTION_win7:
+				qebek_os_major = QEBEK_OS_windows;
+				qebek_os_minor = QEBEK_OS_win7;
+				break;
             }
         }
     }
+
+    if (!qebek_bpt_init()) {
+        fprintf(stderr, "Cannot initialize qebek break point table\n");
+        exit(1);
+    }
+
 
 #ifndef _WIN32
     if (daemonize && !nographic && vnc_display == NULL) {
@@ -8998,5 +9052,8 @@ int main(int argc, char **argv)
         }
     }
 #endif
+
+	qebek_bpt_free();
+
     return 0;
 }

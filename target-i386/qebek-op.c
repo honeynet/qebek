@@ -21,53 +21,96 @@
 
 #include <stdio.h>
 #include "qebek-common.h"
+#include "qebek-os.h"
 #include "qebek-op.h"
+#include "qebek-bp.h"
 #include "qebek-console.h"
 
 
 void qebek_get_service_address(CPUX86State *env)
 {
-	if(qebek_service_init)
-		return;
-	
 	target_ulong pkthread = 0xffdff124, psdt, pssdt; //structure pointer
 	target_ulong kthread, sdt, ssdt; //virtual address
 
-	if(!qebek_read_ulong(env, pkthread, &kthread))
-	{
-		qemu_printf("qebek_get_service_address: failed to read kthread\n");
+	if(qebek_service_init)
 		return;
-	}
-		
-	psdt = kthread + 0xe0;
-	if(!qebek_read_ulong(env, psdt, &sdt))
-	{
-		qemu_printf("qebek_get_service_address: failed to read SDT\n");
-		return;
-	}
-
-	pssdt = sdt;
-	if(!qebek_read_ulong(env, pssdt, &ssdt))
-	{
-		qemu_printf("qebek_get_service_address: failed to read SSDT\n");
-		return;
-	}
-
-	index_NtRequestWaitReplyPort = 0x0c5;
-	index_NtSecureConnectPort = 0x0d2;
-	index_NtClose = 0x019;
-	index_NtReadFile = 0x0b7;
-	index_NtWriteFile = 0x112;
 	
-	qebek_read_ulong(env, ssdt + index_NtRequestWaitReplyPort * 4, &NtRequestWaitReplyPort);
-	qebek_read_ulong(env, ssdt + index_NtSecureConnectPort * 4, &NtSecureConnectPort);
-	qebek_read_ulong(env, ssdt + index_NtClose * 4, &NtClose);
-	qebek_read_ulong(env, ssdt + index_NtReadFile * 4, &NtReadFile);
-	qebek_read_ulong(env, ssdt + index_NtWriteFile * 4, &NtWriteFile);
-	qemu_printf("NtWriteFile: %x\n", NtWriteFile);
+	switch(qebek_os_major)
+	{
+	
+	case QEBEK_OS_windows:
 
-	NtReadFilePost = 0;
-	NtWriteFilePost = 0;
+		if(!qebek_read_ulong(env, pkthread, &kthread))
+		{
+			qemu_printf("qebek_get_service_address: failed to read kthread\n");
+			return;
+		}
+		
+		psdt = kthread + 0xe0;
+		if(!qebek_read_ulong(env, psdt, &sdt))
+		{
+			qemu_printf("qebek_get_service_address: failed to read SDT\n");
+			return;
+		}
+		
+		pssdt = sdt;
+		if(!qebek_read_ulong(env, pssdt, &ssdt))
+		{
+			qemu_printf("qebek_get_service_address: failed to read SSDT\n");
+			return;
+		}
+
+		switch(qebek_os_minor)
+		{
+		case QEBEK_OS_winxp:
+			index_NtRequestWaitReplyPort = 0x0c5;
+			index_NtSecureConnectPort = 0x0d2;
+			index_NtClose = 0x019;
+			index_NtReadFile = 0x0b7;
+			index_NtWriteFile = 0x112;
+			break;
+		default:
+			break;
+		}
+	
+		qebek_read_ulong(env, ssdt + index_NtRequestWaitReplyPort * 4, &NtRequestWaitReplyPort);
+		qebek_read_ulong(env, ssdt + index_NtSecureConnectPort * 4, &NtSecureConnectPort);
+		qebek_read_ulong(env, ssdt + index_NtClose * 4, &NtClose);
+		qebek_read_ulong(env, ssdt + index_NtReadFile * 4, &NtReadFile);
+		qebek_read_ulong(env, ssdt + index_NtWriteFile * 4, &NtWriteFile);
+		qemu_printf("NtWriteFile: %x\n", NtWriteFile);
+
+		/*if(!qebek_bp_add(NtRequestWaitReplyPort, preNtRequestWaitReplyPort, NULL))
+		{
+			qemu_printf("qebek_get_service_address: failed to insert break point for NtRequestWaitReplyPort\n");
+			return;
+		}
+        if(!qebek_bp_add(NtSecureConnectPort, preNtSecureConnectPort, NULL))
+        {
+            qemu_printf("qebek_get_service_address: failed to insert break point for NtSecureConnectPort\n");
+            return;
+        }
+        if(!qebek_bp_add(NtClose, preNtClose, NULL))
+        {
+            qemu_printf("qebek_get_service_address: failed to insert break point for NtClose\n");
+            return;
+        }*/
+        if(!qebek_bp_add(NtReadFile, preNtReadFile, NULL))
+        {
+            qemu_printf("qebek_get_service_address: failed to insert break point for NtReadFile\n");
+            return;
+        }
+        if(!qebek_bp_add(NtWriteFile, preNtWriteFile, NULL))
+        {
+            qemu_printf("qebek_get_service_address: failed to insert break point for NtWriteFile\n");
+            return;
+        }
+
+		break;
+		
+	default:
+		break;
+	}
 
 	qebek_service_init = 1;
 }
@@ -75,10 +118,12 @@ void qebek_get_service_address(CPUX86State *env)
 void qebek_check_target(CPUX86State *env, target_ulong new_eip)
 {
 	target_ulong eip = new_eip + env->segs[R_CS].base;
+	qebek_bp_slot* bp_slot = NULL;	
 
 	if(eip == 0)
 		return;
 
+	/*
 	// NtReadFile pre call
 	if(eip == NtReadFile)
 	{
@@ -101,26 +146,10 @@ void qebek_check_target(CPUX86State *env, target_ulong new_eip)
 			OnNtReadWriteFile(env, ReadHandle, ReadBuffer, ReadSize);
 
 		NtReadFilePost = 0;
-	}
-	else if(eip == NtWriteFile)
-	{
-		// get file handle, buffer & buffer size from stack
-        qebek_read_ulong(env, env->regs[R_ESP] + 4, &WriteHandle);
-        qebek_read_ulong(env, env->regs[R_ESP] + 4 * 6, &WriteBuffer);
-        qebek_read_ulong(env, env->regs[R_ESP] + 4 * 7, &WriteSize);
+	}*/
 
-        qemu_printf("Write FileHandle %08x, Buffer %08x, Size %08x\n", WriteHandle, WriteBuffer, WriteSize);
-        
-		// set return address, so the VM will break when returned
-        qebek_read_ulong(env, env->regs[R_ESP], &NtWriteFilePost);
-	}
-	// NtWriteFile post call
-	else if(eip == NtWriteFilePost)
-	{	
-		// if success
-		if(env->regs[R_EAX] == 0)
-			OnNtReadWriteFile(env, WriteHandle, WriteBuffer, WriteSize);
+	if((bp_slot = qebek_bp_check(eip)) == NULL)
+		return;
 
-		NtWriteFilePost = 0;
-	}	
+	bp_slot->cb_func(env, bp_slot->user_data);
 }
