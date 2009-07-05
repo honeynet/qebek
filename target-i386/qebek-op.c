@@ -24,15 +24,15 @@
 #include "qebek-os.h"
 #include "qebek-op.h"
 #include "qebek-bp.h"
-#include "qebek-console.h"
+#include "qebek-nt-console.h"
 
 
-void qebek_get_service_address(CPUX86State *env)
+void qebek_hook_syscall(CPUX86State *env)
 {
 	target_ulong pkthread = 0xffdff124, psdt, pssdt; //structure pointer
 	target_ulong kthread, sdt, ssdt; //virtual address
 
-	if(qebek_service_init)
+	if(qebek_syscall_init)
 		return;
 	
 	switch(qebek_os_major)
@@ -42,21 +42,21 @@ void qebek_get_service_address(CPUX86State *env)
 
 		if(!qebek_read_ulong(env, pkthread, &kthread))
 		{
-			qemu_printf("qebek_get_service_address: failed to read kthread\n");
+			qemu_printf("qebek_hook_syscall: failed to read kthread\n");
 			return;
 		}
 		
 		psdt = kthread + 0xe0;
 		if(!qebek_read_ulong(env, psdt, &sdt))
 		{
-			qemu_printf("qebek_get_service_address: failed to read SDT\n");
+			qemu_printf("qebek_hook_syscall: failed to read SDT\n");
 			return;
 		}
 		
 		pssdt = sdt;
 		if(!qebek_read_ulong(env, pssdt, &ssdt))
 		{
-			qemu_printf("qebek_get_service_address: failed to read SSDT\n");
+			qemu_printf("qebek_hook_syscall: failed to read SSDT\n");
 			return;
 		}
 
@@ -72,6 +72,12 @@ void qebek_get_service_address(CPUX86State *env)
 		default:
 			break;
 		}
+
+		if(!InitConsoleSpy())
+		{
+			qemu_printf("qebek_hook_syscall: failed to initialize windows console spy.\n");
+			return;
+		}
 	
 		qebek_read_ulong(env, ssdt + index_NtRequestWaitReplyPort * 4, &NtRequestWaitReplyPort);
 		qebek_read_ulong(env, ssdt + index_NtSecureConnectPort * 4, &NtSecureConnectPort);
@@ -82,27 +88,27 @@ void qebek_get_service_address(CPUX86State *env)
 
 		/*if(!qebek_bp_add(NtRequestWaitReplyPort, preNtRequestWaitReplyPort, NULL))
 		{
-			qemu_printf("qebek_get_service_address: failed to insert break point for NtRequestWaitReplyPort\n");
+			qemu_printf("qebek_hook_syscall: failed to insert break point for NtRequestWaitReplyPort\n");
 			return;
-		}
+		}*/
         if(!qebek_bp_add(NtSecureConnectPort, preNtSecureConnectPort, NULL))
         {
-            qemu_printf("qebek_get_service_address: failed to insert break point for NtSecureConnectPort\n");
+            qemu_printf("qebek_hook_syscall: failed to insert break point for NtSecureConnectPort\n");
             return;
         }
         if(!qebek_bp_add(NtClose, preNtClose, NULL))
         {
-            qemu_printf("qebek_get_service_address: failed to insert break point for NtClose\n");
+            qemu_printf("qebek_hook_syscall: failed to insert break point for NtClose\n");
             return;
-        }*/
+        }
         if(!qebek_bp_add(NtReadFile, preNtReadFile, NULL))
         {
-            qemu_printf("qebek_get_service_address: failed to insert break point for NtReadFile\n");
+            qemu_printf("qebek_hook_syscall: failed to insert break point for NtReadFile\n");
             return;
         }
         if(!qebek_bp_add(NtWriteFile, preNtWriteFile, NULL))
         {
-            qemu_printf("qebek_get_service_address: failed to insert break point for NtWriteFile\n");
+            qemu_printf("qebek_hook_syscall: failed to insert break point for NtWriteFile\n");
             return;
         }
 
@@ -112,7 +118,7 @@ void qebek_get_service_address(CPUX86State *env)
 		break;
 	}
 
-	qebek_service_init = 1;
+	qebek_syscall_init = True;
 }
 
 void qebek_check_target(CPUX86State *env, target_ulong new_eip)

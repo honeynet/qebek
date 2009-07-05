@@ -23,9 +23,19 @@
 #define QEBEK_COMMON_H
 #include "cpu.h"
 
+#ifndef IN
+#define IN
+#endif
+
+#ifndef OUT
+#define OUT
+#endif
+
 #ifndef VOID
 #define VOID void
 #endif
+
+typedef void *PVOID;
 
 #ifndef CONST
 #define CONST const
@@ -34,6 +44,7 @@
 typedef unsigned char BOOLEAN, bool;
 typedef target_ulong ULONG;
 typedef target_ulong HANDLE;
+typedef unsigned short USHORT;
 
 #ifndef False
 #define False 0
@@ -43,15 +54,27 @@ typedef target_ulong HANDLE;
 #define True 1
 #endif
 
-uint16_t index_NtRequestWaitReplyPort;
-uint16_t index_NtSecureConnectPort;
-uint16_t index_NtClose;
-uint16_t index_NtReadFile;
-uint16_t index_NtWriteFile;
+#ifndef FALSE
+#define FALSE 0
+#endif
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 
 bool qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *value);
+bool qebek_read_uword(CPUX86State *env, target_ulong address, target_ulong *value);
 bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int len);
+
+bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid);
 
 void qebek_log_data(CPUX86State *env, uint16_t type, uint8_t *data, uint32_t len);
 

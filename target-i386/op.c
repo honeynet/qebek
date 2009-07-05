@@ -594,7 +594,7 @@ void OPPROTO op_andl_A0_ffff(void)
 void OPPROTO op_jmp_T0(void)
 {
 	EIP = T0;
-    qebek_check_target(env, T0);
+    qebek_check_target(env, T0); //added for qebek
 }
 
 void OPPROTO op_movl_eip_im(void)
@@ -980,7 +980,7 @@ void OPPROTO op_enter64_level(void)
 void OPPROTO op_sysenter(void)
 {
     helper_sysenter();
-	qebek_get_service_address(env);
+	qebek_hook_syscall(env); //added for qebek
 }
 
 void OPPROTO op_sysexit(void)

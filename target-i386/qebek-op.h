@@ -23,10 +23,10 @@
 #define QEBEK_OP_H
 #include "cpu.h"
 
-int qebek_service_init;
+int qebek_syscall_init;
 
-void qebek_get_service_address(CPUX86State *env);
+void qebek_hook_syscall(CPUX86State *env);
 
-
+void qebek_check_target(CPUX86State *env, target_ulong new_eip);
 
 #endif
