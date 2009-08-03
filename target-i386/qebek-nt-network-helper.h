@@ -19,38 +19,51 @@
  *
  */
 
-#ifndef QEBEK_BP_H
-#define QEBEK_BP_H
-#include "cpu.h"
-#include "qebek-common.h"
+#ifndef QEBEK_NT_NETWORK_HELPER_H
+#define QEBEK_NT_NETWORK_HELPER_H
 
-typedef void (*qebek_cb_func)(CPUX86State *env, void* user_data);
-//enum qebek_bp_type
-//{
-//	QEBEK_RECALL,
-//	QEBEK_POSTCALL
-//};
+#include "qebek-nt-linklist.h"
 
-typedef struct qebek_bp_slot
-{
-	struct qebek_bp_slot *next;
+//
+// socket management
+//
+typedef struct _SOCKET_ENTRY {
+   NT_LIST_ENTRY ListEntry;
+   ULONG ProcessId;
+   HANDLE SocketHandle;
+   
+   UINT dip;
+   USHORT dport;
+   UINT sip;
+   USHORT sport;
+   UCHAR protocol;
+} SOCKET_ENTRY, *PSOCKET_ENTRY;
 
-	target_ulong breakpoint;
-	target_ulong cr3;
+BOOLEAN
+InitSocketList();
 
-	qebek_cb_func cb_func;
-	void* user_data;
+PSOCKET_ENTRY
+GetSocketEntry(
+   IN ULONG ProcessId,
+   IN CONST HANDLE SocketHandle
+   );
 
-	bool enable;
-}qebek_bp_slot, *pqbek_bp_slot;
+BOOLEAN 
+IsSocketHandle(
+   IN ULONG ProcessId,
+   IN HANDLE hSocket
+   );
 
-#define QEBEK_BP_MAX 0x1000
-#define QEBEK_BP_HASH(X) ((X >> 4) & (QEBEK_BP_MAX - 1))
+PSOCKET_ENTRY
+InsertSocketHandle(
+   IN ULONG ProcessId,
+   IN HANDLE SocketHandle
+   );
 
-bool qebek_bpt_init();
-void qebek_bpt_free();
-qebek_bp_slot* qebek_bp_check(target_ulong address, target_ulong cr3);
-bool qebek_bp_add(target_ulong address, target_ulong cr3, qebek_cb_func cb_func, void* user_data);
-bool qebek_bp_remove(target_ulong address, target_ulong cr3);
+VOID
+RemoveSocketEntry(
+   IN ULONG ProcessId,
+   IN HANDLE SocketHandle
+   );
 
 #endif

@@ -25,7 +25,7 @@
 #include "qebek-op.h"
 #include "qebek-bp.h"
 #include "qebek-nt-console.h"
-
+#include "qebek-nt-network.h"
 
 void qebek_hook_syscall(CPUX86State *env)
 {
@@ -68,11 +68,16 @@ void qebek_hook_syscall(CPUX86State *env)
 			index_NtClose = 0x019;
 			index_NtReadFile = 0x0b7;
 			index_NtWriteFile = 0x112;
+
+			index_NtDeviceIoControlFile = 0x042;
+			index_NtWaitForSingleObject = 0x10f;
 			break;
 		default:
 			break;
 		}
 
+		// ConsoleSpy
+		//
 		if(!InitConsoleSpy())
 		{
 			qemu_printf("qebek_hook_syscall: failed to initialize windows console spy.\n");
@@ -84,33 +89,51 @@ void qebek_hook_syscall(CPUX86State *env)
 		qebek_read_ulong(env, ssdt + index_NtClose * 4, &NtClose);
 		qebek_read_ulong(env, ssdt + index_NtReadFile * 4, &NtReadFile);
 		qebek_read_ulong(env, ssdt + index_NtWriteFile * 4, &NtWriteFile);
-		qemu_printf("NtWriteFile: %x\n", NtWriteFile);
+		//qemu_printf("NtWriteFile: %x\n", NtWriteFile);
 
-		/*if(!qebek_bp_add(NtRequestWaitReplyPort, preNtRequestWaitReplyPort, NULL))
+
+		if(!qebek_bp_add(NtRequestWaitReplyPort, 0, preNtRequestWaitReplyPort, NULL))
 		{
 			qemu_printf("qebek_hook_syscall: failed to insert break point for NtRequestWaitReplyPort\n");
 			return;
-		}*/
-        if(!qebek_bp_add(NtSecureConnectPort, preNtSecureConnectPort, NULL))
+		}
+        if(!qebek_bp_add(NtSecureConnectPort, 0, preNtSecureConnectPort, NULL))
         {
             qemu_printf("qebek_hook_syscall: failed to insert break point for NtSecureConnectPort\n");
             return;
         }
-        if(!qebek_bp_add(NtClose, preNtClose, NULL))
+        if(!qebek_bp_add(NtClose, 0, preNtClose, NULL))
         {
             qemu_printf("qebek_hook_syscall: failed to insert break point for NtClose\n");
             return;
         }
-        if(!qebek_bp_add(NtReadFile, preNtReadFile, NULL))
+        if(!qebek_bp_add(NtReadFile, 0, preNtReadFile, NULL))
         {
             qemu_printf("qebek_hook_syscall: failed to insert break point for NtReadFile\n");
             return;
         }
-        if(!qebek_bp_add(NtWriteFile, preNtWriteFile, NULL))
+        if(!qebek_bp_add(NtWriteFile, 0, preNtWriteFile, NULL))
         {
             qemu_printf("qebek_hook_syscall: failed to insert break point for NtWriteFile\n");
             return;
         }
+
+		// network
+		//
+		if(!InitNetwork())
+		{
+			qemu_printf("qebek_hook_syscall: failed to initialize network spy.\n");
+			return;
+		}
+		
+		qebek_read_ulong(env, ssdt + index_NtDeviceIoControlFile * 4, &NtDeviceIoControlFile);
+		qebek_read_ulong(env, ssdt + index_NtWaitForSingleObject * 4, &NtWaitForSingleObject);
+		
+		if(!qebek_bp_add(NtDeviceIoControlFile, 0, preNtDeviceIoControlFile, NULL))
+		{
+			qemu_printf("qebek_hook_syscall: failed to insert break point for NtDeviceIoControlFile\n");
+			return;
+		}
 
 		break;
 		
@@ -154,7 +177,7 @@ void qebek_check_target(CPUX86State *env, target_ulong new_eip)
 		NtReadFilePost = 0;
 	}*/
 
-	if((bp_slot = qebek_bp_check(eip)) == NULL)
+	if((bp_slot = qebek_bp_check(eip, env->cr[3])) == NULL)
 		return;
 
 	bp_slot->cb_func(env, bp_slot->user_data);

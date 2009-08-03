@@ -23,7 +23,7 @@
 #include "qebek-common.h"
 #include "qebek-os.h"
 
-bool qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *value)
+bool qebek_read_ulong(CPUX86State *env, target_ulong address, uint32_t *value)
 {
 	target_phys_addr_t phys_addr;
 
@@ -35,7 +35,7 @@ bool qebek_read_ulong(CPUX86State *env, target_ulong address, target_ulong *valu
 	return True;
 }
 
-bool qebek_read_uword(CPUX86State *env, target_ulong address, target_ulong *value)
+bool qebek_read_uword(CPUX86State *env, target_ulong address, uint16_t *value)
 {
 	target_phys_addr_t phys_addr;
 
@@ -61,7 +61,10 @@ bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int
 
 void qebek_log_data(CPUX86State *env, uint16_t type, uint8_t *data, uint32_t len)
 {
-	//log data
+	//get process information
+	proc_info_t proc_info;
+
+	qebek_get_proc_info(env, &proc_info);
 }
 
 bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid)
@@ -93,7 +96,75 @@ bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid)
 		if(!qebek_read_ulong(env, pid_addr, pid))
 		{
 			qemu_printf("qebek_get_current_pid: failed to read PID, pointer %08X.\n", pid_addr);
+			return False;
 		}
+
+		break;
+
+	default:
+		break;
+	}
+
+	return True;
+}
+
+bool qebek_get_proc_info(CPUX86State *env, proc_info_t *proc_info)
+{
+	target_ulong pkthread = 0xffdff124, peprocess, pid_addr, ppid_addr, pname_addr;
+	target_ulong kthread, eprocess, pname;
+	uint32_t pname_offset;
+
+	switch(qebek_os_major)
+	{
+	case QEBEK_OS_windows:
+		if(!qebek_read_ulong(env, pkthread, &kthread))
+		{
+			qemu_printf("qebek_get_proc_info: failed to read KTHREAD address.\n");
+			return False;
+		}
+
+		peprocess = pkthread + 0x44;
+		if(!qebek_read_ulong(env, peprocess, &eprocess))
+		{
+			qemu_printf("qebek_get_proc_info: failed to read EPROCESS address, pointer %08X.\n", peprocess);
+			return False;
+		}
+
+		if(eprocess == 0) //system thread, belongs to no process
+			return False;
+
+		pid_addr = eprocess + 0x84;
+		if(!qebek_read_ulong(env, pid_addr, &proc_info->pid))
+		{
+			qemu_printf("qebek_get_proc_info: failed to read PID, pointer %08X.\n", pid_addr);
+			return False;
+		}
+
+		ppid_addr = eprocess + 0x14c;
+		if(!qebek_read_ulong(env, ppid_addr, &proc_info->ppid))
+		{
+			qemu_printf("qebek_get_proc_info: failed to read PPID, pointer %08X.\n", ppid_addr);
+			return False;
+		}
+
+		switch(qebek_os_minor)
+		{
+		case QEBEK_OS_winxp:
+			pname_offset = 0x174;
+			break;
+
+		default:
+			return False;
+		}
+		
+		pname_addr = eprocess + pname_offset;
+		memset(proc_info->pname, 0, PROCNAMELEN+1);
+		if(!qebek_read_raw(env, pname_addr, proc_info->pname, PROCNAMELEN))
+		{
+			qemu_printf("qebek_get_proc_info: failed to read PNAME, pointer %08X.\n", pname_addr);
+			return False;
+		}
+		proc_info->pname[PROCNAMELEN] = '\0';
 
 		break;
 

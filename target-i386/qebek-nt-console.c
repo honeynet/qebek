@@ -25,6 +25,7 @@
 #include "qebek-bp.h"
 #include "qebek-nt-console.h"
 #include "qebek-nt-console-helper.h"
+#include "qebek-nt-network-helper.h"
 
 BOOLEAN InitConsoleSpy()
 {
@@ -145,7 +146,7 @@ void preNtReadFile(CPUX86State *env, void* user_data)
 	        
 	// set return address, so the VM will break when returned
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-	if(!qebek_bp_add(ret_addr, postNtReadFile, pReadData))
+	if(!qebek_bp_add(ret_addr, env->cr[3], postNtReadFile, pReadData))
 	{
 		qemu_printf("preNtReadFile: failed to add postcall interception.\n");
 	}
@@ -181,7 +182,7 @@ void postNtReadFile(CPUX86State *env, void* user_data)
 
 	// remove return address
 	bp_addr = env->eip;
-	if(!qebek_bp_remove(bp_addr))
+	if(!qebek_bp_remove(bp_addr, env->cr[3]))
 	{
 		qemu_printf("postNtReadFile: failed to remove postcall interception.\n");
 	}
@@ -210,7 +211,7 @@ void preNtWriteFile(CPUX86State *env, void* user_data)
 
     // set return address, so the VM will break when returned
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-    if(!qebek_bp_add(ret_addr, postNtWriteFile, pWriteData))
+    if(!qebek_bp_add(ret_addr, env->cr[3], postNtWriteFile, pWriteData))
     {
         qemu_printf("preNtWriteFile: failed to add postcall interception.\n");
     }
@@ -246,7 +247,7 @@ void postNtWriteFile(CPUX86State *env, void* user_data)
 
     // remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr))
+    if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
         qemu_printf("postNtWriteFile: failed to remove postcall interception.\n");
     }
@@ -275,7 +276,7 @@ void preNtSecureConnectPort(CPUX86State *env, void* user_data)
 
     // set return address, so the VM will break when returned
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-    if(!qebek_bp_add(ret_addr, postNtSecureConnectPort, pPortData))
+    if(!qebek_bp_add(ret_addr, env->cr[3], postNtSecureConnectPort, pPortData))
     {
         qemu_printf("preNtSecureConnectPort: failed to add postcall interception.\n");
     }
@@ -313,8 +314,9 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 		if(pWriteSection == 0)
 			goto remove_bp;
 
-		if(!qebek_get_current_pid(env, &PID)) //system thread
-			goto remove_bp;
+		//if(!qebek_get_current_pid(env, &PID)) //system thread
+		//	goto remove_bp;
+		PID = env->cr[3];
 
 		if(!qebek_read_ulong(env, pPortHandle, &PortHandle))
 		{
@@ -366,7 +368,7 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 remove_bp:
     // remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr))
+    if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
         qemu_printf("postNtSecureConnectPort: failed to remove postcall interception.\n");
     }
@@ -379,17 +381,18 @@ void preNtClose(CPUX86State *env, void* user_data)
 	//get handle from stack
 	qebek_read_ulong(env, env->regs[R_ESP] + 4, &Handle);
 
-	if(qebek_get_current_pid(env, &PID))
+	//if(qebek_get_current_pid(env, &PID))
 	{
-		if(IsCsrssPortHandle(PID, Handle))
-			RemoveCsrssPortHandle(PID, Handle);
+		PID = env->cr[3];
+		RemoveCsrssPortHandle(PID, Handle);
+		RemoveSocketEntry(PID, Handle);
 	}
 }
 
 void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 {
 	uint32_t PortHandle, RequestMessage;
-	target_ulong ret_addr, opcode_addr;
+	target_ulong ret_addr, csrmsg_addr, opcode_addr;
 	PNtRequestPortData pPortData;
 	uint32_t PID, VirtualOffset, OpCode;
 
@@ -400,14 +403,16 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 	if(RequestMessage == 0)
 		return;
 
-	if(!qebek_get_current_pid(env, &PID))
-		return;
+	//if(!qebek_get_current_pid(env, &PID))
+	//	return;
+	PID = env->cr[3];
 
 	if(!IsCsrssPortHandle(PID, PortHandle))
 		return;
 
 	VirtualOffset = GetVirtualOffsetFromHandle(PID, PortHandle);
-	opcode_addr = RequestMessage + 1 + 4;
+	csrmsg_addr = RequestMessage + 18;
+	opcode_addr = csrmsg_addr + 4;
 
 	//read opcode
 	qebek_read_ulong(env, opcode_addr, &OpCode);
@@ -426,7 +431,7 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 
 		// set return address, so the VM will break when returned
 		qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-		if(!qebek_bp_add(ret_addr, postNtRequestWaitReplyPort, pPortData))
+		if(!qebek_bp_add(ret_addr, env->cr[3], postNtRequestWaitReplyPort, pPortData))
 		{
 			qemu_printf("preNtRequestWaitReplyPort: failed to add postcall interception.\n");
 		}
@@ -445,8 +450,9 @@ void postNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 		qebek_read_ulong(env, env->regs[R_ESP] - 3 * 4, &PortHandle);
 		qebek_read_ulong(env, env->regs[R_ESP] - 2 * 4, &RequestMessage);
 
-		if(!qebek_get_current_pid(env, &PID))
-			goto remove_bp;
+		//if(!qebek_get_current_pid(env, &PID))
+		//	goto remove_bp;
+		PID = env->cr[3];
 
 		VirtualOffset = GetVirtualOffsetFromHandle(PID, PortHandle);
 	}
@@ -463,7 +469,7 @@ void postNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 remove_bp:
 	// remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr))
+    if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
         qemu_printf("postNtRequestWaitReplyPort: failed to remove postcall interception.\n");
     }
@@ -477,9 +483,9 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	uint8_t *buffer;
 	
 	//get MessageBuffer, MessageBufferPtr, MessageBufferSize
-	qebek_read_ulong(env, Message + 20 + 16 + 8, &MessageBuffer);
-	qebek_read_ulong(env, Message + 20 + 16 + 88, &MessageBufferPtr);
-	qebek_read_ulong(env, Message + 20 + 16 + 92, &MessageBufferSize);
+	qebek_read_ulong(env, Message + 24 + 16 + 8, &MessageBuffer); // 0x30
+	qebek_read_ulong(env, Message + 24 + 16 + 88, &MessageBufferPtr); // 0x80
+	qebek_read_ulong(env, Message + 24 + 16 + 92, &MessageBufferSize); // 0x84
 
 	if(MessageBuffer != MessageBufferPtr)
 	{
@@ -515,7 +521,7 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	else
 	{
 		// log
-		//qebek_log_data(env, SEBEK_TYPE_WRITE, buffer, BufferSize);
+		qebek_log_data(env, SEBEK_TYPE_WRITE, buffer, cbSize);
 	}
 
 	qemu_free(buffer);
@@ -528,10 +534,10 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	uint8_t *buffer;
 	
 	//get MessageBuffer, MessageBufferPtr, MessageBufferSize
-	qebek_read_ulong(env, Message + 20 + 16 + 10, &MessageBuffer);
-	qebek_read_ulong(env, Message + 20 + 16 + 92, &MessageBufferPtr);
-	qebek_read_ulong(env, Message + 20 + 16 + 96, &NumberOfCharsToRead);
-	qebek_read_ulong(env, Message + 20 + 16 + 100, &MessageBufferSize);
+	qebek_read_ulong(env, Message + 24 + 16 + 10, &MessageBuffer); // 0x32
+	qebek_read_ulong(env, Message + 24 + 16 + 92, &MessageBufferPtr); // 0x84
+	qebek_read_ulong(env, Message + 24 + 16 + 96, &NumberOfCharsToRead); // 0x88
+	qebek_read_ulong(env, Message + 24 + 16 + 100, &MessageBufferSize); // 0x8c
 
 	if(MessageBuffer != MessageBufferPtr)
 	{
@@ -565,7 +571,7 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	else
 	{
 		// log
-		//qebek_log_data(env, SEBEK_TYPE_READ, buffer, NumberOfCharsToRead);
+		qebek_log_data(env, SEBEK_TYPE_READ, buffer, NumberOfCharsToRead);
 	}
 
 	qemu_free(buffer);
