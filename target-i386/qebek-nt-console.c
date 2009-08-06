@@ -20,6 +20,7 @@
  */
 
 #include "qemu-common.h"
+#include <wchar.h>
 #include "osdep.h"
 #include "qebek-common.h"
 #include "qebek-bp.h"
@@ -264,7 +265,7 @@ void preNtSecureConnectPort(CPUX86State *env, void* user_data)
     qebek_read_ulong(env, env->regs[R_ESP] + 2 * 4, &PortName);
     qebek_read_ulong(env, env->regs[R_ESP] + 4 * 4, &WriteSection);
 
-    qemu_printf("preNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", PortHandle, PortName, WriteSection);
+    //qemu_printf("preNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", PortHandle, PortName, WriteSection);
 
 	pPortData = (PNtConnectPortData)qemu_malloc(sizeof(NtConnectPortData));
 	if(pPortData != NULL)
@@ -285,8 +286,10 @@ void preNtSecureConnectPort(CPUX86State *env, void* user_data)
 void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 {
     uint32_t pPortHandle, pPortName, pWriteSection;
-    target_ulong bp_addr, name_length, name_buffer;
+    target_ulong bp_addr, name_buffer;
+	uint16_t name_length;
 	char port_name[34];
+	char target_name[32] = {'\\',0,'W',0,'i',0,'n',0,'d',0,'o',0,'w',0,'s',0,'\\',0,'A',0,'p',0,'i',0,'P',0,'o',0,'r',0,'t',0};
 	PNtConnectPortData pPortData = (PNtConnectPortData)user_data;
 	uint32_t PortHandle, VirtualOffset, TargetViewBase, ViewBase, PID;
 
@@ -306,7 +309,7 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 		qemu_free(pPortData);
 	}
 
-    qemu_printf("postNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", pPortHandle, pPortName, pWriteSection);
+    //qemu_printf("postNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", pPortHandle, pPortName, pWriteSection);
 
     // if succeed
     if(env->regs[R_EAX] == 0)
@@ -345,7 +348,7 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 			goto remove_bp;
 		}
 
-		if(memcmp(port_name, L"\\Windows\\ApiPort", 32))
+		if(memcmp(port_name, target_name, 32))
 			goto remove_bp;
 
 		if(!qebek_read_ulong(env, pWriteSection + 16, &ViewBase))
@@ -399,6 +402,8 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 	//get port handle, request message address
 	qebek_read_ulong(env, env->regs[R_ESP] + 4, &PortHandle);
 	qebek_read_ulong(env, env->regs[R_ESP] + 2 * 4, &RequestMessage);
+
+	//qemu_printf("preNtRequestWaitReplyPort: PortHandle %08x, RequestMessage %08x\n", PortHandle, RequestMessage);
 	
 	if(RequestMessage == 0)
 		return;
@@ -411,11 +416,16 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 		return;
 
 	VirtualOffset = GetVirtualOffsetFromHandle(PID, PortHandle);
-	csrmsg_addr = RequestMessage + 18;
+	csrmsg_addr = RequestMessage + 24;
 	opcode_addr = csrmsg_addr + 4;
 
 	//read opcode
-	qebek_read_ulong(env, opcode_addr, &OpCode);
+	if(!qebek_read_ulong(env, opcode_addr, &OpCode))
+	{
+		qemu_printf("preNtRequestWaitReplyPort: failed to read opcode: %08x\n", opcode_addr);
+		return;
+	}
+	
 	if(OpCode == OPCODE_WRITE_CONSOLE)
 	{
 		OnCsrWriteDataPre(env, RequestMessage, VirtualOffset);
@@ -464,9 +474,10 @@ void postNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 		qemu_free(pPortData);
 	}
 
+	qemu_printf("postNtRequestWaitReplyPort: PortHandle %08x, RequestMessage %08x\n", PortHandle, RequestMessage);
+
 	OnCsrReadDataPost(env, RequestMessage, VirtualOffset);
 
-remove_bp:
 	// remove return address
     bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
@@ -478,14 +489,19 @@ remove_bp:
 void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 {
 	uint32_t MessageBuffer, MessageBufferPtr, MessageBufferSize;
+	uint8_t Unicode;
 	uint32_t Offset, WriteStringPtr = 0;
 	USHORT cbSize = 0;
 	uint8_t *buffer;
 	
 	//get MessageBuffer, MessageBufferPtr, MessageBufferSize
-	qebek_read_ulong(env, Message + 24 + 16 + 8, &MessageBuffer); // 0x30
+	MessageBuffer =  Message + 24 + 16 + 8; // 0x30
 	qebek_read_ulong(env, Message + 24 + 16 + 88, &MessageBufferPtr); // 0x80
 	qebek_read_ulong(env, Message + 24 + 16 + 92, &MessageBufferSize); // 0x84
+	qebek_read_byte(env, Message + 24 + 16 + 101, &Unicode); //0x8d
+
+	qemu_printf("OnWriteDataPre: MessageBuffer %08x, MessageBufferPtr %08x, MessageBufferSize %08x, Unicode %d\n",
+			MessageBuffer, MessageBufferPtr, MessageBufferSize, Unicode);
 
 	if(MessageBuffer != MessageBufferPtr)
 	{
@@ -505,6 +521,9 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 		WriteStringPtr = MessageBuffer;
 		cbSize = (USHORT)(min(MessageBufferSize, CONSOLE_WRITE_INFO_MESSAGE_BUFFER_SIZE));
 	}
+
+	if(!WriteStringPtr) // bad data
+		return;
 
 	buffer = (uint8_t *)qemu_malloc(cbSize + 1);
 	if(buffer == NULL)
@@ -530,15 +549,20 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 {
 	uint32_t MessageBuffer, MessageBufferPtr, MessageBufferSize, NumberOfCharsToRead;
+	uint8_t Unicode;
 	uint32_t Offset, ReadStringPtr = 0;
 	uint8_t *buffer;
 	
 	//get MessageBuffer, MessageBufferPtr, MessageBufferSize
-	qebek_read_ulong(env, Message + 24 + 16 + 10, &MessageBuffer); // 0x32
+	MessageBuffer = Message + 24 + 16 + 10; // 0x32
 	qebek_read_ulong(env, Message + 24 + 16 + 92, &MessageBufferPtr); // 0x84
 	qebek_read_ulong(env, Message + 24 + 16 + 96, &NumberOfCharsToRead); // 0x88
 	qebek_read_ulong(env, Message + 24 + 16 + 100, &MessageBufferSize); // 0x8c
+	qebek_read_byte(env, Message + 24 + 16 + 116, &Unicode); // 0x9c
 
+	qemu_printf("OnReadDataPost: MessageBuffer %08x, MessageBufferPtr %08x, NumberOfCharsToRead %08x, MessageBufferSize %08x, Unicode %d\n",
+			MessageBuffer, MessageBufferPtr, NumberOfCharsToRead, MessageBufferSize, Unicode);
+	
 	if(MessageBuffer != MessageBufferPtr)
 	{
 		Offset = MessageBufferPtr - VirtualOffset;
@@ -555,6 +579,9 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	{
 		ReadStringPtr = MessageBuffer;
 	}
+
+	if(!ReadStringPtr) // bad data
+		return;
 
 	buffer = (uint8_t *)qemu_malloc(NumberOfCharsToRead + 1);
 	if(buffer == NULL)

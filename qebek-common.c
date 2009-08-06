@@ -47,6 +47,18 @@ bool qebek_read_uword(CPUX86State *env, target_ulong address, uint16_t *value)
 	return True;
 }
 
+bool qebek_read_byte(CPUX86State *env, target_ulong address, uint8_t *value)
+{
+    target_phys_addr_t phys_addr;
+
+    phys_addr = cpu_get_phys_page_debug(env, address);
+    if(phys_addr == -1)
+        return False;
+
+    *value = ldub_phys((phys_addr & TARGET_PAGE_MASK) | (address & ~TARGET_PAGE_MASK));
+    return True;
+}
+
 bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int len)
 {
 	target_phys_addr_t phys_addr;

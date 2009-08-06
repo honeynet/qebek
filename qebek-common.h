@@ -138,6 +138,7 @@ typedef struct proc_infor_t
 
 bool qebek_read_ulong(CPUX86State *env, target_ulong address, uint32_t *value);
 bool qebek_read_uword(CPUX86State *env, target_ulong address, uint16_t *value);
+bool qebek_read_byte(CPUX86State *env, target_ulong address, uint8_t *value);
 bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int len);
 
 bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid);

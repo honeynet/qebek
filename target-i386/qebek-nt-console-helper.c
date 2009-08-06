@@ -94,6 +94,8 @@ GetVirtualOffsetFromHandle(
    if (!s_PortDataInitialized)
       return FALSE;
 
+   //qemu_printf("GetVirtualOffsetFromHandle(PID:%xh; PortHandle:%xh)\n", ProcessId, PortHandle);
+
    Entry = GetCsrssHandleEntry(ProcessId, PortHandle);
    if (Entry)
       VirtualOffset = Entry->VirtualOffset;
@@ -118,7 +120,7 @@ InsertCsrssPortHandle(
    if (!Entry)
       return;
 
-   qemu_printf("InsertCsrssPortHandle(PID:%d; PortHandle:%xh; Offset:0x%08x\n", ProcessId, PortHandle, VirtualOffset);
+   //qemu_printf("InsertCsrssPortHandle(PID:%xh; PortHandle:%xh; Offset:0x%08x)\n", ProcessId, PortHandle, VirtualOffset);
 
    Entry->PortHandle = PortHandle;
    Entry->ProcessId = ProcessId;
@@ -142,7 +144,7 @@ RemoveCsrssPortHandle(
 
    if (Entry)
    {
-      qemu_printf("RemoveCsrssPortHandle(PID:%d; PortHandle:%xh\n", ProcessId, PortHandle);
+      //qemu_printf("RemoveCsrssPortHandle(PID:%x; PortHandle:%xh)\n", ProcessId, PortHandle);
 
       RemoveEntryList(&Entry->ListEntry);
       qemu_free(Entry);
