@@ -76,6 +76,9 @@ typedef unsigned char UCHAR;
 #define PROCNAMELEN 20
 #endif
 
+#define SEBEK_MAGIC   208 // this is in network order. 0xD0D0D000 in host order on x86
+#define SEBEK_PROTOCOL_VER 3
+
 #define SYS_SOCKET      1               /* sys_socket(2)                */
 #define SYS_BIND        2               /* sys_bind(2)                  */
 #define SYS_CONNECT     3               /* sys_connect(2)               */

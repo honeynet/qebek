@@ -134,6 +134,8 @@ int inet_aton(const char *cp, struct in_addr *ia);
 /* qebek specific */
 #include "qebek-os.h"
 #include "qebek-bp.h"
+extern uint32_t qebek_g_magic;
+extern uint32_t qebek_g_ip;
 
 #define DEFAULT_NETWORK_SCRIPT "/etc/qemu-ifup"
 #define DEFAULT_NETWORK_DOWN_SCRIPT "/etc/qemu-ifdown"
@@ -7732,6 +7734,8 @@ enum {
     QEBEK_OPTION_win2k8,
     QEBEK_OPTION_win7,
 
+	QEBEK_OPTION_magic,
+	QEBEK_OPTION_ip,
 };
 
 typedef struct QEMUOption {
@@ -7848,6 +7852,9 @@ const QEMUOption qemu_options[] = {
     { "vista", 0, QEBEK_OPTION_vista },
     { "win2k8", 0, QEBEK_OPTION_win2k8 },
     { "win7", 0, QEBEK_OPTION_win7 },
+
+	{ "sbk_magic", HAS_ARG, QEBEK_OPTION_magic },
+	{ "sbk_ip", HAS_ARG, QEBEK_OPTION_ip },
 
     { NULL },
 };
@@ -8109,6 +8116,7 @@ int main(int argc, char **argv)
     int fds[2];
     const char *pid_file = NULL;
     VLANState *vlan;
+	struct in_addr inp;
 
     LIST_INIT (&vm_change_state_head);
 #ifndef _WIN32
@@ -8178,6 +8186,13 @@ int main(int argc, char **argv)
 
     nb_nics = 0;
     /* default mac address of the first network interface */
+
+	/* default qebek os type Windows XP */
+	qebek_os_major = QEBEK_OS_windows;
+	qebek_os_minor = QEBEK_OS_winxp;
+
+	qebek_g_magic = SEBEK_MAGIC;
+	qebek_g_ip = 0x7f000001; // 127.0.0.1
 
     optind = 1;
     for(;;) {
@@ -8683,7 +8698,38 @@ int main(int argc, char **argv)
                     }
                 }
                 break;
-			
+
+	    case QEMU_OPTION_linux:
+		argos_os_hint = 0;
+		if (argos_wprofile == NULL)
+			argos_wprofile = "linux";
+		break;
+	    case QEMU_OPTION_win2k:
+		argos_os_hint = 1;
+		if (argos_wprofile == NULL)
+			argos_wprofile = "win2k";
+		break;
+	    case QEMU_OPTION_winxp:
+		argos_os_hint = 2;
+		if (argos_wprofile == NULL)
+			argos_wprofile = "winxp";
+		break;
+	    case QEMU_OPTION_wp:
+		argos_wprofile = strdup(optarg);
+		break;
+	    case QEMU_OPTION_csilog:
+		argos_csilog = 0;
+		break;
+	    case QEMU_OPTION_no_fsc:
+		argos_fsc = 0;
+		break;
+            case QEMU_OPTION_cs_laddr:
+		ctrl_socket_laddr = optarg;
+		break;
+	    case QEMU_OPTION_cs_lport:
+		ctrl_socket_lport = atoi(optarg);
+		break;
+
 			/* qebek os options */
 			case QEBEK_OPTION_win2k:
 				qebek_os_major = QEBEK_OS_windows;
@@ -8709,14 +8755,23 @@ int main(int argc, char **argv)
 				qebek_os_major = QEBEK_OS_windows;
 				qebek_os_minor = QEBEK_OS_win7;
 				break;
-            }
+
+			case QEBEK_OPTION_magic:
+				qebek_g_magic = htonl(atoi(optarg));
+				break;
+			case QEBEK_OPTION_ip:
+				if(inet_aton(optarg, &inp))
+					qebek_g_ip = inp.s_addr;
+				break;
+
+	    	}
         }
     }
 
-    if (!qebek_bpt_init()) {
-        fprintf(stderr, "Cannot initialize qebek break point table\n");
-        exit(1);
-    }
+	if (!qebek_bpt_init()) {
+		fprintf(stderr, "Cannot initialize qebek break point table\n");
+		exit(1);
+	}
 
 
 #ifndef _WIN32

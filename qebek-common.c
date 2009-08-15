@@ -20,8 +20,13 @@
  */
 
 #include "qemu-common.h"
+#include <netinet/in.h>
+#include <sys/time.h>
 #include "qebek-common.h"
 #include "qebek-os.h"
+
+uint32_t qebek_g_magic;
+uint32_t qebek_g_ip;
 
 bool qebek_read_ulong(CPUX86State *env, target_ulong address, uint32_t *value)
 {
@@ -73,10 +78,40 @@ bool qebek_read_raw(CPUX86State *env, target_ulong address, uint8_t* buffer, int
 
 void qebek_log_data(CPUX86State *env, uint16_t type, uint8_t *data, uint32_t len)
 {
-	//get process information
+	static int counter;
+	struct timeval tv;
+	struct sebek_hdr sbk_hdr;
 	proc_info_t proc_info;
 
-	qebek_get_proc_info(env, &proc_info);
+	gettimeofday(&tv, NULL);
+
+	//get process information
+	if(!qebek_get_proc_info(env, &proc_info))
+		return;
+
+	memset(&sbk_hdr, 0, sizeof(sbk_hdr));
+	
+	sbk_hdr.magic = htonl(qebek_g_magic);
+	sbk_hdr.version = htons(SEBEK_PROTOCOL_VER);
+	sbk_hdr.type = htons(type);
+
+	sbk_hdr.counter = htonl(counter++);
+	sbk_hdr.time_sec = htonl(tv.tv_sec);
+	sbk_hdr.time_usec = htonl(tv.tv_usec);
+
+	sbk_hdr.parent_pid = htonl(proc_info.ppid);
+	sbk_hdr.pid = htonl(proc_info.pid);
+
+	memcpy(sbk_hdr.com, proc_info.pname, SEBEK_HEADER_COMMAND_LEN);
+	sbk_hdr.length = len;
+
+	fwrite(&tv.tv_sec, 4, 1, stdout); // write fake pcap sec
+	fwrite(&tv.tv_usec, 4, 1, stdout); // write fake pcap usec
+	fwrite(&qebek_g_ip, 4, 1, stdout); // write fake ip
+	fwrite(&sbk_hdr, sizeof(sbk_hdr), 1, stdout); // write sebek header
+	if(data)
+		fwrite(data, len, 1, stdout); // write sebek data
+	fflush(stdout);
 }
 
 bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid)
@@ -94,7 +129,7 @@ bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid)
 			return False;
 		}
 
-		peprocess = pkthread + 0x44;
+		peprocess = kthread + 0x44;
 		if(!qebek_read_ulong(env, peprocess, &eprocess))
 		{
 			qemu_printf("qebek_get_current_pid: failed to read EPROCESS address, pointer %08X.\n", peprocess);
@@ -135,7 +170,7 @@ bool qebek_get_proc_info(CPUX86State *env, proc_info_t *proc_info)
 			return False;
 		}
 
-		peprocess = pkthread + 0x44;
+		peprocess = kthread + 0x44;
 		if(!qebek_read_ulong(env, peprocess, &eprocess))
 		{
 			qemu_printf("qebek_get_proc_info: failed to read EPROCESS address, pointer %08X.\n", peprocess);
@@ -176,7 +211,6 @@ bool qebek_get_proc_info(CPUX86State *env, proc_info_t *proc_info)
 			qemu_printf("qebek_get_proc_info: failed to read PNAME, pointer %08X.\n", pname_addr);
 			return False;
 		}
-		proc_info->pname[PROCNAMELEN] = '\0';
 
 		break;
 
