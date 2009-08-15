@@ -117,8 +117,7 @@ VOID OnNtReadWriteFile(CPUX86State *env, HANDLE Handle, ULONG Buffer, ULONG Buff
 	else
 	{
 		// log
-		//qebek_log_data(env, SEBEK_TYPE_READ, buffer, BufferSize);
-		qemu_printf("OnNtReadWriteFile: %s\n", buffer);	
+		qebek_log_data(env, SEBEK_TYPE_READ, buffer, BufferSize);
 	}
 
 	qemu_free(buffer);
@@ -500,8 +499,8 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	qebek_read_ulong(env, Message + 24 + 16 + 92, &MessageBufferSize); // 0x84
 	qebek_read_byte(env, Message + 24 + 16 + 101, &Unicode); //0x8d
 
-	qemu_printf("OnWriteDataPre: MessageBuffer %08x, MessageBufferPtr %08x, MessageBufferSize %08x, Unicode %d\n",
-			MessageBuffer, MessageBufferPtr, MessageBufferSize, Unicode);
+	//qemu_printf("OnWriteDataPre: MessageBuffer %08x, MessageBufferPtr %08x, MessageBufferSize %08x, Unicode %d\n",
+	//		MessageBuffer, MessageBufferPtr, MessageBufferSize, Unicode);
 
 	if(MessageBuffer != MessageBufferPtr)
 	{
@@ -560,8 +559,8 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	qebek_read_ulong(env, Message + 24 + 16 + 100, &MessageBufferSize); // 0x8c
 	qebek_read_byte(env, Message + 24 + 16 + 116, &Unicode); // 0x9c
 
-	qemu_printf("OnReadDataPost: MessageBuffer %08x, MessageBufferPtr %08x, NumberOfCharsToRead %08x, MessageBufferSize %08x, Unicode %d\n",
-			MessageBuffer, MessageBufferPtr, NumberOfCharsToRead, MessageBufferSize, Unicode);
+	//qemu_printf("OnReadDataPost: MessageBuffer %08x, MessageBufferPtr %08x, NumberOfCharsToRead %08x, MessageBufferSize %08x, Unicode %d\n",
+	//		MessageBuffer, MessageBufferPtr, NumberOfCharsToRead, MessageBufferSize, Unicode);
 	
 	if(MessageBuffer != MessageBufferPtr)
 	{
@@ -605,3 +604,33 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 
 }
 
+void preNtCreateThread(CPUX86State *env, void* user_data)
+{
+	target_ulong ret_addr;
+
+	// set return address, so the VM will break when returned
+    qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
+    if(!qebek_bp_add(ret_addr, env->cr[3], postNtSecureConnectPort, NULL))
+    {
+        qemu_printf("preNtCreateThread: failed to add postcall interception.\n");
+    }
+	
+}
+
+void postNtCreateThread(CPUX86State *env, void* user_data)
+{
+	target_ulong bp_addr;
+
+	if(env->regs[R_EAX] == 0)
+	{
+		// log
+		qebek_log_data(env, SEBEK_TYPE_READ, NULL, 0);
+	}
+
+	// remove return address
+    bp_addr = env->eip;
+    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    {
+        qemu_printf("postNtCreateThread: failed to remove postcall interception.\n");
+    }
+}

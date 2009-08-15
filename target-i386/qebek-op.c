@@ -63,7 +63,7 @@ void qebek_hook_syscall(CPUX86State *env)
 		switch(qebek_os_minor)
 		{
 		case QEBEK_OS_winxp:
-			index_NtRequestWaitReplyPort = 0x0c5;
+			index_NtRequestWaitReplyPort = 0x0c8;
 			index_NtSecureConnectPort = 0x0d2;
 			index_NtClose = 0x019;
 			index_NtReadFile = 0x0b7;
@@ -71,7 +71,49 @@ void qebek_hook_syscall(CPUX86State *env)
 
 			index_NtDeviceIoControlFile = 0x042;
 			index_NtWaitForSingleObject = 0x10f;
+
+			index_NtCreateThread = 0x035;
 			break;
+
+		case QEBEK_OS_win2k:
+			index_NtRequestWaitReplyPort = 0x0b0;
+			index_NtSecureConnectPort = 0x0b8;
+			index_NtClose = 0x018;
+			index_NtReadFile = 0x0a1;
+			index_NtWriteFile = 0x0ed;
+
+			index_NtDeviceIoControlFile = 0x038;
+			index_NtWaitForSingleObject = 0x0ea;
+
+			index_NtCreateThread = 0x02e;
+			break;
+
+		case QEBEK_OS_win2k3:
+			index_NtRequestWaitReplyPort = 0x0d0;
+			index_NtSecureConnectPort = 0x0da;
+			index_NtClose = 0x01b;
+			index_NtReadFile = 0x0bf;
+			index_NtWriteFile = 0x11c;
+
+			index_NtDeviceIoControlFile = 0x045;
+			index_NtWaitForSingleObject = 0x119;
+
+			index_NtCreateThread = 0x037;
+			break;
+
+		case QEBEK_OS_vista:
+			index_NtRequestWaitReplyPort = 0x110;
+			index_NtSecureConnectPort = 0x11f;
+			index_NtClose = 0x02f;
+			index_NtReadFile = 0x0ff;
+			index_NtWriteFile = 0x164;
+
+			index_NtDeviceIoControlFile = 0x07e;
+			index_NtWaitForSingleObject = 0x161;
+
+			index_NtCreateThread = 0x04c;
+			break;
+
 		default:
 			break;
 		}
@@ -91,6 +133,7 @@ void qebek_hook_syscall(CPUX86State *env)
 		qebek_read_ulong(env, ssdt + index_NtWriteFile * 4, &NtWriteFile);
 		//qemu_printf("NtWriteFile: %x\n", NtWriteFile);
 
+		qebek_read_ulong(env, ssdt + index_NtCreateThread * 4, &NtCreateThread);
 
 		if(!qebek_bp_add(NtRequestWaitReplyPort, 0, preNtRequestWaitReplyPort, NULL))
 		{
@@ -117,6 +160,12 @@ void qebek_hook_syscall(CPUX86State *env)
             qemu_printf("qebek_hook_syscall: failed to insert break point for NtWriteFile\n");
             return;
         }
+
+		if(!qebek_bp_add(NtCreateThread, 0, preNtCreateThread, NULL))
+		{
+			qemu_printf("qebek_hook_syscall: failed to insert break point for NtCreateThread\n");
+			return;
+		}
 
 		// network
 		//

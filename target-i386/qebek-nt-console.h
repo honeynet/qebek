@@ -27,12 +27,14 @@ uint16_t index_NtSecureConnectPort;
 uint16_t index_NtClose;
 uint16_t index_NtReadFile;
 uint16_t index_NtWriteFile;
+uint16_t index_NtCreateThread;
 
 uint32_t NtRequestWaitReplyPort;
 uint32_t NtSecureConnectPort;
 uint32_t NtClose;
 uint32_t NtWriteFile;
 uint32_t NtReadFile;
+uint32_t NtCreateThread;
 
 BOOLEAN InitConsoleSpy();
 
@@ -69,6 +71,9 @@ void preNtReadFile(CPUX86State *env, void* user_data);
 void postNtReadFile(CPUX86State *env, void* user_data);
 void preNtWriteFile(CPUX86State *env, void* user_data);
 void postNtWriteFile(CPUX86State *env, void* user_data);
+
+void preNtCreateThread(CPUX86State *env, void* user_data);
+void postNtCreateThread(CPUX86State *env, void* user_data);
 
 //
 // TODO: Check the current version before choosing an opcode
