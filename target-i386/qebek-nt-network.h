@@ -67,5 +67,14 @@ void postNtWaitForSingleObject(CPUX86State *env, void* user_data);
 void OnRecvfromComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer);
 void OnAcceptComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer);
 
-void LogRecord(CPUX86State *env, uint8_t call, PSOCKET_ENTRY entry);
+struct sbk_sock_rec {
+	UINT  dip;
+	USHORT  dport;
+	UINT  sip;
+	USHORT  sport;
+	USHORT  call;
+	UCHAR   proto;
+};
+
+void LogRecord(CPUX86State *env, uint8_t call, uint32_t Handle, PSOCKET_ENTRY entry);
 #endif

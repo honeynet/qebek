@@ -27,6 +27,7 @@
 #include "qebek-nt-network.h"
 #include "qebek-nt-network-helper.h"
 
+extern uint32_t qebek_g_ip;
 
 BOOLEAN InitNetwork()
 {
@@ -89,8 +90,8 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	PNtDeviceIoControlFileData pControlData;
 	PSOCKET_ENTRY pSocketEntry;
 	PNtWaitForSingleObjectData pWaitData;
-	uint32_t ip, addr_in, dip;
-	uint16_t port, dport;
+	uint32_t ip, addr_in;
+	uint16_t port;
 	target_ulong ip_addr, port_addr, addr_addr, bp_addr, sh_addr;
 
 	
@@ -200,19 +201,19 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		pSocketEntry->dport = port;
 		pSocketEntry->protocol = IPPROTO_TCP;
 		
-		LogRecord(env, SYS_CONNECT, pSocketEntry);
+		LogRecord(env, SYS_CONNECT, SocketHandle, pSocketEntry);
 
 		break;
 		
 	case AFD_SEND:
 		if((pSocketEntry = GetSocketEntry(PID, FileHandle)) != NULL)
-			LogRecord(env, SYS_SENDMSG, pSocketEntry);
+			LogRecord(env, SYS_SENDMSG, FileHandle, pSocketEntry);
 
 		break;
 
 	case AFD_RECV:
 		if((pSocketEntry = GetSocketEntry(PID, FileHandle)) != NULL)
-			LogRecord(env, SYS_RECVMSG, pSocketEntry);
+			LogRecord(env, SYS_RECVMSG, FileHandle, pSocketEntry);
 
 		break;
 
@@ -247,7 +248,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		pSocketEntry->dport = port;
 		pSocketEntry->protocol = IPPROTO_UDP;
 		
-		LogRecord(env, SYS_SENDTO, pSocketEntry);
+		LogRecord(env, SYS_SENDTO, FileHandle, pSocketEntry);
 
 		break;
 
@@ -357,7 +358,7 @@ void OnRecvfromComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer)
 	pSocketEntry->dport = port;
 	pSocketEntry->protocol = IPPROTO_UDP;
 		
-	LogRecord(env, SYS_RECVFROM, pSocketEntry);
+	LogRecord(env, SYS_RECVFROM, FileHandle, pSocketEntry);
 }
 
 void OnAcceptComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer)
@@ -389,7 +390,7 @@ void OnAcceptComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer)
 	pSocketEntry->dport = port;
 	pSocketEntry->protocol = IPPROTO_TCP;
 		
-	LogRecord(env, SYS_ACCEPT, pSocketEntry);
+	LogRecord(env, SYS_ACCEPT, FileHandle, pSocketEntry);
 }
 
 void preNtWaitForSingleObject(CPUX86State *env, void* user_data)
@@ -451,11 +452,15 @@ void postNtWaitForSingleObject(CPUX86State *env, void* user_data)
     }
 }
 
-void LogRecord(CPUX86State *env, uint8_t call, PSOCKET_ENTRY entry)
+void LogRecord(CPUX86State *env, uint8_t call, uint32_t handle, PSOCKET_ENTRY entry)
 {
+	struct sbk_sock_rec record;
 	uint32_t sip, dip;
 	uint16_t sport, dport;
 
+	if(!entry)
+		return;
+	
 	dip = ntohl(entry->dip);
 	dport = ntohs(entry->dport);
 	sip = ntohl(entry->sip);
@@ -464,4 +469,16 @@ void LogRecord(CPUX86State *env, uint8_t call, PSOCKET_ENTRY entry)
 	qemu_printf("%d: %hu.%hu.%hu.%hu:%hu -> %hu.%hu.%hu.%hu:%hu\n", call,
 			(short)((sip >> 24) & 0xff), (short)((sip >> 16) & 0xff), (short)((sip >> 8) & 0xff), (short)(sip & 0xff), sport,
 			(short)((dip >> 24) & 0xff), (short)((dip >> 16) & 0xff), (short)((dip >> 8) & 0xff), (short)(dip & 0xff), dport);
+
+	record.dip = entry->dip;
+	record.dport = entry->dport;
+	if(entry->sip == 0 || entry->sip == 0x7f000001)
+		record.sip = qebek_g_ip;
+	else
+		record.sip = entry->sip;
+	record.sport = entry->sport;
+	record.call = call;
+	record.proto = entry->protocol;
+
+	qebek_log_data(env, SEBEK_TYPE_SOCKET, (uint8_t *)&record, sizeof(record));
 }
