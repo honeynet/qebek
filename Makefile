@@ -29,7 +29,7 @@ LIBS+=$(AIOLIBS)
 
 all: $(TOOLS) $(DOCS) recurse-all 
 
-subdir-%: dyngen$(EXESUF) libqemu_common.a
+subdir-%: dyngen$(EXESUF) libqebek_common.a
 	$(MAKE) -C $(subst subdir-,,$@) all
 
 recurse-all: $(patsubst %,subdir-%, $(TARGET_DIRS))
@@ -43,7 +43,7 @@ BLOCK_OBJS+=block-dmg.o block-bochs.o block-vpc.o block-vvfat.o
 BLOCK_OBJS+=block-qcow2.o block-parallels.o
 
 ######################################################################
-# libqemu_common.a: Target indepedent part of system emulation. The
+# libqebek_common.a: Target indepedent part of system emulation. The
 # long term path is to suppress *all* target specific code in case of
 # system emulation, i.e. a single QEMU executable should support all
 # CPUs and machines.
@@ -116,7 +116,7 @@ vnc.o: vnc.c keymaps.c sdl_keysym.h vnchextile.h d3des.c d3des.h
 audio/sdlaudio.o: audio/sdlaudio.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(SDL_CFLAGS) $(BASE_CFLAGS) -c -o $@ $<
 
-libqemu_common.a: $(OBJS)
+libqebek_common.a: $(OBJS)
 	rm -f $@ 
 	$(AR) rcs $@ $(OBJS)
 
@@ -168,7 +168,7 @@ install-doc: $(DOCS)
 	$(INSTALL) -m 644 qemu-doc.html  qemu-tech.html "$(DESTDIR)$(docdir)"
 ifndef CONFIG_WIN32
 	mkdir -p "$(DESTDIR)$(mandir)/man1"
-	$(INSTALL) qemu.1 qemu-img.1 "$(DESTDIR)$(mandir)/man1"
+	$(INSTALL) qebek.1 "$(DESTDIR)$(mandir)/man1"
 endif
 
 install: all $(if $(BUILD_DOCS),install-doc)
@@ -228,64 +228,15 @@ dvi: qemu-doc.dvi qemu-tech.dvi
 
 html: qemu-doc.html qemu-tech.html
 
-VERSION ?= $(shell cat VERSION)
-FILE = qemu-$(VERSION)
+QEBEK_VERSION ?= $(shell cat QEBEK_VERSION)
+FILE = qebek-$(QEBEK_VERSION)
 
 # tar release (use 'make -k tar' on a checkouted tree)
 tar:
 	rm -rf /tmp/$(FILE)
 	cp -r . /tmp/$(FILE)
-	( cd /tmp ; tar zcvf ~/$(FILE).tar.gz $(FILE) --exclude CVS )
+	( cd /tmp ; tar zcvf ~/$(FILE).tar.gz $(FILE) --exclude .svn )
 	rm -rf /tmp/$(FILE)
-
-# generate a binary distribution
-tarbin:
-	( cd / ; tar zcvf ~/qemu-$(VERSION)-$(ARCH).tar.gz \
-	$(bindir)/qemu \
-	$(bindir)/qemu-system-ppc \
-	$(bindir)/qemu-system-ppc64 \
-	$(bindir)/qemu-system-ppcemb \
-	$(bindir)/qemu-system-sparc \
-	$(bindir)/qemu-system-x86_64 \
-	$(bindir)/qemu-system-mips \
-	$(bindir)/qemu-system-mipsel \
-	$(bindir)/qemu-system-mips64 \
-	$(bindir)/qemu-system-mips64el \
-	$(bindir)/qemu-system-arm \
-	$(bindir)/qemu-system-m68k \
-	$(bindir)/qemu-system-sh4 \
-	$(bindir)/qemu-system-sh4eb \
-	$(bindir)/qemu-system-cris \
-	$(bindir)/qemu-i386 \
-	$(bindir)/qemu-x86_64 \
-        $(bindir)/qemu-arm \
-        $(bindir)/qemu-armeb \
-        $(bindir)/qemu-sparc \
-        $(bindir)/qemu-sparc32plus \
-        $(bindir)/qemu-sparc64 \
-        $(bindir)/qemu-ppc \
-        $(bindir)/qemu-ppc64 \
-        $(bindir)/qemu-ppc64abi32 \
-        $(bindir)/qemu-mips \
-        $(bindir)/qemu-mipsel \
-        $(bindir)/qemu-alpha \
-        $(bindir)/qemu-m68k \
-        $(bindir)/qemu-sh4 \
-        $(bindir)/qemu-sh4eb \
-        $(bindir)/qemu-cris \
-        $(bindir)/qemu-img \
-	$(datadir)/bios.bin \
-	$(datadir)/vgabios.bin \
-	$(datadir)/vgabios-cirrus.bin \
-	$(datadir)/ppc_rom.bin \
-	$(datadir)/video.x \
-	$(datadir)/openbios-sparc32 \
-        $(datadir)/pxe-ne2k_pci.bin \
-	$(datadir)/pxe-rtl8139.bin \
-        $(datadir)/pxe-pcnet.bin \
-	$(docdir)/qemu-doc.html \
-	$(docdir)/qemu-tech.html \
-	$(mandir)/man1/qemu.1 $(mandir)/man1/qemu-img.1 )
 
 ifneq ($(wildcard .depend),)
 include .depend

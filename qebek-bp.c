@@ -30,7 +30,7 @@ bool qebek_bpt_init()
 	qebek_bpt = qemu_malloc(QEBEK_BP_MAX * sizeof(qebek_bp_slot*));
 	if(!qebek_bpt)
 	{
-		qemu_printf("qebek_bpt_init: failed to allocate break point table.\n");
+		fprintf(stderr, "qebek_bpt_init: failed to allocate break point table.\n");
 
 		return False;
 	}
@@ -81,7 +81,7 @@ bool qebek_bp_add(target_ulong address, target_ulong cr3, qebek_cb_func cb_func,
 		bp_slot = qemu_malloc(sizeof(qebek_bp_slot));
 		if(bp_slot == NULL)
 		{
-			qemu_printf("qebek_bp_add: failed to allocate break point.\n");
+			fprintf(stderr, "qebek_bp_add: failed to allocate break point.\n");
 
 			return False;
 		}

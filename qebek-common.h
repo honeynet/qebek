@@ -115,6 +115,9 @@ typedef unsigned char UCHAR;
 #define SEBEK_TYPE_SOCKET 2
 #define SEBEK_TYPE_OPEN 3
 
+uint32_t qebek_g_ip;
+uint32_t qebek_g_magic;
+
 typedef struct sebek_hdr{
   uint32_t  magic;
   uint16_t  version;

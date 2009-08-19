@@ -75,7 +75,7 @@ QEMU_USER=qemu-$(TARGET_ARCH2)
 # system emulator name
 ifdef CONFIG_SOFTMMU
 ifeq ($(TARGET_ARCH), i386)
-QEMU_SYSTEM=qemu$(EXESUF)
+QEMU_SYSTEM=qebek$(EXESUF)
 else
 QEMU_SYSTEM=qemu-system-$(TARGET_ARCH2)$(EXESUF)
 endif
@@ -285,7 +285,7 @@ OBJS= main.o commpage.o machload.o mmap.o osdep.o signal.o syscall.o thunk.o
 endif
 
 SRCS:= $(OBJS:.o=.c)
-OBJS+= libqemu.a
+OBJS+= libqebek.a
 
 # cpu emulator library
 LIBOBJS=exec.o kqemu.o translate-op.o translate-all.o cpu-exec.o\
@@ -304,7 +304,7 @@ LIBOBJS+=helper.o helper2.o \
 endif
 
 ifeq ($(TARGET_ARCH), x86_64)
-LIBOBJS+=helper.o helper2.o
+LIBOBJS+=helper.o helper2.o 
 endif
 
 ifeq ($(TARGET_BASE_ARCH), ppc)
@@ -391,11 +391,12 @@ $(QEMU_USER): $(OBJS)
 ifeq ($(ARCH),alpha)
 # Mark as 32 bit binary, i. e. it will be mapped into the low 31 bit of
 # the address space (31 bit so sign extending doesn't matter)
-	echo -ne '\001\000\000\000' | dd of=qemu bs=1 seek=48 count=4 conv=notrunc
+	echo -ne '\001\000\000\000' | dd of=qebek bs=1 seek=48 count=4 conv=notrunc
 endif
 
 # must use static linking to avoid leaving stuff in virtual address space
-VL_OBJS=vl.o osdep.o monitor.o pci.o loader.o isa_mmio.o
+VL_OBJS=vl.o osdep.o monitor.o pci.o loader.o isa_mmio.o \
+	qebek-bp.o
 # XXX: suppress QEMU_TOOL tests
 ifdef CONFIG_WIN32
 VL_OBJS+=block-raw-win32.o
@@ -570,7 +571,7 @@ ifdef CONFIG_WIN32
 SDL_LIBS := $(filter-out -mwindows, $(SDL_LIBS)) -mconsole
 endif
 
-$(QEMU_SYSTEM): $(VL_OBJS) ../libqemu_common.a libqemu.a
+$(QEMU_SYSTEM): $(VL_OBJS) ../libqebek_common.a libqebek.a
 	$(CC) $(VL_LDFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS) $(SDL_LIBS) $(COCOA_LIBS) $(VL_LIBS)
 
 depend: $(SRCS)
@@ -581,7 +582,7 @@ vldepend: $(VL_OBJS:.o=.c)
 
 # libqemu
 
-libqemu.a: $(LIBOBJS)
+libqebek.a: $(LIBOBJS)
 	rm -f $@
 	$(AR) rcs $@ $(LIBOBJS)
 

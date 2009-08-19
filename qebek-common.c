@@ -25,9 +25,6 @@
 #include "qebek-common.h"
 #include "qebek-os.h"
 
-uint32_t qebek_g_magic;
-uint32_t qebek_g_ip;
-
 bool qebek_read_ulong(CPUX86State *env, target_ulong address, uint32_t *value)
 {
 	target_phys_addr_t phys_addr;
@@ -103,7 +100,7 @@ void qebek_log_data(CPUX86State *env, uint16_t type, uint8_t *data, uint32_t len
 	sbk_hdr.pid = htonl(proc_info.pid);
 
 	memcpy(sbk_hdr.com, proc_info.pname, SEBEK_HEADER_COMMAND_LEN);
-	sbk_hdr.length = len;
+	sbk_hdr.length = htonl(len);
 
 	fwrite(&tv.tv_sec, 4, 1, stdout); // write fake pcap sec
 	fwrite(&tv.tv_usec, 4, 1, stdout); // write fake pcap usec
@@ -158,7 +155,7 @@ bool qebek_get_current_pid(CPUX86State *env, uint32_t *pid)
 bool qebek_get_proc_info(CPUX86State *env, proc_info_t *proc_info)
 {
 	target_ulong pkthread = 0xffdff124, peprocess, pid_addr, ppid_addr, pname_addr;
-	target_ulong kthread, eprocess, pname;
+	target_ulong kthread, eprocess;
 	uint32_t pname_offset;
 
 	switch(qebek_os_major)

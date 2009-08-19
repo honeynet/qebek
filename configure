@@ -11,14 +11,14 @@ else
     TMPDIR1="/tmp"
 fi
 
-TMPC="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}.c"
-TMPO="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}.o"
-TMPE="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}"
-TMPS="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}.S"
+TMPC="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}.c"
+TMPO="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}.o"
+TMPE="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}"
+TMPS="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}.S"
 
 # default parameters
 prefix=""
-interp_prefix="/usr/gnemul/qemu-%M"
+interp_prefix="/usr/gnemul/qebek-%M"
 static="no"
 cross_prefix=""
 cc="gcc"
@@ -169,7 +169,7 @@ SunOS)
             if test -f /opt/SUNWspro/prod/lib/libsunmath.so.1; then
                 needs_libsunmath="yes"
             else
-                echo "QEMU will not link correctly on Solaris 8/X86 or 9/x86 without"
+                echo "QEBEK will not link correctly on Solaris 8/X86 or 9/x86 without"
                 echo "libsunmath from the Sun Studio compilers tools, due to a lack of"
                 echo "C99 math features in libm.so in Solaris 8/x86 and Solaris 9/x86"
                 echo "Studio 11 can be downloaded from www.sun.com."
@@ -248,8 +248,8 @@ for opt do
   ;;
   --cpu=*) cpu="$optarg"
   ;;
-  --target-list=*) target_list="$optarg"
-  ;;
+  #--target-list=*) target_list="$optarg"
+  #;;
   --enable-gprof) gprof="yes"
   ;;
   --static) static="yes"
@@ -286,20 +286,20 @@ for opt do
   ;;
   --disable-gcc-check) check_gcc="no"
   ;;
-  --disable-system) softmmu="no"
-  ;;
-  --enable-system) softmmu="yes"
-  ;;
-  --disable-linux-user) linux_user="no"
-  ;;
-  --enable-linux-user) linux_user="yes"
-  ;;
-  --disable-darwin-user) darwin_user="no"
-  ;;
-  --enable-darwin-user) darwin_user="yes"
-  ;;
-  --enable-uname-release=*) uname_release="$optarg"
-  ;;
+  #--disable-system) softmmu="no"
+  #;;
+  #--enable-system) softmmu="yes"
+  #;;
+  #--disable-linux-user) linux_user="no"
+  #;;
+  #--enable-linux-user) linux_user="yes"
+  #;;
+  #--disable-darwin-user) darwin_user="no"
+  #;;
+  #--enable-darwin-user) darwin_user="yes"
+  #;;
+  #--enable-uname-release=*) uname_release="$optarg"
+  #;;
   --sparc_cpu=*)
       sparc_cpu="$optarg"
       case $sparc_cpu in
@@ -384,8 +384,8 @@ echo "  --help                   print this message"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
 echo "  --interp-prefix=PREFIX   where to find shared libraries, etc."
 echo "                           use %M for cpu name [$interp_prefix]"
-echo "  --target-list=LIST       set target list [$target_list]"
-echo ""
+#echo "  --target-list=LIST       set target list [$target_list]"
+#echo ""
 echo "kqemu kernel acceleration support:"
 echo "  --disable-kqemu          disable kqemu support"
 echo ""
@@ -407,16 +407,16 @@ echo "  --enable-alsa            enable ALSA audio driver"
 echo "  --enable-fmod            enable FMOD audio driver"
 echo "  --enable-dsound          enable DirectSound audio driver"
 echo "  --disable-vnc-tls        disable TLS encryption for VNC server"
-echo "  --enable-system          enable all system emulation targets"
-echo "  --disable-system         disable all system emulation targets"
-echo "  --enable-linux-user      enable all linux usermode emulation targets"
-echo "  --disable-linux-user     disable all linux usermode emulation targets"
-echo "  --enable-darwin-user     enable all darwin usermode emulation targets"
-echo "  --disable-darwin-user    disable all darwin usermode emulation targets"
+#echo "  --enable-system          enable all system emulation targets"
+#echo "  --disable-system         disable all system emulation targets"
+#echo "  --enable-linux-user      enable all linux usermode emulation targets"
+#echo "  --disable-linux-user     disable all linux usermode emulation targets"
+#echo "  --enable-darwin-user     enable all darwin usermode emulation targets"
+#echo "  --disable-darwin-user    disable all darwin usermode emulation targets"
 echo "  --fmod-lib               path to FMOD library"
 echo "  --fmod-inc               path to FMOD includes"
 echo "  --enable-uname-release=R Return R for uname -r in usermode emulation"
-echo "  --sparc_cpu=V            Build qemu for Sparc architecture v7, v8, v8plus, v8plusa, v9"
+echo "  --sparc_cpu=V            Build qebek for Sparc architecture v7, v8, v8plus, v8plusa, v9"
 echo ""
 echo "NOTE: The object files are built at the place where configure is launched"
 exit 1
@@ -470,8 +470,8 @@ EOF
 	    fi
 	fi
 	if test "$found_compat_cc" = "no" ; then
-	    echo "QEMU is known to have problems when compiled with gcc 4.x"
-	    echo "It is recommended that you use gcc 3.x to build QEMU"
+	    echo "QEBEK is known to have problems when compiled with gcc 4.x"
+	    echo "It is recommended that you use gcc 3.x to build QEBEK"
 	    echo "To use this compiler anyway, configure with --disable-gcc-check"
 	    exit 1;
 	fi
@@ -489,7 +489,7 @@ if test "$solaris" = "yes" ; then
   if test "$solarisrev" -eq 10 -a "$check_gcc" = "yes" ; then
     solgcc=`which $cc`
     if test "$solgcc" = "/usr/sfw/bin/gcc" ; then
-      echo "Solaris 10/FCS gcc in /usr/sfw/bin will not compiled qemu correctly."
+      echo "Solaris 10/FCS gcc in /usr/sfw/bin will not compiled qebek correctly."
       echo "please get gcc-3.4.3 or later, from www.blastwave.org using pkg-get -i gcc3"
       echo "or get the latest patch from SunSolve for gcc"
       exit 1
@@ -535,6 +535,10 @@ if test -z "$target_list" ; then
 else
     target_list=`echo "$target_list" | sed -e 's/,/ /g'`
 fi
+
+# only i386 now
+target_list="i386-softmmu"
+
 if test -z "$target_list" ; then
     echo "No targets enabled"
     exit 1
@@ -600,7 +604,7 @@ cat > $TMPC << EOF
 #undef main /* We don't want SDL to override our main() */
 int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
 EOF
-        if $cc -o $TMPE ${OS_CFLAGS} `$sdl_config --cflags 2> /dev/null` $TMPC `$sdl_config --libs 2> /dev/null` 2> /tmp/qemu-$$-sdl-config.log ; then
+        if $cc -o $TMPE ${OS_CFLAGS} `$sdl_config --cflags 2> /dev/null` $TMPC `$sdl_config --libs 2> /dev/null` 2> /tmp/qebek-$$-sdl-config.log ; then
             _sdlversion=`$sdl_config --version | sed 's/[^0-9]//g'`
             if test "$_sdlversion" -lt 121 ; then
                 sdl_too_old=yes
@@ -670,7 +674,7 @@ fi
 
 if test "$mingw32" = "yes" ; then
   if test -z "$prefix" ; then
-      prefix="/c/Program Files/Qemu"
+      prefix="/c/Program Files/Qebek"
   fi
   mansuffix=""
   datasuffix=""
@@ -681,8 +685,8 @@ else
       prefix="/usr/local"
   fi
   mansuffix="/share/man"
-  datasuffix="/share/qemu"
-  docsuffix="/share/doc/qemu"
+  datasuffix="/share/qebek"
+  docsuffix="/share/doc/qebek"
   binsuffix="/bin"
 fi
 
@@ -747,11 +751,11 @@ echo "uname -r          $uname_release"
 if test $sdl_too_old = "yes"; then
 echo "-> Your SDL version is too old - please upgrade to have SDL support"
 fi
-if [ -s /tmp/qemu-$$-sdl-config.log ]; then
+if [ -s /tmp/qebek-$$-sdl-config.log ]; then
   echo "The error log from compiling the libSDL test is: "
-  cat /tmp/qemu-$$-sdl-config.log
+  cat /tmp/qebek-$$-sdl-config.log
 fi
-rm -f /tmp/qemu-$$-sdl-config.log
+rm -f /tmp/qebek-$$-sdl-config.log
 #if test "$sdl_static" = "no"; then
 #  echo "WARNING: cannot compile statically with SDL - qemu-fast won't have a graphical output"
 #fi
@@ -920,6 +924,8 @@ fi
 qemu_version=`head $source_path/VERSION`
 echo "VERSION=$qemu_version" >>$config_mak
 echo "#define QEMU_VERSION \"$qemu_version\"" >> $config_h
+qebek_version=`head $source_path/QEBEK_VERSION`
+echo "#define QEBEK_VERSION \"$qebek_version\"" >> $config_h
 
 echo "SRC_PATH=$source_path" >> $config_mak
 if [ "$source_path_used" = "yes" ]; then
@@ -1013,8 +1019,8 @@ esac
 
 if test "$target_user_only" = "no" -a "$check_gfx" = "yes" \
         -a "$sdl" = "no" -a "$cocoa" = "no" ; then
-    echo "ERROR: QEMU requires SDL or Cocoa for graphical output"
-    echo "To build QEMU without graphical output configure with --disable-gfx-check"
+    echo "ERROR: QEBEK requires SDL or Cocoa for graphical output"
+    echo "To build QEBEK without graphical output configure with --disable-gfx-check"
     echo "Note that this will disable all output from the virtual graphics card."
     exit 1;
 fi

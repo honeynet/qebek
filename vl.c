@@ -133,12 +133,11 @@ int inet_aton(const char *cp, struct in_addr *ia);
 
 /* qebek specific */
 #include "qebek-os.h"
+#include "qebek-common.h"
 #include "qebek-bp.h"
-extern uint32_t qebek_g_magic;
-extern uint32_t qebek_g_ip;
 
-#define DEFAULT_NETWORK_SCRIPT "/etc/qemu-ifup"
-#define DEFAULT_NETWORK_DOWN_SCRIPT "/etc/qemu-ifdown"
+#define DEFAULT_NETWORK_SCRIPT "/etc/qebek-ifup"
+#define DEFAULT_NETWORK_DOWN_SCRIPT "/etc/qebek-ifdown"
 #ifdef __sun__
 #define SMBD_COMMAND "/usr/sfw/sbin/smbd"
 #else
@@ -7494,7 +7493,8 @@ static int main_loop(void)
 
 static void help(int exitcode)
 {
-    printf("QEMU PC emulator version " QEMU_VERSION ", Copyright (c) 2003-2008 Fabrice Bellard\n"
+    printf("QEBEK High Interaction Honeypot Monitor version " QEBEK_VERSION ", Copyright (c) 2009 Chengyu Song\n"
+           "Based on QEMU PC emulator version " QEMU_VERSION ", Copyright (c) 2003-2008 Fabrice Bellard\n"
            "usage: %s [options] [disk_image]\n"
            "\n"
            "'disk_image' is a raw hard image image for IDE hard disk 0\n"
@@ -7585,6 +7585,18 @@ static void help(int exitcode)
            "                redirect TCP or UDP connections from host to guest [-net user]\n"
 #endif
            "\n"
+#ifdef TARGET_I386
+           "Qebek specific:\n"
+//           "-win2k          host OS is Windows 2000\n"
+           "-winxp          host OS is Windows XP\n"
+//           "-win2k3         host OS is Windows Server 2003\n"
+//           "-vista          host OS is Windows Vista\n"
+//           "-win2k8         host OS is Windows Server 2008\n"
+//           "-win7           host OS is Windows 7\n"
+           "-sbk_magic     set magic number in Sebek header (Optional)\n"
+           "-sbk_ip        set ip of the host OS\n"
+           "\n"
+#endif
            "Linux boot specific:\n"
            "-kernel bzImage use 'bzImage' as kernel image\n"
            "-append cmdline use 'cmdline' as kernel command line\n"
@@ -8116,7 +8128,6 @@ int main(int argc, char **argv)
     int fds[2];
     const char *pid_file = NULL;
     VLANState *vlan;
-	struct in_addr inp;
 
     LIST_INIT (&vm_change_state_head);
 #ifndef _WIN32
@@ -8443,7 +8454,7 @@ int main(int argc, char **argv)
                 if (ram_size <= 0)
                     help(1);
                 if (ram_size > PHYS_RAM_MAX_SIZE) {
-                    fprintf(stderr, "qemu: at most %d MB RAM can be simulated\n",
+                    fprintf(stderr, "qebek: at most %d MB RAM can be simulated\n",
                             PHYS_RAM_MAX_SIZE / (1024 * 1024));
                     exit(1);
                 }
@@ -8699,37 +8710,6 @@ int main(int argc, char **argv)
                 }
                 break;
 
-	    case QEMU_OPTION_linux:
-		argos_os_hint = 0;
-		if (argos_wprofile == NULL)
-			argos_wprofile = "linux";
-		break;
-	    case QEMU_OPTION_win2k:
-		argos_os_hint = 1;
-		if (argos_wprofile == NULL)
-			argos_wprofile = "win2k";
-		break;
-	    case QEMU_OPTION_winxp:
-		argos_os_hint = 2;
-		if (argos_wprofile == NULL)
-			argos_wprofile = "winxp";
-		break;
-	    case QEMU_OPTION_wp:
-		argos_wprofile = strdup(optarg);
-		break;
-	    case QEMU_OPTION_csilog:
-		argos_csilog = 0;
-		break;
-	    case QEMU_OPTION_no_fsc:
-		argos_fsc = 0;
-		break;
-            case QEMU_OPTION_cs_laddr:
-		ctrl_socket_laddr = optarg;
-		break;
-	    case QEMU_OPTION_cs_lport:
-		ctrl_socket_lport = atoi(optarg);
-		break;
-
 			/* qebek os options */
 			case QEBEK_OPTION_win2k:
 				qebek_os_major = QEBEK_OS_windows;
@@ -8760,8 +8740,7 @@ int main(int argc, char **argv)
 				qebek_g_magic = htonl(atoi(optarg));
 				break;
 			case QEBEK_OPTION_ip:
-				if(inet_aton(optarg, &inp))
-					qebek_g_ip = inp.s_addr;
+				qebek_g_ip = inet_addr(optarg);
 				break;
 
 	    	}
@@ -9045,7 +9024,7 @@ int main(int argc, char **argv)
         /* XXX: use standard host:port notation and modify options
            accordingly. */
         if (gdbserver_start(gdbstub_port) < 0) {
-            fprintf(stderr, "qemu: could not open gdbstub device on port '%s'\n",
+            fprintf(stderr, "qebek: could not open gdbstub device on port '%s'\n",
                     gdbstub_port);
             exit(1);
         }
