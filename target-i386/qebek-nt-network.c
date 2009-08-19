@@ -27,8 +27,6 @@
 #include "qebek-nt-network.h"
 #include "qebek-nt-network-helper.h"
 
-extern uint32_t qebek_g_ip;
-
 BOOLEAN InitNetwork()
 {
 	if(!InitSocketList())
@@ -63,7 +61,7 @@ void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		return; // only handle network related calling
 	}
 	
-	//qemu_printf("preNtDeviceIoControlFile: FileHandle %08x, IoControlCode %08x, InputBuffer %08x, OutputBuffer %08x\n", 
+	//fprintf(stderr, "preNtDeviceIoControlFile: FileHandle %08x, IoControlCode %08x, InputBuffer %08x, OutputBuffer %08x\n", 
 	//		FileHandle, IoControlCode, InputBuffer, OutputBuffer);
 	
 	pControlData = (PNtDeviceIoControlFileData)qemu_malloc(sizeof(NtDeviceIoControlFileData));
@@ -80,7 +78,7 @@ void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
 	if(!qebek_bp_add(ret_addr, env->cr[3], postNtDeviceIoControlFile, pControlData))
 	{
-		qemu_printf("preNtDeviceIoControlFile: failed to add postcall interception.\n");
+		fprintf(stderr, "preNtDeviceIoControlFile: failed to add postcall interception.\n");
 	}
 }
 
@@ -116,7 +114,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		qemu_free(pControlData);
 	}
 
-	//qemu_printf("postNtDeviceIoControlFile: FileHandle %08x, IoControlCode %08x, InputBuffer %08x, OutputBuffer %08x\n", 
+	//fprintf(stderr, "postNtDeviceIoControlFile: FileHandle %08x, IoControlCode %08x, InputBuffer %08x, OutputBuffer %08x\n", 
 	//		FileHandle, IoControlCode, InputBuffer, OutputBuffer);
 	
 	//if(!qebek_get_current_pid(env, &PID))
@@ -138,13 +136,13 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 
 		if(!qebek_read_ulong(env, ip_addr, &ip))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read bind ip: %08x\n", ip_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read bind ip: %08x\n", ip_addr);
 			break;
 		}
 
 		if(!qebek_read_uword(env, port_addr, &port))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read bind port: %08x\n", port_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read bind port: %08x\n", port_addr);
 			break;
 		}
 
@@ -152,7 +150,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		{
 			if((pSocketEntry = InsertSocketHandle(PID, FileHandle)) == NULL)
 			{
-				qemu_printf("postNtDeviceIoControlFile: failed to insert socket entry\n");
+				fprintf(stderr, "postNtDeviceIoControlFile: failed to insert socket entry\n");
 				break;
 			}
 		}
@@ -169,19 +167,19 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 
 		if(!qebek_read_ulong(env, ip_addr, &ip))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read connect ip: %08x\n", ip_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read connect ip: %08x\n", ip_addr);
 			break;
 		}
 
 		if(!qebek_read_uword(env, port_addr, &port))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read connect port: %08x\n", port_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read connect port: %08x\n", port_addr);
 			break;
 		}
 
 		/*dip = ntohl(ip);
 		dport = ntohs(port);
-		qemu_printf("connect to %hu.%hu.%hu.%hu:%hu, using handle %x\n", 
+		fprintf(stderr, "connect to %hu.%hu.%hu.%hu:%hu, using handle %x\n", 
 				(short)((dip >> 24) & 0xff), (short)((dip >> 16) & 0xff), (short)((dip >> 8) & 0xff),
 				(short)(dip & 0xff), dport, FileHandle);*/
 
@@ -189,7 +187,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		sh_addr = InputBuffer + 0x08;
 		if(!qebek_read_ulong(env, sh_addr, &SocketHandle))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read socket handle: %08x\n", sh_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read socket handle: %08x\n", sh_addr);
 		}
 		if(SocketHandle == 0)
 			SocketHandle = FileHandle;
@@ -222,7 +220,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		addr_addr = InputBuffer + 0x34;
 		if(!qebek_read_ulong(env, addr_addr, &addr_in))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read sendto sockaddr_in: %08x\n", addr_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read sendto sockaddr_in: %08x\n", addr_addr);
 			break;
 		}
 
@@ -231,13 +229,13 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		
 		if(!qebek_read_ulong(env, ip_addr, &ip))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read sendto ip: %08x\n", ip_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read sendto ip: %08x\n", ip_addr);
 			break;
 		}
 
 		if(!qebek_read_uword(env, port_addr, &port))
 		{
-			qemu_printf("postNtDeviceIoControlFile: failed to read sendto port: %08x\n", port_addr);
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read sendto port: %08x\n", port_addr);
 			break;
 		}
 
@@ -262,7 +260,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 			pWaitData = (PNtWaitForSingleObjectData)qemu_malloc(sizeof(NtWaitForSingleObjectData));
 			if(!pWaitData)
 			{
-				qemu_printf("postNtDeviceIoControlFile: failed to malloc wait data\n");
+				fprintf(stderr, "postNtDeviceIoControlFile: failed to malloc wait data\n");
 				break;
 			}
 
@@ -273,7 +271,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 
 			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], preNtWaitForSingleObject, pWaitData))
 			{
-				qemu_printf("postNtDeviceIoControlFile: failed to add wait bp\n");
+				fprintf(stderr, "postNtDeviceIoControlFile: failed to add wait bp\n");
 				qemu_free(pWaitData);
 			}
 		}
@@ -290,7 +288,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 			pWaitData = (PNtWaitForSingleObjectData)qemu_malloc(sizeof(NtWaitForSingleObjectData));
 			if(!pWaitData)
 			{
-				qemu_printf("postNtDeviceIoControlFile: failed to malloc wait data2\n");
+				fprintf(stderr, "postNtDeviceIoControlFile: failed to malloc wait data2\n");
 				break;
 			}
 
@@ -301,7 +299,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 
 			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], preNtWaitForSingleObject, pWaitData))
 			{
-				qemu_printf("postNtDeviceIoControlFile: failed to add wait bp2\n");
+				fprintf(stderr, "postNtDeviceIoControlFile: failed to add wait bp2\n");
 				qemu_free(pWaitData);
 			}
 		}
@@ -318,7 +316,7 @@ remove_bp:
     bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("postNtDeviceIoControlFile: failed to remove postcall interception.\n");
+        fprintf(stderr, "postNtDeviceIoControlFile: failed to remove postcall interception.\n");
     }
 }
 
@@ -332,7 +330,7 @@ void OnRecvfromComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer)
 	addr_addr = Buffer + 0x10;
 	if(!qebek_read_ulong(env, addr_addr, &addr_in))
 	{
-		qemu_printf("OnRecvComplete: failed to read recvfrom sockaddr_in: %08x\n", addr_addr);
+		fprintf(stderr, "OnRecvComplete: failed to read recvfrom sockaddr_in: %08x\n", addr_addr);
 		return;
 	}
 
@@ -341,13 +339,13 @@ void OnRecvfromComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer)
 		
 	if(!qebek_read_ulong(env, ip_addr, &ip))
 	{
-		qemu_printf("OnRecvComplete: failed to read recvfrom ip: %08x\n", ip_addr);
+		fprintf(stderr, "OnRecvComplete: failed to read recvfrom ip: %08x\n", ip_addr);
 		return;
 	}
 
 	if(!qebek_read_uword(env, port_addr, &port))
 	{
-		qemu_printf("OnRecvComplete: failed to read recvfrom port: %08x\n", port_addr);
+		fprintf(stderr, "OnRecvComplete: failed to read recvfrom port: %08x\n", port_addr);
 		return;
 	}
 
@@ -373,13 +371,13 @@ void OnAcceptComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer)
 		
 	if(!qebek_read_ulong(env, ip_addr, &ip))
 	{
-		qemu_printf("OnAcceptComplete: failed to read accepted ip: %08x\n", ip_addr);
+		fprintf(stderr, "OnAcceptComplete: failed to read accepted ip: %08x\n", ip_addr);
 		return;
 	}
 
 	if(!qebek_read_uword(env, port_addr, &port))
 	{
-		qemu_printf("OnAcceptComplete: failed to read accepted port: %08x\n", port_addr);
+		fprintf(stderr, "OnAcceptComplete: failed to read accepted port: %08x\n", port_addr);
 		return;
 	}
 
@@ -401,7 +399,7 @@ void preNtWaitForSingleObject(CPUX86State *env, void* user_data)
 
 	qebek_read_ulong(env, env->regs[R_ESP] + 4, &Handle);
 
-	qemu_printf("preNtWaitForSingleObject: Handle %08x\n", Handle);
+	fprintf(stderr, "preNtWaitForSingleObject: Handle %08x\n", Handle);
 
 	pWaitData = (PNtWaitForSingleObjectData)user_data;
 	if(Handle != pWaitData->EventHandle)
@@ -411,14 +409,14 @@ void preNtWaitForSingleObject(CPUX86State *env, void* user_data)
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
 	if(!qebek_bp_add(ret_addr, env->cr[3], postNtWaitForSingleObject, pWaitData))
 	{
-		qemu_printf("preNtWaitForSingleObject: failed to add postcall interception.\n");
+		fprintf(stderr, "preNtWaitForSingleObject: failed to add postcall interception.\n");
 	}
 
 	// remove self
 	bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("preNtWaitForSingleObject: failed to remove precall interception.\n");
+        fprintf(stderr, "preNtWaitForSingleObject: failed to remove precall interception.\n");
     }
 }
 
@@ -427,7 +425,7 @@ void postNtWaitForSingleObject(CPUX86State *env, void* user_data)
 	target_ulong bp_addr;
 	PNtWaitForSingleObjectData pWaitData = (PNtWaitForSingleObjectData)user_data;
 
-	qemu_printf("postNtWaitForSingleObject: Handle %08x\n", pWaitData->EventHandle);
+	fprintf(stderr, "postNtWaitForSingleObject: Handle %08x\n", pWaitData->EventHandle);
 
 	switch(pWaitData->IoControlCode)
 	{
@@ -448,7 +446,7 @@ void postNtWaitForSingleObject(CPUX86State *env, void* user_data)
 	bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("postNtWaitForSingleObject: failed to remove postcall interception.\n");
+        fprintf(stderr, "postNtWaitForSingleObject: failed to remove postcall interception.\n");
     }
 }
 
@@ -466,9 +464,9 @@ void LogRecord(CPUX86State *env, uint8_t call, uint32_t handle, PSOCKET_ENTRY en
 	sip = ntohl(entry->sip);
 	sport = ntohs(entry->sport);
 
-	qemu_printf("%d: %hu.%hu.%hu.%hu:%hu -> %hu.%hu.%hu.%hu:%hu\n", call,
-			(short)((sip >> 24) & 0xff), (short)((sip >> 16) & 0xff), (short)((sip >> 8) & 0xff), (short)(sip & 0xff), sport,
-			(short)((dip >> 24) & 0xff), (short)((dip >> 16) & 0xff), (short)((dip >> 8) & 0xff), (short)(dip & 0xff), dport);
+	//fprintf(stderr, "%d: %hu.%hu.%hu.%hu:%hu -> %hu.%hu.%hu.%hu:%hu\n", call,
+	//		(short)((sip >> 24) & 0xff), (short)((sip >> 16) & 0xff), (short)((sip >> 8) & 0xff), (short)(sip & 0xff), sport,
+	//		(short)((dip >> 24) & 0xff), (short)((dip >> 16) & 0xff), (short)((dip >> 8) & 0xff), (short)(dip & 0xff), dport);
 
 	record.dip = entry->dip;
 	record.dport = entry->dport;
@@ -477,7 +475,7 @@ void LogRecord(CPUX86State *env, uint8_t call, uint32_t handle, PSOCKET_ENTRY en
 	else
 		record.sip = entry->sip;
 	record.sport = entry->sport;
-	record.call = call;
+	record.call = htons(call);
 	record.proto = entry->protocol;
 
 	qebek_log_data(env, SEBEK_TYPE_SOCKET, (uint8_t *)&record, sizeof(record));

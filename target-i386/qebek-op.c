@@ -42,21 +42,21 @@ void qebek_hook_syscall(CPUX86State *env)
 
 		if(!qebek_read_ulong(env, pkthread, &kthread))
 		{
-			qemu_printf("qebek_hook_syscall: failed to read kthread\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to read kthread\n");
 			return;
 		}
 		
 		psdt = kthread + 0xe0;
 		if(!qebek_read_ulong(env, psdt, &sdt))
 		{
-			qemu_printf("qebek_hook_syscall: failed to read SDT\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to read SDT\n");
 			return;
 		}
 		
 		pssdt = sdt;
 		if(!qebek_read_ulong(env, pssdt, &ssdt))
 		{
-			qemu_printf("qebek_hook_syscall: failed to read SSDT\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to read SSDT\n");
 			return;
 		}
 
@@ -122,7 +122,7 @@ void qebek_hook_syscall(CPUX86State *env)
 		//
 		if(!InitConsoleSpy())
 		{
-			qemu_printf("qebek_hook_syscall: failed to initialize windows console spy.\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to initialize windows console spy.\n");
 			return;
 		}
 	
@@ -131,39 +131,39 @@ void qebek_hook_syscall(CPUX86State *env)
 		qebek_read_ulong(env, ssdt + index_NtClose * 4, &NtClose);
 		qebek_read_ulong(env, ssdt + index_NtReadFile * 4, &NtReadFile);
 		qebek_read_ulong(env, ssdt + index_NtWriteFile * 4, &NtWriteFile);
-		//qemu_printf("NtWriteFile: %x\n", NtWriteFile);
+		//fprintf(stderr, "NtWriteFile: %x\n", NtWriteFile);
 
 		qebek_read_ulong(env, ssdt + index_NtCreateThread * 4, &NtCreateThread);
 
 		if(!qebek_bp_add(NtRequestWaitReplyPort, 0, preNtRequestWaitReplyPort, NULL))
 		{
-			qemu_printf("qebek_hook_syscall: failed to insert break point for NtRequestWaitReplyPort\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtRequestWaitReplyPort\n");
 			return;
 		}
         if(!qebek_bp_add(NtSecureConnectPort, 0, preNtSecureConnectPort, NULL))
         {
-            qemu_printf("qebek_hook_syscall: failed to insert break point for NtSecureConnectPort\n");
+            fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtSecureConnectPort\n");
             return;
         }
         if(!qebek_bp_add(NtClose, 0, preNtClose, NULL))
         {
-            qemu_printf("qebek_hook_syscall: failed to insert break point for NtClose\n");
+            fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtClose\n");
             return;
         }
         if(!qebek_bp_add(NtReadFile, 0, preNtReadFile, NULL))
         {
-            qemu_printf("qebek_hook_syscall: failed to insert break point for NtReadFile\n");
+            fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtReadFile\n");
             return;
         }
         if(!qebek_bp_add(NtWriteFile, 0, preNtWriteFile, NULL))
         {
-            qemu_printf("qebek_hook_syscall: failed to insert break point for NtWriteFile\n");
+            fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtWriteFile\n");
             return;
         }
 
 		if(!qebek_bp_add(NtCreateThread, 0, preNtCreateThread, NULL))
 		{
-			qemu_printf("qebek_hook_syscall: failed to insert break point for NtCreateThread\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtCreateThread\n");
 			return;
 		}
 
@@ -171,7 +171,7 @@ void qebek_hook_syscall(CPUX86State *env)
 		//
 		if(!InitNetwork())
 		{
-			qemu_printf("qebek_hook_syscall: failed to initialize network spy.\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to initialize network spy.\n");
 			return;
 		}
 		
@@ -180,7 +180,7 @@ void qebek_hook_syscall(CPUX86State *env)
 		
 		if(!qebek_bp_add(NtDeviceIoControlFile, 0, preNtDeviceIoControlFile, NULL))
 		{
-			qemu_printf("qebek_hook_syscall: failed to insert break point for NtDeviceIoControlFile\n");
+			fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtDeviceIoControlFile\n");
 			return;
 		}
 
@@ -210,7 +210,7 @@ void qebek_check_target(CPUX86State *env, target_ulong new_eip)
 		qebek_read_ulong(env, env->regs[R_ESP] + 4 * 6, &ReadBuffer);
 		qebek_read_ulong(env, env->regs[R_ESP] + 4 * 7, &ReadSize);
 
-		qemu_printf("Read FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
+		fprintf(stderr, "Read FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
 		
 		// set return address, so the VM will break when returned
 		qebek_read_ulong(env, env->regs[R_ESP], &NtReadFilePost);
@@ -218,7 +218,7 @@ void qebek_check_target(CPUX86State *env, target_ulong new_eip)
 	// NtReadFile post call
 	else if(eip == NtReadFilePost)
 	{
-		qemu_printf("ReadPost\n");
+		fprintf(stderr, "ReadPost\n");
 		// if succeed
 		if(env->regs[R_EAX] == 0)
 			OnNtReadWriteFile(env, ReadHandle, ReadBuffer, ReadSize);

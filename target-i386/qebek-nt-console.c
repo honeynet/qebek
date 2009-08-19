@@ -32,7 +32,7 @@ BOOLEAN InitConsoleSpy()
 {
 	if(!InitPortHandleList())
 	{
-		qemu_printf("InitConsoleSpy: failed to initialize port handle list.\n");
+		fprintf(stderr, "InitConsoleSpy: failed to initialize port handle list.\n");
 		return False;
 	}
 
@@ -48,14 +48,14 @@ BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle)
 	// get KPCR.KPRCB->KTHREAD->TEB->PEB->ProcessParameters
 	if(!qebek_read_ulong(env, pkthread, &kthread))
 	{
-		qemu_printf("LogIfStdHandle: failed to read kthread\n");
+		fprintf(stderr, "LogIfStdHandle: failed to read kthread\n");
 		return False;
 	}
 
 	pteb = kthread + 0x20;
 	if(!qebek_read_ulong(env, pteb, &teb))
 	{
-		qemu_printf("LogIfStdHandle: failed to read teb, pointer %08X\n", pteb);
+		fprintf(stderr, "LogIfStdHandle: failed to read teb, pointer %08X\n", pteb);
 		return False;
 	}
 
@@ -65,7 +65,7 @@ BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle)
 	ppeb = teb + 0x30;
 	if(!qebek_read_ulong(env, ppeb, &peb))
     {
-        qemu_printf("LogIfStdHandle: failed to read peb, pointer %08X\n", ppeb);
+        fprintf(stderr, "LogIfStdHandle: failed to read peb, pointer %08X\n", ppeb);
         return False;
     }
 
@@ -75,7 +75,7 @@ BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle)
 	pproc_param = peb + 0x10;
 	if(!qebek_read_ulong(env, pproc_param, &proc_param))
     {
-        qemu_printf("LogIfStdHandle: failed to read process_parameters, pointer %08X\n", pproc_param);
+        fprintf(stderr, "LogIfStdHandle: failed to read process_parameters, pointer %08X\n", pproc_param);
         return False;
     }
 
@@ -88,7 +88,7 @@ BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle)
 		Handle == stdout_handle ||
 		Handle == stderr_handle)
 	{
-		qemu_printf("LogIfStdHandle: std handle\n");
+		fprintf(stderr, "LogIfStdHandle: std handle\n");
 		return True;
 	}
 
@@ -105,14 +105,14 @@ VOID OnNtReadWriteFile(CPUX86State *env, HANDLE Handle, ULONG Buffer, ULONG Buff
 	buffer = qemu_malloc(BufferSize + 1);
 	if(buffer == NULL)
 	{
-		qemu_printf("OnNtReadWriteFile: failed to alloc buffer\n");
+		fprintf(stderr, "OnNtReadWriteFile: failed to alloc buffer\n");
 		return;
 	}
 	memset(buffer, 0, BufferSize + 1);
 
 	if(!qebek_read_raw(env, Buffer, buffer, BufferSize))
 	{
-		qemu_printf("OnNtReadWriteFile: failed to read buffer: %x %x\n", Buffer, BufferSize);
+		fprintf(stderr, "OnNtReadWriteFile: failed to read buffer: %x %x\n", Buffer, BufferSize);
 	}
 	else
 	{
@@ -134,7 +134,7 @@ void preNtReadFile(CPUX86State *env, void* user_data)
     qebek_read_ulong(env, env->regs[R_ESP] + 6 * 4, &ReadBuffer);
     qebek_read_ulong(env, env->regs[R_ESP] + 7 * 4, &ReadSize);	
 	
-	//qemu_printf("preNtReadFile: FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
+	//fprintf(stderr, "preNtReadFile: FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
 
 	pReadData = (PNtReadWriteData)qemu_malloc(sizeof(NtReadWriteData));
 	if(pReadData != NULL)
@@ -148,7 +148,7 @@ void preNtReadFile(CPUX86State *env, void* user_data)
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
 	if(!qebek_bp_add(ret_addr, env->cr[3], postNtReadFile, pReadData))
 	{
-		qemu_printf("preNtReadFile: failed to add postcall interception.\n");
+		fprintf(stderr, "preNtReadFile: failed to add postcall interception.\n");
 	}
 }
 
@@ -174,7 +174,7 @@ void postNtReadFile(CPUX86State *env, void* user_data)
 		qemu_free(pReadData);
 	}
 
-	//qemu_printf("postNtReadFile: FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
+	//fprintf(stderr, "postNtReadFile: FileHandle %08x, Buffer %08x, Size %08x\n", ReadHandle, ReadBuffer, ReadSize);
 	
 	// if succeed
 	if(env->regs[R_EAX] == 0)
@@ -184,7 +184,7 @@ void postNtReadFile(CPUX86State *env, void* user_data)
 	bp_addr = env->eip;
 	if(!qebek_bp_remove(bp_addr, env->cr[3]))
 	{
-		qemu_printf("postNtReadFile: failed to remove postcall interception.\n");
+		fprintf(stderr, "postNtReadFile: failed to remove postcall interception.\n");
 	}
 }
 
@@ -199,7 +199,7 @@ void preNtWriteFile(CPUX86State *env, void* user_data)
     qebek_read_ulong(env, env->regs[R_ESP] + 6 * 4, &WriteBuffer);
     qebek_read_ulong(env, env->regs[R_ESP] + 7 * 4, &WriteSize);
 
-    //qemu_printf("preNtWriteFile: FileHandle %08x, Buffer %08x, Size %08x\n", WriteHandle, WriteBuffer, WriteSize);
+    //fprintf(stderr, "preNtWriteFile: FileHandle %08x, Buffer %08x, Size %08x\n", WriteHandle, WriteBuffer, WriteSize);
 
 	pWriteData = (PNtReadWriteData)qemu_malloc(sizeof(NtReadWriteData));
 	if(pWriteData != NULL)
@@ -213,7 +213,7 @@ void preNtWriteFile(CPUX86State *env, void* user_data)
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
     if(!qebek_bp_add(ret_addr, env->cr[3], postNtWriteFile, pWriteData))
     {
-        qemu_printf("preNtWriteFile: failed to add postcall interception.\n");
+        fprintf(stderr, "preNtWriteFile: failed to add postcall interception.\n");
     }
 }
 
@@ -239,7 +239,7 @@ void postNtWriteFile(CPUX86State *env, void* user_data)
 		qemu_free(pWriteData);
 	}
 
-    //qemu_printf("postNtWriteFile: FileHandle %08x, Buffer %08x, Size %08x\n", WriteHandle, WriteBuffer, WriteSize);
+    //fprintf(stderr, "postNtWriteFile: FileHandle %08x, Buffer %08x, Size %08x\n", WriteHandle, WriteBuffer, WriteSize);
 
     // if succeed
     if(env->regs[R_EAX] == 0)
@@ -249,7 +249,7 @@ void postNtWriteFile(CPUX86State *env, void* user_data)
     bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("postNtWriteFile: failed to remove postcall interception.\n");
+        fprintf(stderr, "postNtWriteFile: failed to remove postcall interception.\n");
     }
 }
 
@@ -264,7 +264,7 @@ void preNtSecureConnectPort(CPUX86State *env, void* user_data)
     qebek_read_ulong(env, env->regs[R_ESP] + 2 * 4, &PortName);
     qebek_read_ulong(env, env->regs[R_ESP] + 4 * 4, &WriteSection);
 
-    //qemu_printf("preNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", PortHandle, PortName, WriteSection);
+    //fprintf(stderr, "preNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", PortHandle, PortName, WriteSection);
 
 	pPortData = (PNtConnectPortData)qemu_malloc(sizeof(NtConnectPortData));
 	if(pPortData != NULL)
@@ -278,7 +278,7 @@ void preNtSecureConnectPort(CPUX86State *env, void* user_data)
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
     if(!qebek_bp_add(ret_addr, env->cr[3], postNtSecureConnectPort, pPortData))
     {
-        qemu_printf("preNtSecureConnectPort: failed to add postcall interception.\n");
+        fprintf(stderr, "preNtSecureConnectPort: failed to add postcall interception.\n");
     }
 }
 
@@ -308,7 +308,7 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 		qemu_free(pPortData);
 	}
 
-    //qemu_printf("postNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", pPortHandle, pPortName, pWriteSection);
+    //fprintf(stderr, "postNtSecureConnectPort: PortHandle %08x, PortName %08x, WriteSection %08x\n", pPortHandle, pPortName, pWriteSection);
 
     // if succeed
     if(env->regs[R_EAX] == 0)
@@ -322,13 +322,13 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 
 		if(!qebek_read_ulong(env, pPortHandle, &PortHandle))
 		{
-			qemu_printf("postNtSecureConnectPort: failed to read *PortHandle.\n");
+			fprintf(stderr, "postNtSecureConnectPort: failed to read *PortHandle.\n");
 			goto remove_bp;
 		}
 
 		if(!qebek_read_uword(env, pPortName, &name_length))
 		{
-			qemu_printf("postNtSecureConnectPort: failed to read PortName->Length.\n");
+			fprintf(stderr, "postNtSecureConnectPort: failed to read PortName->Length.\n");
 			goto remove_bp;
 		}
 
@@ -337,13 +337,13 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 
 		if(!qebek_read_ulong(env, pPortName + 4, &name_buffer))
 		{
-			qemu_printf("postNtSecureConnectPort: failed to read PortName->Buffer.\n");
+			fprintf(stderr, "postNtSecureConnectPort: failed to read PortName->Buffer.\n");
 			goto remove_bp;
 		}
 
 		if(!qebek_read_raw(env, name_buffer, port_name, 32))
 		{
-			qemu_printf("postNtSecureConnectPort: failed to read PortName->Buffer content.\n");
+			fprintf(stderr, "postNtSecureConnectPort: failed to read PortName->Buffer content.\n");
 			goto remove_bp;
 		}
 
@@ -352,13 +352,13 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 
 		if(!qebek_read_ulong(env, pWriteSection + 16, &ViewBase))
 		{
-			qemu_printf("postNtSecureConnectPort: failed to read WriteSection->ViewBase.\n");
+			fprintf(stderr, "postNtSecureConnectPort: failed to read WriteSection->ViewBase.\n");
 			goto remove_bp;
 		}
 
 		if(!qebek_read_ulong(env, pWriteSection + 20, &TargetViewBase))
 		{
-			qemu_printf("postNtSecureConnectPort: failed to read WriteSection->TargetViewBase.\n");
+			fprintf(stderr, "postNtSecureConnectPort: failed to read WriteSection->TargetViewBase.\n");
 			goto remove_bp;
 		}
 
@@ -372,7 +372,7 @@ remove_bp:
     bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("postNtSecureConnectPort: failed to remove postcall interception.\n");
+        fprintf(stderr, "postNtSecureConnectPort: failed to remove postcall interception.\n");
     }
 }
 
@@ -402,7 +402,7 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 	qebek_read_ulong(env, env->regs[R_ESP] + 4, &PortHandle);
 	qebek_read_ulong(env, env->regs[R_ESP] + 2 * 4, &RequestMessage);
 
-	//qemu_printf("preNtRequestWaitReplyPort: PortHandle %08x, RequestMessage %08x\n", PortHandle, RequestMessage);
+	//fprintf(stderr, "preNtRequestWaitReplyPort: PortHandle %08x, RequestMessage %08x\n", PortHandle, RequestMessage);
 	
 	if(RequestMessage == 0)
 		return;
@@ -421,7 +421,7 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 	//read opcode
 	if(!qebek_read_ulong(env, opcode_addr, &OpCode))
 	{
-		qemu_printf("preNtRequestWaitReplyPort: failed to read opcode: %08x\n", opcode_addr);
+		fprintf(stderr, "preNtRequestWaitReplyPort: failed to read opcode: %08x\n", opcode_addr);
 		return;
 	}
 	
@@ -442,7 +442,7 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 		qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
 		if(!qebek_bp_add(ret_addr, env->cr[3], postNtRequestWaitReplyPort, pPortData))
 		{
-			qemu_printf("preNtRequestWaitReplyPort: failed to add postcall interception.\n");
+			fprintf(stderr, "preNtRequestWaitReplyPort: failed to add postcall interception.\n");
 		}
 	}
 }
@@ -473,7 +473,7 @@ void postNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 		qemu_free(pPortData);
 	}
 
-	qemu_printf("postNtRequestWaitReplyPort: PortHandle %08x, RequestMessage %08x\n", PortHandle, RequestMessage);
+	//fprintf(stderr, "postNtRequestWaitReplyPort: PortHandle %08x, RequestMessage %08x\n", PortHandle, RequestMessage);
 
 	OnCsrReadDataPost(env, RequestMessage, VirtualOffset);
 
@@ -481,7 +481,7 @@ void postNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
     bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("postNtRequestWaitReplyPort: failed to remove postcall interception.\n");
+        fprintf(stderr, "postNtRequestWaitReplyPort: failed to remove postcall interception.\n");
     }
 }
 
@@ -499,7 +499,7 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	qebek_read_ulong(env, Message + 24 + 16 + 92, &MessageBufferSize); // 0x84
 	qebek_read_byte(env, Message + 24 + 16 + 101, &Unicode); //0x8d
 
-	//qemu_printf("OnWriteDataPre: MessageBuffer %08x, MessageBufferPtr %08x, MessageBufferSize %08x, Unicode %d\n",
+	//fprintf(stderr, "OnWriteDataPre: MessageBuffer %08x, MessageBufferPtr %08x, MessageBufferSize %08x, Unicode %d\n",
 	//		MessageBuffer, MessageBufferPtr, MessageBufferSize, Unicode);
 
 	if(MessageBuffer != MessageBufferPtr)
@@ -527,14 +527,14 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	buffer = (uint8_t *)qemu_malloc(cbSize + 1);
 	if(buffer == NULL)
 	{
-		qemu_printf("OnCsrWriteDataPre: failed to allocate buffer.\n");
+		fprintf(stderr, "OnCsrWriteDataPre: failed to allocate buffer.\n");
 		return;
 	}
 	memset(buffer, 0, cbSize + 1);
 
 	if(!qebek_read_raw(env, WriteStringPtr, buffer, cbSize))
 	{
-		qemu_printf("OnCsrWriteDataPre: failed to read buffer: %x %x\n", WriteStringPtr, cbSize);
+		fprintf(stderr, "OnCsrWriteDataPre: failed to read buffer: %x %x\n", WriteStringPtr, cbSize);
 	}
 	else
 	{
@@ -551,6 +551,7 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	uint8_t Unicode;
 	uint32_t Offset, ReadStringPtr = 0;
 	uint8_t *buffer;
+	USHORT length;
 	
 	//get MessageBuffer, MessageBufferPtr, MessageBufferSize
 	MessageBuffer = Message + 24 + 16 + 10; // 0x32
@@ -559,7 +560,7 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	qebek_read_ulong(env, Message + 24 + 16 + 100, &MessageBufferSize); // 0x8c
 	qebek_read_byte(env, Message + 24 + 16 + 116, &Unicode); // 0x9c
 
-	//qemu_printf("OnReadDataPost: MessageBuffer %08x, MessageBufferPtr %08x, NumberOfCharsToRead %08x, MessageBufferSize %08x, Unicode %d\n",
+	//fprintf(stderr, "OnReadDataPost: MessageBuffer %08x, MessageBufferPtr %08x, NumberOfCharsToRead %08x, MessageBufferSize %08x, Unicode %d\n",
 	//		MessageBuffer, MessageBufferPtr, NumberOfCharsToRead, MessageBufferSize, Unicode);
 	
 	if(MessageBuffer != MessageBufferPtr)
@@ -582,22 +583,24 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	if(!ReadStringPtr) // bad data
 		return;
 
-	buffer = (uint8_t *)qemu_malloc(NumberOfCharsToRead + 1);
+	length = (USHORT)NumberOfCharsToRead;
+
+	buffer = (uint8_t *)qemu_malloc(length + 1);
 	if(buffer == NULL)
 	{
-		qemu_printf("OnCsrReadDataPost: failed to allocate buffer.\n");
+		fprintf(stderr, "OnCsrReadDataPost: failed to allocate buffer.\n");
 		return;
 	}
-	memset(buffer, 0, NumberOfCharsToRead + 1);
+	memset(buffer, 0, length + 1);
 
-	if(!qebek_read_raw(env, ReadStringPtr, buffer, NumberOfCharsToRead))
+	if(!qebek_read_raw(env, ReadStringPtr, buffer, length))
 	{
-		qemu_printf("OnCsrReadDataPost: failed to read buffer: %x %x\n", ReadStringPtr, NumberOfCharsToRead);
+		fprintf(stderr, "OnCsrReadDataPost: failed to read buffer: %x %x\n", ReadStringPtr, length);
 	}
 	else
 	{
 		// log
-		qebek_log_data(env, SEBEK_TYPE_READ, buffer, NumberOfCharsToRead);
+		qebek_log_data(env, SEBEK_TYPE_READ, buffer, length);
 	}
 
 	qemu_free(buffer);
@@ -608,11 +611,13 @@ void preNtCreateThread(CPUX86State *env, void* user_data)
 {
 	target_ulong ret_addr;
 
+	//fprintf(stderr, "preNtCreateThread\n");
+
 	// set return address, so the VM will break when returned
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-    if(!qebek_bp_add(ret_addr, env->cr[3], postNtSecureConnectPort, NULL))
+    if(!qebek_bp_add(ret_addr, env->cr[3], postNtCreateThread, NULL))
     {
-        qemu_printf("preNtCreateThread: failed to add postcall interception.\n");
+        fprintf(stderr, "preNtCreateThread: failed to add postcall interception.\n");
     }
 	
 }
@@ -620,6 +625,8 @@ void preNtCreateThread(CPUX86State *env, void* user_data)
 void postNtCreateThread(CPUX86State *env, void* user_data)
 {
 	target_ulong bp_addr;
+
+	//fprintf(stderr, "postNtCreateThread\n");
 
 	if(env->regs[R_EAX] == 0)
 	{
@@ -631,6 +638,6 @@ void postNtCreateThread(CPUX86State *env, void* user_data)
     bp_addr = env->eip;
     if(!qebek_bp_remove(bp_addr, env->cr[3]))
     {
-        qemu_printf("postNtCreateThread: failed to remove postcall interception.\n");
+        fprintf(stderr, "postNtCreateThread: failed to remove postcall interception.\n");
     }
 }

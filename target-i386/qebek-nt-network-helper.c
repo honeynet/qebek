@@ -97,7 +97,7 @@ InsertSocketHandle(
 
 	if(Entry)
 	{
-		//qemu_printf("InsertSocketHandle(PID:%d; SocketHandle:%x)\n", ProcessId, SocketHandle);
+		//fprintf(stderr, "InsertSocketHandle(PID:%d; SocketHandle:%x)\n", ProcessId, SocketHandle);
 
 		memset(Entry, 0, sizeof(SOCKET_ENTRY));
 		Entry->SocketHandle = SocketHandle;
@@ -126,7 +126,7 @@ RemoveSocketEntry(
 
 	if (Entry)
 	{
-		//qemu_printf("RemoveSocketHandle(PID:%d; SocketHandle:%x)\n", ProcessId, SocketHandle);
+		//fprintf(stderr, "RemoveSocketHandle(PID:%d; SocketHandle:%x)\n", ProcessId, SocketHandle);
 
 		RemoveEntryList(&Entry->ListEntry);
 		qemu_free(Entry);
