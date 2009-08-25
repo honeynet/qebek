@@ -87,4 +87,7 @@ void postNtCreateThread(CPUX86State *env, void* user_data);
 void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset);
 void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset);
 
+bool UnicodeToAnsiString(uint8_t *buffer, uint16_t *length);
+bool DummyUnicodeToAnsiString(uint8_t *buffer, uint16_t *length);
+
 #endif

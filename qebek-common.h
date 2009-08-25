@@ -119,21 +119,29 @@ uint32_t qebek_g_ip;
 uint32_t qebek_g_magic;
 
 typedef struct sebek_hdr{
-  uint32_t  magic;
-  uint16_t  version;
-  uint16_t  type;
-  uint32_t  counter;
-  uint32_t  time_sec;
-  uint32_t  time_usec;
-  uint32_t  parent_pid;
-  uint32_t  pid;
-  uint32_t  uid;
-  uint32_t  fd;
-  uint32_t  inode;
+  uint32_t  magic		__attribute__((packed));
+  uint16_t  version		__attribute__((packed));
+  uint16_t  type		__attribute__((packed));
+  uint32_t  counter		__attribute__((packed));
+  uint32_t  time_sec	__attribute__((packed));
+  uint32_t  time_usec	__attribute__((packed));
+  uint32_t  parent_pid	__attribute__((packed));
+  uint32_t  pid			__attribute__((packed));
+  uint32_t  uid			__attribute__((packed));
+  uint32_t  fd			__attribute__((packed));
+  uint32_t  inode		__attribute__((packed));
   uint8_t   com[SEBEK_HEADER_COMMAND_LEN];
-  uint32_t  length;
+  uint32_t  length		__attribute__((packed));
 }sebek_hdr, *psebek_hdr;
 
+struct sbk_sock_rec {
+    uint32_t  dip       __attribute__((packed));
+    uint16_t  dport     __attribute__((packed));
+    uint32_t  sip       __attribute__((packed));
+    uint16_t  sport     __attribute__((packed));
+    uint16_t  call      __attribute__((packed));
+    uint8_t   proto     __attribute__((packed));
+};
 
 typedef struct proc_infor_t
 {

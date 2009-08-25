@@ -459,15 +459,15 @@ void LogRecord(CPUX86State *env, uint8_t call, uint32_t handle, PSOCKET_ENTRY en
 	if(!entry)
 		return;
 	
-	dip = ntohl(entry->dip);
+	/*dip = ntohl(entry->dip);
 	dport = ntohs(entry->dport);
-	sip = ntohl(entry->sip);
+	sip = ntohl(qebek_g_ip);
 	sport = ntohs(entry->sport);
 
-	//fprintf(stderr, "%d: %hu.%hu.%hu.%hu:%hu -> %hu.%hu.%hu.%hu:%hu\n", call,
-	//		(short)((sip >> 24) & 0xff), (short)((sip >> 16) & 0xff), (short)((sip >> 8) & 0xff), (short)(sip & 0xff), sport,
-	//		(short)((dip >> 24) & 0xff), (short)((dip >> 16) & 0xff), (short)((dip >> 8) & 0xff), (short)(dip & 0xff), dport);
-
+	fprintf(stderr, "%d: %hu.%hu.%hu.%hu:%hu -> %hu.%hu.%hu.%hu:%hu\n", call,
+			(short)((sip >> 24) & 0xff), (short)((sip >> 16) & 0xff), (short)((sip >> 8) & 0xff), (short)(sip & 0xff), sport,
+			(short)((dip >> 24) & 0xff), (short)((dip >> 16) & 0xff), (short)((dip >> 8) & 0xff), (short)(dip & 0xff), dport);
+	*/
 	record.dip = entry->dip;
 	record.dport = entry->dport;
 	if(entry->sip == 0 || entry->sip == 0x7f000001)

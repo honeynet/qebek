@@ -538,8 +538,10 @@ void OnCsrWriteDataPre(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	}
 	else
 	{
+		if(Unicode)
+			UnicodeToAnsiString(buffer, &cbSize);
 		// log
-		qebek_log_data(env, SEBEK_TYPE_WRITE, buffer, cbSize);
+		qebek_log_data(env, SEBEK_TYPE_READ, buffer, cbSize);
 	}
 
 	qemu_free(buffer);
@@ -574,16 +576,16 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 			return;
 
 		ReadStringPtr = Offset;
+		length = (USHORT)NumberOfCharsToRead;
 	}
 	else
 	{
 		ReadStringPtr = MessageBuffer;
+		length = (USHORT)(min(NumberOfCharsToRead, CONSOLE_READ_INFO_MESSAGE_BUFFER_SIZE));
 	}
 
 	if(!ReadStringPtr) // bad data
 		return;
-
-	length = (USHORT)NumberOfCharsToRead;
 
 	buffer = (uint8_t *)qemu_malloc(length + 1);
 	if(buffer == NULL)
@@ -599,6 +601,8 @@ void OnCsrReadDataPost(CPUX86State *env, ULONG Message, ULONG VirtualOffset)
 	}
 	else
 	{
+		if(Unicode)
+			UnicodeToAnsiString(buffer, &length);
 		// log
 		qebek_log_data(env, SEBEK_TYPE_READ, buffer, length);
 	}
@@ -631,7 +635,7 @@ void postNtCreateThread(CPUX86State *env, void* user_data)
 	if(env->regs[R_EAX] == 0)
 	{
 		// log
-		qebek_log_data(env, SEBEK_TYPE_READ, NULL, 0);
+		//qebek_log_data(env, SEBEK_TYPE_READ, NULL, 0);
 	}
 
 	// remove return address
@@ -640,4 +644,21 @@ void postNtCreateThread(CPUX86State *env, void* user_data)
     {
         fprintf(stderr, "postNtCreateThread: failed to remove postcall interception.\n");
     }
+}
+
+bool UnicodeToAnsiString(uint8_t *buffer, uint16_t *length)
+{
+	return DummyUnicodeToAnsiString(buffer, length);
+}
+
+bool DummyUnicodeToAnsiString(uint8_t *buffer, uint16_t *length)
+{
+	uint16_t i,j;
+
+	for(i = 0, j = 0; i < *length; i += 2, j++)
+	{
+		buffer[j] = buffer[i];
+	}
+
+	*length /= 2;
 }
