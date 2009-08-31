@@ -7587,14 +7587,14 @@ static void help(int exitcode)
            "\n"
 #ifdef TARGET_I386
            "Qebek specific:\n"
-//           "-win2k          guest OS is Windows 2000\n"
-           "-winxp          guest OS is Windows XP\n"
-//           "-win2k3         guest OS is Windows Server 2003\n"
-//           "-vista          guest OS is Windows Vista\n"
-//           "-win2k8         guest OS is Windows Server 2008\n"
-//           "-win7           guest OS is Windows 7\n"
+//           "-win2k          host OS is Windows 2000\n"
+           "-winxp          host OS is Windows XP\n"
+//           "-win2k3         host OS is Windows Server 2003\n"
+//           "-vista          host OS is Windows Vista\n"
+//           "-win2k8         host OS is Windows Server 2008\n"
+//           "-win7           host OS is Windows 7\n"
            "-sbk_magic     set magic number in Sebek header (Optional)\n"
-           "-sbk_ip        set ip of the guest OS\n"
+           "-sbk_ip        set ip of the host OS\n"
            "\n"
 #endif
            "Linux boot specific:\n"
@@ -8203,7 +8203,7 @@ int main(int argc, char **argv)
 	qebek_os_minor = QEBEK_OS_winxp;
 
 	qebek_g_magic = SEBEK_MAGIC;
-	qebek_g_ip = 0x7f000001; // 127.0.0.1
+	qebek_g_ip = inet_addr("127.0.0.1");
 
     optind = 1;
     for(;;) {

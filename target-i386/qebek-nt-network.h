@@ -36,15 +36,18 @@ uint32_t NtWaitForSingleObject;
 #define AFD_BIND				0x12003
 #define AFD_CONNECT				0x12007
 #define AFD_ACCEPT				0x1200c
+#define AFD_DUPLICATE			0x12010
 #define AFD_SEND_DATAGRAM		0x12023
 #define AFD_SEND                0x1201f
 #define AFD_RECV_DATAGRAM       0x1201b
 #define AFD_RECV				0x12017
+#define AFD_SELECT				0x12024
 
 typedef struct NtDeviceIoControlFileData
 {
 	uint32_t FileHandle;
 	uint32_t EventHandle;
+	uint32_t IoStatusBlock;
 	uint32_t IoControlCode;
 	uint32_t InputBuffer;
 	uint32_t OutputBuffer;
@@ -59,6 +62,7 @@ typedef struct NtWaitForSingleObjectData
 	uint32_t FileHandle;
 	uint32_t IoControlCode;
 	uint32_t Buffer;
+	uint32_t Status;
 }NtWaitForSingleObjectData, *PNtWaitForSingleObjectData;
 
 void preNtWaitForSingleObject(CPUX86State *env, void* user_data);
@@ -66,15 +70,6 @@ void postNtWaitForSingleObject(CPUX86State *env, void* user_data);
 
 void OnRecvfromComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer);
 void OnAcceptComplete(CPUX86State *env, uint32_t FileHandle, uint32_t Buffer);
-
-/*struct sbk_sock_rec {
-	uint32_t  dip		__attribute__((packed));
-	uint16_t  dport		__attribute__((packed));
-	uint32_t  sip		__attribute__((packed));
-	uint16_t  sport		__attribute__((packed));
-	uint16_t  call		__attribute__((packed));
-	uint8_t   proto		__attribute__((packed));
-};*/
 
 void LogRecord(CPUX86State *env, uint8_t call, uint32_t Handle, PSOCKET_ENTRY entry);
 #endif

@@ -37,13 +37,14 @@ BOOLEAN InitNetwork()
 
 void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 {
-	uint32_t FileHandle, IoControlCode, InputBuffer, OutputBuffer, EventHandle;
+	uint32_t FileHandle, IoControlCode, InputBuffer, OutputBuffer, EventHandle, IoStatusBlock;
 	PNtDeviceIoControlFileData pControlData;
 	target_ulong ret_addr;
 
 	// get file handle, buffer & buffer size from stack
     qebek_read_ulong(env, env->regs[R_ESP] + 4, &FileHandle);
 	qebek_read_ulong(env, env->regs[R_ESP] + 2 * 4, &EventHandle);
+	qebek_read_ulong(env, env->regs[R_ESP] + 5 * 4, &IoStatusBlock);
     qebek_read_ulong(env, env->regs[R_ESP] + 6 * 4, &IoControlCode);
     qebek_read_ulong(env, env->regs[R_ESP] + 7 * 4, &InputBuffer);
 	qebek_read_ulong(env, env->regs[R_ESP] + 9 * 4, &OutputBuffer);
@@ -56,6 +57,9 @@ void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	case AFD_RECV_DATAGRAM:
 	case AFD_SEND:
 	case AFD_RECV:
+	case AFD_ACCEPT:
+	case AFD_DUPLICATE:
+	case AFD_SELECT:
 		break;
 	default:
 		return; // only handle network related calling
@@ -69,6 +73,7 @@ void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	{
 		pControlData->FileHandle = FileHandle;
 		pControlData->EventHandle = EventHandle;
+		pControlData->IoStatusBlock = IoStatusBlock;
 		pControlData->IoControlCode = IoControlCode;
 		pControlData->InputBuffer = InputBuffer;
 		pControlData->OutputBuffer = OutputBuffer;
@@ -84,9 +89,10 @@ void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 
 void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 {
-	uint32_t FileHandle, IoControlCode, InputBuffer, OutputBuffer, EventHandle, PID, ntStatus, SocketHandle;
+	uint32_t FileHandle, IoControlCode, InputBuffer, OutputBuffer, EventHandle, IoStatusBlock;
+	uint32_t PID, ntStatus, SocketHandle;
 	PNtDeviceIoControlFileData pControlData;
-	PSOCKET_ENTRY pSocketEntry;
+	PSOCKET_ENTRY pSocketEntry, pSocketEntry2;
 	PNtWaitForSingleObjectData pWaitData;
 	uint32_t ip, addr_in;
 	uint16_t port;
@@ -99,6 +105,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 		//get file handle, control code, input buffer and output buffer
 		qebek_read_ulong(env, env->regs[R_ESP] - 10 * 4, &FileHandle);
 		qebek_read_ulong(env, env->regs[R_ESP] - 9 * 4, &EventHandle);
+		qebek_read_ulong(env, env->regs[R_ESP] - 6 * 4, &IoStatusBlock);
 		qebek_read_ulong(env, env->regs[R_ESP] - 5 * 4, &IoControlCode);
 		qebek_read_ulong(env, env->regs[R_ESP] - 4 * 4, &InputBuffer);
 		qebek_read_ulong(env, env->regs[R_ESP] - 2 * 4, &OutputBuffer);
@@ -107,6 +114,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	{
 		FileHandle = pControlData->FileHandle;
 		EventHandle = pControlData->EventHandle;
+		IoStatusBlock = pControlData->IoStatusBlock;
 		IoControlCode = pControlData->IoControlCode;
 		InputBuffer = pControlData->InputBuffer;
 		OutputBuffer = pControlData->OutputBuffer;
@@ -206,12 +214,20 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	case AFD_SEND:
 		if((pSocketEntry = GetSocketEntry(PID, FileHandle)) != NULL)
 			LogRecord(env, SYS_SENDMSG, FileHandle, pSocketEntry);
+		else
+		{
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to get socket entry for send: %08x\n", FileHandle);
+		}
 
 		break;
 
 	case AFD_RECV:
 		if((pSocketEntry = GetSocketEntry(PID, FileHandle)) != NULL)
 			LogRecord(env, SYS_RECVMSG, FileHandle, pSocketEntry);
+		else
+		{
+			fprintf(stderr, "postNtDeviceIoControlFIle: failed to get socket entry for recv: %08x\n", FileHandle);
+		}
 
 		break;
 
@@ -268,6 +284,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 			pWaitData->FileHandle = FileHandle;
 			pWaitData->IoControlCode = IoControlCode;
 			pWaitData->Buffer = InputBuffer;
+			pWaitData->Status = IoStatusBlock;
 
 			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], preNtWaitForSingleObject, pWaitData))
 			{
@@ -296,6 +313,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 			pWaitData->FileHandle = FileHandle;
 			pWaitData->IoControlCode = IoControlCode;
 			pWaitData->Buffer = OutputBuffer;
+			pWaitData->Status = IoStatusBlock;
 
 			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], preNtWaitForSingleObject, pWaitData))
 			{
@@ -303,6 +321,35 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 				qemu_free(pWaitData);
 			}
 		}
+
+		break;
+
+	case AFD_DUPLICATE:
+		sh_addr = InputBuffer + 0x08;
+		if(!qebek_read_ulong(env, sh_addr, &SocketHandle))
+		{
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to read new socket handle: %08x\n", sh_addr);
+			break;
+		}
+
+		if((pSocketEntry = GetSocketEntry(PID, FileHandle)) == NULL)
+		{
+			fprintf(stderr, "psotNtDeviceIoControlFile: failed to get old socket entry: %08x\n", FileHandle);
+			break;
+		}
+
+		if((pSocketEntry2 = InsertSocketHandle(PID, SocketHandle)) == NULL)
+		{
+			fprintf(stderr, "postNtDeviceIoControlFile: failed to insert new socket entry: %08x\n", SocketHandle);
+			break;
+		}
+
+		memcpy(pSocketEntry2, pSocketEntry, sizeof(SOCKET_ENTRY));
+
+		break;
+
+	case AFD_SELECT:
+		//fprintf(stderr, "AFD_SELECT\n");
 
 		break;
 
@@ -399,7 +446,7 @@ void preNtWaitForSingleObject(CPUX86State *env, void* user_data)
 
 	qebek_read_ulong(env, env->regs[R_ESP] + 4, &Handle);
 
-	fprintf(stderr, "preNtWaitForSingleObject: Handle %08x\n", Handle);
+	//fprintf(stderr, "preNtWaitForSingleObject: Handle %08x\n", Handle);
 
 	pWaitData = (PNtWaitForSingleObjectData)user_data;
 	if(Handle != pWaitData->EventHandle)
@@ -422,10 +469,15 @@ void preNtWaitForSingleObject(CPUX86State *env, void* user_data)
 
 void postNtWaitForSingleObject(CPUX86State *env, void* user_data)
 {
+	uint32_t Status;
 	target_ulong bp_addr;
 	PNtWaitForSingleObjectData pWaitData = (PNtWaitForSingleObjectData)user_data;
 
-	fprintf(stderr, "postNtWaitForSingleObject: Handle %08x\n", pWaitData->EventHandle);
+	//fprintf(stderr, "postNtWaitForSingleObject: Handle %08x\n", pWaitData->EventHandle);
+	
+	qebek_read_ulong(env, pWaitData->Status, &Status);
+	if(Status != 0)
+		goto remove_bp;
 
 	switch(pWaitData->IoControlCode)
 	{
@@ -441,6 +493,7 @@ void postNtWaitForSingleObject(CPUX86State *env, void* user_data)
 		break;
 	}
 
+remove_bp:
 	qemu_free(pWaitData);
 
 	bp_addr = env->eip;
@@ -470,10 +523,10 @@ void LogRecord(CPUX86State *env, uint8_t call, uint32_t handle, PSOCKET_ENTRY en
 	*/
 	record.dip = entry->dip;
 	record.dport = entry->dport;
-	if(entry->sip == 0 || entry->sip == 0x7f000001)
+	//if(entry->sip == 0 || entry->sip == 0x7f000001)
 		record.sip = qebek_g_ip;
-	else
-		record.sip = entry->sip;
+	//else
+	//	record.sip = entry->sip;
 	record.sport = entry->sport;
 	record.call = htons(call);
 	record.proto = entry->protocol;
