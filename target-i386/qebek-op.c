@@ -135,33 +135,33 @@ void qebek_hook_syscall(CPUX86State *env)
 
 		qebek_read_ulong(env, ssdt + index_NtCreateThread * 4, &NtCreateThread);
 
-		if(!qebek_bp_add(NtRequestWaitReplyPort, 0, preNtRequestWaitReplyPort, NULL))
+		if(!qebek_bp_add(NtRequestWaitReplyPort, 0, 0, preNtRequestWaitReplyPort, NULL))
 		{
 			fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtRequestWaitReplyPort\n");
 			return;
 		}
-        if(!qebek_bp_add(NtSecureConnectPort, 0, preNtSecureConnectPort, NULL))
+        if(!qebek_bp_add(NtSecureConnectPort, 0, 0, preNtSecureConnectPort, NULL))
         {
             fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtSecureConnectPort\n");
             return;
         }
-        if(!qebek_bp_add(NtClose, 0, preNtClose, NULL))
+        if(!qebek_bp_add(NtClose, 0, 0, preNtClose, NULL))
         {
             fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtClose\n");
             return;
         }
-        if(!qebek_bp_add(NtReadFile, 0, preNtReadFile, NULL))
+        if(!qebek_bp_add(NtReadFile, 0, 0, preNtReadFile, NULL))
         {
             fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtReadFile\n");
             return;
         }
-        if(!qebek_bp_add(NtWriteFile, 0, preNtWriteFile, NULL))
+        if(!qebek_bp_add(NtWriteFile, 0, 0, preNtWriteFile, NULL))
         {
             fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtWriteFile\n");
             return;
         }
 
-		if(!qebek_bp_add(NtCreateThread, 0, preNtCreateThread, NULL))
+		if(!qebek_bp_add(NtCreateThread, 0, 0, preNtCreateThread, NULL))
 		{
 			fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtCreateThread\n");
 			return;
@@ -178,7 +178,7 @@ void qebek_hook_syscall(CPUX86State *env)
 		qebek_read_ulong(env, ssdt + index_NtDeviceIoControlFile * 4, &NtDeviceIoControlFile);
 		qebek_read_ulong(env, ssdt + index_NtWaitForSingleObject * 4, &NtWaitForSingleObject);
 		
-		if(!qebek_bp_add(NtDeviceIoControlFile, 0, preNtDeviceIoControlFile, NULL))
+		if(!qebek_bp_add(NtDeviceIoControlFile, 0, 0, preNtDeviceIoControlFile, NULL))
 		{
 			fprintf(stderr, "qebek_hook_syscall: failed to insert break point for NtDeviceIoControlFile\n");
 			return;
@@ -226,7 +226,7 @@ void qebek_check_target(CPUX86State *env, target_ulong new_eip)
 		NtReadFilePost = 0;
 	}*/
 
-	if((bp_slot = qebek_bp_check(eip, env->cr[3])) == NULL)
+	if((bp_slot = qebek_bp_check(eip, env->cr[3], env->regs[R_EBP])) == NULL)
 		return;
 
 	bp_slot->cb_func(env, bp_slot->user_data);

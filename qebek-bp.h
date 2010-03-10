@@ -35,11 +35,12 @@ typedef struct qebek_bp_slot
 {
 	struct qebek_bp_slot *next;
 
-	target_ulong breakpoint;
-	target_ulong cr3;
+	target_ulong breakpoint; //break point virtual address
+	target_ulong cr3; //set if want to break for certain process
+	target_ulong ebp; //set if want to break for certain thread
 
-	qebek_cb_func cb_func;
-	void* user_data;
+	qebek_cb_func cb_func; //callback function
+	void* user_data; //callback data
 
 	bool enable;
 }qebek_bp_slot, *pqbek_bp_slot;
@@ -49,8 +50,8 @@ typedef struct qebek_bp_slot
 
 bool qebek_bpt_init();
 void qebek_bpt_free();
-qebek_bp_slot* qebek_bp_check(target_ulong address, target_ulong cr3);
-bool qebek_bp_add(target_ulong address, target_ulong cr3, qebek_cb_func cb_func, void* user_data);
-bool qebek_bp_remove(target_ulong address, target_ulong cr3);
+qebek_bp_slot* qebek_bp_check(target_ulong address, target_ulong cr3, target_ulong ebp);
+bool qebek_bp_add(target_ulong address, target_ulong cr3, target_ulong ebp, qebek_cb_func cb_func, void* user_data);
+bool qebek_bp_remove(target_ulong address, target_ulong cr3, target_ulong ebp);
 
 #endif

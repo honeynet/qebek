@@ -61,7 +61,7 @@ void qebek_bpt_free()
 	qemu_free(qebek_bpt);
 }
 
-bool qebek_bp_add(target_ulong address, target_ulong cr3, qebek_cb_func cb_func, void* user_data)
+bool qebek_bp_add(target_ulong address, target_ulong cr3, target_ulong ebp, qebek_cb_func cb_func, void* user_data)
 {
 	qebek_bp_slot* bp_slot;
 	uint32_t hash;
@@ -91,13 +91,14 @@ bool qebek_bp_add(target_ulong address, target_ulong cr3, qebek_cb_func cb_func,
 
 	bp_slot->breakpoint = address;
 	bp_slot->cr3 = cr3;
+	bp_slot->ebp = ebp;
 	bp_slot->cb_func = cb_func;
 	bp_slot->user_data = user_data;
 
 	return True;
 }
 
-bool qebek_bp_remove(target_ulong address, target_ulong cr3)
+bool qebek_bp_remove(target_ulong address, target_ulong cr3, target_ulong ebp)
 {
 	qebek_bp_slot *bp_slot, *bp_next;
 	uint32_t hash;
@@ -108,7 +109,7 @@ bool qebek_bp_remove(target_ulong address, target_ulong cr3)
 	hash = QEBEK_BP_HASH(address);
 	for(bp_slot = qebek_bpt[hash]; bp_slot != NULL; bp_slot = bp_slot->next)
 	{
-		if(bp_slot->breakpoint == address && bp_slot->cr3 == cr3)
+		if(bp_slot->breakpoint == address && bp_slot->cr3 == cr3 && bp_slot->ebp == ebp)
 		{
 			bp_next = bp_slot->next;
 			
@@ -124,7 +125,7 @@ bool qebek_bp_remove(target_ulong address, target_ulong cr3)
 	return False;
 }
 
-qebek_bp_slot* qebek_bp_check(target_ulong address, target_ulong cr3)
+qebek_bp_slot* qebek_bp_check(target_ulong address, target_ulong cr3, target_ulong ebp)
 {
 	qebek_bp_slot* bp_slot;
 	uint32_t hash;
@@ -139,7 +140,8 @@ qebek_bp_slot* qebek_bp_check(target_ulong address, target_ulong cr3)
 	for(bp_slot = qebek_bpt[hash]; bp_slot != NULL; bp_slot = bp_slot->next)
 	{
 		if(bp_slot->breakpoint == address && 
-				(bp_slot->cr3 == cr3 || bp_slot->cr3 == 0)
+				(bp_slot->cr3 == 0 || bp_slot->cr3 == cr3) &&
+				(bp_slot->ebp == 0 || bp_slot->ebp == ebp)
 		  )
 			return bp_slot;
 	}

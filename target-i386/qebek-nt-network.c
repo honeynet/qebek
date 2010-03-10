@@ -81,7 +81,7 @@ void preNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 	
 	// set return address, so the VM will break when returned
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-	if(!qebek_bp_add(ret_addr, env->cr[3], postNtDeviceIoControlFile, pControlData))
+	if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtDeviceIoControlFile, pControlData))
 	{
 		fprintf(stderr, "preNtDeviceIoControlFile: failed to add postcall interception.\n");
 	}
@@ -286,7 +286,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 			pWaitData->Buffer = InputBuffer;
 			pWaitData->Status = IoStatusBlock;
 
-			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], preNtWaitForSingleObject, pWaitData))
+			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], env->regs[R_EBP], preNtWaitForSingleObject, pWaitData))
 			{
 				fprintf(stderr, "postNtDeviceIoControlFile: failed to add wait bp\n");
 				qemu_free(pWaitData);
@@ -315,7 +315,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 			pWaitData->Buffer = OutputBuffer;
 			pWaitData->Status = IoStatusBlock;
 
-			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], preNtWaitForSingleObject, pWaitData))
+			if(!qebek_bp_add(NtWaitForSingleObject, env->cr[3], env->regs[R_EBP], preNtWaitForSingleObject, pWaitData))
 			{
 				fprintf(stderr, "postNtDeviceIoControlFile: failed to add wait bp2\n");
 				qemu_free(pWaitData);
@@ -361,7 +361,7 @@ void postNtDeviceIoControlFile(CPUX86State *env, void* user_data)
 remove_bp:
 	// remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "postNtDeviceIoControlFile: failed to remove postcall interception.\n");
     }
@@ -454,14 +454,14 @@ void preNtWaitForSingleObject(CPUX86State *env, void* user_data)
 
 	// set return address, so the VM will break when returned
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-	if(!qebek_bp_add(ret_addr, env->cr[3], postNtWaitForSingleObject, pWaitData))
+	if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtWaitForSingleObject, pWaitData))
 	{
 		fprintf(stderr, "preNtWaitForSingleObject: failed to add postcall interception.\n");
 	}
 
 	// remove self
 	bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "preNtWaitForSingleObject: failed to remove precall interception.\n");
     }
@@ -497,7 +497,7 @@ remove_bp:
 	qemu_free(pWaitData);
 
 	bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "postNtWaitForSingleObject: failed to remove postcall interception.\n");
     }
