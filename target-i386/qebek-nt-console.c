@@ -146,7 +146,7 @@ void preNtReadFile(CPUX86State *env, void* user_data)
 	        
 	// set return address, so the VM will break when returned
 	qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-	if(!qebek_bp_add(ret_addr, env->cr[3], postNtReadFile, pReadData))
+	if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtReadFile, pReadData))
 	{
 		fprintf(stderr, "preNtReadFile: failed to add postcall interception.\n");
 	}
@@ -182,7 +182,7 @@ void postNtReadFile(CPUX86State *env, void* user_data)
 
 	// remove return address
 	bp_addr = env->eip;
-	if(!qebek_bp_remove(bp_addr, env->cr[3]))
+	if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
 	{
 		fprintf(stderr, "postNtReadFile: failed to remove postcall interception.\n");
 	}
@@ -211,7 +211,7 @@ void preNtWriteFile(CPUX86State *env, void* user_data)
 
     // set return address, so the VM will break when returned
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-    if(!qebek_bp_add(ret_addr, env->cr[3], postNtWriteFile, pWriteData))
+    if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtWriteFile, pWriteData))
     {
         fprintf(stderr, "preNtWriteFile: failed to add postcall interception.\n");
     }
@@ -247,7 +247,7 @@ void postNtWriteFile(CPUX86State *env, void* user_data)
 
     // remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "postNtWriteFile: failed to remove postcall interception.\n");
     }
@@ -276,7 +276,7 @@ void preNtSecureConnectPort(CPUX86State *env, void* user_data)
 
     // set return address, so the VM will break when returned
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-    if(!qebek_bp_add(ret_addr, env->cr[3], postNtSecureConnectPort, pPortData))
+    if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtSecureConnectPort, pPortData))
     {
         fprintf(stderr, "preNtSecureConnectPort: failed to add postcall interception.\n");
     }
@@ -370,7 +370,7 @@ void postNtSecureConnectPort(CPUX86State *env, void* user_data)
 remove_bp:
     // remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "postNtSecureConnectPort: failed to remove postcall interception.\n");
     }
@@ -440,7 +440,7 @@ void preNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 
 		// set return address, so the VM will break when returned
 		qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-		if(!qebek_bp_add(ret_addr, env->cr[3], postNtRequestWaitReplyPort, pPortData))
+		if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtRequestWaitReplyPort, pPortData))
 		{
 			fprintf(stderr, "preNtRequestWaitReplyPort: failed to add postcall interception.\n");
 		}
@@ -479,7 +479,7 @@ void postNtRequestWaitReplyPort(CPUX86State *env, void* user_data)
 
 	// remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "postNtRequestWaitReplyPort: failed to remove postcall interception.\n");
     }
@@ -619,7 +619,7 @@ void preNtCreateThread(CPUX86State *env, void* user_data)
 
 	// set return address, so the VM will break when returned
     qebek_read_ulong(env, env->regs[R_ESP], &ret_addr);
-    if(!qebek_bp_add(ret_addr, env->cr[3], postNtCreateThread, NULL))
+    if(!qebek_bp_add(ret_addr, env->cr[3], env->regs[R_EBP], postNtCreateThread, NULL))
     {
         fprintf(stderr, "preNtCreateThread: failed to add postcall interception.\n");
     }
@@ -640,7 +640,7 @@ void postNtCreateThread(CPUX86State *env, void* user_data)
 
 	// remove return address
     bp_addr = env->eip;
-    if(!qebek_bp_remove(bp_addr, env->cr[3]))
+    if(!qebek_bp_remove(bp_addr, env->cr[3], env->regs[R_EBP]))
     {
         fprintf(stderr, "postNtCreateThread: failed to remove postcall interception.\n");
     }
