@@ -20,7 +20,7 @@ ifdef CONFIG_STATIC
 BASE_LDFLAGS += -static
 endif
 ifdef BUILD_DOCS
-DOCS=qemu-doc.html qemu-tech.html qemu.1 qemu-img.1
+DOCS=qemu-doc.html qemu-tech.html qebek.1 qemu-img.1
 else
 DOCS=
 endif
@@ -214,7 +214,7 @@ cscope:
 %.dvi: %.texi
 	texi2dvi $<
 
-qemu.1: qemu-doc.texi
+qebek.1: qemu-doc.texi
 	$(SRC_PATH)/texi2pod.pl $< qemu.pod
 	pod2man --section=1 --center=" " --release=" " qemu.pod > $@
 
@@ -228,8 +228,8 @@ dvi: qemu-doc.dvi qemu-tech.dvi
 
 html: qemu-doc.html qemu-tech.html
 
-QEBEK_VERSION ?= $(shell cat QEBEK_VERSION)
-FILE = qebek-$(QEBEK_VERSION)
+VERSION ?= $(shell cat VERSION)
+FILE = qebek-$(VERSION)
 
 # tar release (use 'make -k tar' on a checkouted tree)
 tar:

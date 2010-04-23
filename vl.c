@@ -7493,7 +7493,7 @@ static int main_loop(void)
 
 static void help(int exitcode)
 {
-    printf("QEBEK High Interaction Honeypot Monitor version " QEBEK_VERSION ", Copyright (c) 2009 Chengyu Song\n"
+    printf("QEBEK High Interaction Honeypot Monitor version " VERSION ", Copyright (c) 2010 Chengyu Song\n"
            "Based on QEMU PC emulator version " QEMU_VERSION ", Copyright (c) 2003-2008 Fabrice Bellard\n"
            "usage: %s [options] [disk_image]\n"
            "\n"
