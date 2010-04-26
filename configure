@@ -242,8 +242,8 @@ for opt do
   ;;
   --enable-adlib) adlib="yes"
   ;;
-  #--disable-kqemu) kqemu="no"
-  #;;
+  --disable-kqemu) kqemu="no"
+  ;;
   --enable-profiler) profiler="yes"
   ;;
   --enable-cocoa) cocoa="yes" ; coreaudio="yes" ; sdl="no"
@@ -350,10 +350,10 @@ echo "  --help                   print this message"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
 echo "  --interp-prefix=PREFIX   where to find shared libraries, etc."
 echo "                           use %M for cpu name [$interp_prefix]"
-#echo "  --target-list=LIST       set target list [$target_list]"
-#echo ""
-#echo "kqemu kernel acceleration support:"
-#echo "  --disable-kqemu          disable kqemu support"
+echo "  --target-list=LIST       set target list [$target_list]"
+echo ""
+echo "kqemu kernel acceleration support:"
+echo "  --disable-kqemu          disable kqemu support"
 echo ""
 echo "Advanced options (experts only):"
 echo "  --source-path=PATH       path of source code [$source_path]"
@@ -506,7 +506,7 @@ fi
 target_list="i386-softmmu"
 
 # no kqemu support now
-kqemu="no"
+#kqemu="no"
 
 if test -z "$target_list" ; then
     echo "No targets enabled"
