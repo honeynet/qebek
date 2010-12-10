@@ -71,16 +71,16 @@ ifeq ($(TARGET_ARCH),mips64)
     TARGET_ARCH2=mips64el
   endif
 endif
-QEMU_USER=qemu-$(TARGET_ARCH2)
+QEMU_USER=qebek-$(TARGET_ARCH2)
 # system emulator name
 ifdef CONFIG_SOFTMMU
 ifeq ($(TARGET_ARCH), i386)
 QEMU_SYSTEM=qebek$(EXESUF)
 else
-QEMU_SYSTEM=qemu-system-$(TARGET_ARCH2)$(EXESUF)
+QEMU_SYSTEM=qebek-system-$(TARGET_ARCH2)$(EXESUF)
 endif
 else
-QEMU_SYSTEM=qemu-fast
+QEMU_SYSTEM=qebek-fast
 endif
 
 ifdef CONFIG_USER_ONLY

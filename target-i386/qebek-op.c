@@ -102,6 +102,7 @@ void qebek_hook_syscall(CPUX86State *env)
 			break;
 
 		case QEBEK_OS_vista:
+		case QEBEK_OS_win2k8:
 			index_NtRequestWaitReplyPort = 0x110;
 			index_NtSecureConnectPort = 0x11f;
 			index_NtClose = 0x02f;
@@ -111,7 +112,20 @@ void qebek_hook_syscall(CPUX86State *env)
 			index_NtDeviceIoControlFile = 0x07e;
 			index_NtWaitForSingleObject = 0x161;
 
-			index_NtCreateThread = 0x04c;
+			index_NtCreateThread = 0x181; //NtCreateThreadEx in fact
+			break;
+
+		case QEBEK_OS_win7:
+			index_NtRequestWaitReplyPort = 0x12b;
+			index_NtSecureConnectPort = 0x138;
+			index_NtClose = 0x032;
+			index_NtReadFile = 0x111;
+			index_NtWriteFile = 0x18c;
+
+			index_NtDeviceIoControlFile = 0x06b;
+			index_NtWaitForSingleObject = 0x187;
+
+			index_NtCreateThread = 0x058; //NtCreateThreadEx in fact
 			break;
 
 		default:

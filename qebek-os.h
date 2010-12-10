@@ -22,7 +22,7 @@
 #ifndef QEBEK_OS_H
 #define QEBEK_OS_H
 
-typedef enum _qebek_os_major_t {
+typedef enum qebek_os_major_t {
 	QEBEK_OS_windows,
 	QEBEK_OS_linux,
 }qebek_os_major_t;
