@@ -52,6 +52,8 @@ libobj-$(CONFIG_NOSOFTFLOAT) += fpu/softfloat-native.o
 libobj-y += op_helper.o helper.o
 ifeq ($(TARGET_BASE_ARCH), i386)
 libobj-y += cpuid.o
+libobj-y += qebek-nt-console-helper.o qebek-nt-console.o
+libobj-y += qebek-nt-network-helper.o qebek-nt-network.o
 endif
 libobj-$(CONFIG_NEED_MMU) += mmu.o
 libobj-$(TARGET_ARM) += neon_helper.o iwmmxt_helper.o
@@ -174,6 +176,9 @@ obj-y += rwhandler.o
 obj-$(CONFIG_KVM) += kvm.o kvm-all.o
 obj-$(CONFIG_NO_KVM) += kvm-stub.o
 LIBS+=-lz
+
+# Qebek
+obj-y += qebek-bp.o qebek-common.o qebek-hook.o
 
 QEMU_CFLAGS += $(VNC_TLS_CFLAGS)
 QEMU_CFLAGS += $(VNC_SASL_CFLAGS)

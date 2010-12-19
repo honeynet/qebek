@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
-
 #include "exec.h"
 #include "exec-all.h"
 #include "host-utils.h"
 #include "ioport.h"
+
+/* For QEBEK, added by Chengyu */
+#include "qebek-hook.h"
 
 //#define DEBUG_PCALL
 
@@ -2822,6 +2824,10 @@ void helper_sysenter(void)
                            DESC_W_MASK | DESC_A_MASK);
     ESP = env->sysenter_esp;
     EIP = env->sysenter_eip;
+
+    if(unlikely(qebek_syscall_init == 0)) {
+	qebek_hook_syscall(env);
+    }
 }
 
 void helper_sysexit(int dflag)

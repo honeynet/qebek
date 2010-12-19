@@ -203,7 +203,8 @@ else
   cpu=`uname -m`
 fi
 
-target_list=""
+target_list="i386-softmmu "
+unsupported_target_list=""
 case "$cpu" in
   alpha|cris|ia64|m68k|microblaze|ppc|ppc64|sparc64)
     cpu="$cpu"
@@ -515,7 +516,7 @@ for opt do
   ;;
   --cpu=*)
   ;;
-  --target-list=*) target_list="$optarg"
+  --target-list=*) #target_list="$optarg"
   ;;
   --enable-gprof) gprof="yes"
   ;;
@@ -935,6 +936,8 @@ if test -z "$target_list" ; then
     if [ "$softmmu" = "yes" ] ; then
         target_list="\
 i386-softmmu \
+"
+	unsupported_target_list="
 x86_64-softmmu \
 arm-softmmu \
 cris-softmmu \
@@ -957,6 +960,8 @@ sparc64-softmmu \
     if [ "$linux_user" = "yes" ] ; then
         target_list="${target_list}\
 i386-linux-user \
+"
+	unsupported_target_list="${unsupported_list}\
 x86_64-linux-user \
 alpha-linux-user \
 arm-linux-user \
@@ -978,12 +983,15 @@ sparc32plus-linux-user \
     fi
 # the following are Darwin specific
     if [ "$darwin_user" = "yes" ] ; then
-        target_list="$target_list i386-darwin-user ppc-darwin-user "
+        target_list="$target_list i386-darwin-user "
+	unsupported_target_list="$unsupported_target_list ppc-darwin-user "
     fi
 # the following are BSD specific
     if [ "$bsd_user" = "yes" ] ; then
         target_list="${target_list}\
 i386-bsd-user \
+"
+	unsupported_target_list="${unsupported_target_list}\
 x86_64-bsd-user \
 sparc-bsd-user \
 sparc64-bsd-user \

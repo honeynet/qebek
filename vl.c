@@ -161,6 +161,11 @@ int main(int argc, char **argv)
 #include "cpus.h"
 #include "arch_init.h"
 
+/* QEBEK specific */
+#include "qebek-os.h"
+#include "qebek-common.h"
+#include "qebek-bp.h"
+
 //#define DEBUG_NET
 //#define DEBUG_SLIRP
 

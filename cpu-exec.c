@@ -23,6 +23,9 @@
 #include "kvm.h"
 #include "qemu-barrier.h"
 
+/* For QEBEK, added by Chengyu */
+#include "qebek-hook.h"
+
 #if !defined(CONFIG_SOFTMMU)
 #undef EAX
 #undef ECX
@@ -587,6 +590,13 @@ int cpu_exec(CPUState *env1)
                              (long)tb->tc_ptr, tb->pc,
                              lookup_symbol(tb->pc));
 #endif
+
+                /* check tb for QEBEK hooked function
+                   added by Chengyu */
+                if (qebek_check_target(env, tb->pc)) {
+                    next_tb = 0;
+                }
+
                 /* see if we can patch the calling TB. When the TB
                    spans two pages, we cannot safely do a direct
                    jump. */
