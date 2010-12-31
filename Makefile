@@ -29,7 +29,7 @@ $(call set-vpath, $(SRC_PATH):$(SRC_PATH)/hw)
 LIBS+=-lz $(LIBS_TOOLS)
 
 ifdef BUILD_DOCS
-DOCS=qemu-doc.html qemu-tech.html qemu.1 qemu-img.1 qemu-nbd.8 QMP/qmp-commands.txt
+DOCS=qemu-doc.html qemu-tech.html qebek.1 qemu-img.1 qemu-nbd.8 QMP/qmp-commands.txt
 else
 DOCS=
 endif
@@ -173,14 +173,14 @@ install-doc: $(DOCS)
 	$(INSTALL_DATA) qemu-doc.html  qemu-tech.html "$(DESTDIR)$(docdir)"
 ifdef CONFIG_POSIX
 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
-	$(INSTALL_DATA) qemu.1 qemu-img.1 "$(DESTDIR)$(mandir)/man1"
+	$(INSTALL_DATA) qebek.1 qemu-img.1 "$(DESTDIR)$(mandir)/man1"
 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
 	$(INSTALL_DATA) qemu-nbd.8 "$(DESTDIR)$(mandir)/man8"
 endif
 
 install-sysconfig:
-	$(INSTALL_DIR) "$(DESTDIR)$(sysconfdir)/qemu"
-	$(INSTALL_DATA) $(SRC_PATH)/sysconfigs/target/target-x86_64.conf "$(DESTDIR)$(sysconfdir)/qemu"
+	$(INSTALL_DIR) "$(DESTDIR)$(sysconfdir)/qebek"
+	$(INSTALL_DATA) $(SRC_PATH)/sysconfigs/target/target-x86_64.conf "$(DESTDIR)$(sysconfdir)/qebek"
 
 install: all $(if $(BUILD_DOCS),install-doc) install-sysconfig
 	$(INSTALL_DIR) "$(DESTDIR)$(bindir)"
@@ -243,7 +243,7 @@ QMP/qmp-commands.txt: $(SRC_PATH)/qemu-monitor.hx
 qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx
 	$(call quiet-command,sh $(SRC_PATH)/hxtool -t < $< > $@,"  GEN   $@")
 
-qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi
+qebek.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi
 	$(call quiet-command, \
 	  perl -Ww -- $(SRC_PATH)/texi2pod.pl $< qemu.pod && \
 	  pod2man --section=1 --center=" " --release=" " qemu.pod > $@, \
@@ -271,7 +271,7 @@ qemu-doc.dvi qemu-doc.html qemu-doc.info qemu-doc.pdf: \
 	qemu-monitor.texi qemu-img-cmds.texi
 
 VERSION ?= $(shell cat VERSION)
-FILE = qemu-$(VERSION)
+FILE = qebek-$(VERSION)
 
 # tar release (use 'make -k tar' on a checkouted tree)
 tar:
@@ -293,7 +293,7 @@ USER_PROGS=$(patsubst %-bsd-user,qemu-%, \
 
 # generate a binary distribution
 tarbin:
-	cd / && tar zcvf ~/qemu-$(VERSION)-$(ARCH).tar.gz \
+	cd / && tar zcvf ~/qebek-$(VERSION)-$(ARCH).tar.gz \
 	$(patsubst %,$(bindir)/%, $(SYSTEM_PROGS)) \
 	$(patsubst %,$(bindir)/%, $(USER_PROGS)) \
 	$(bindir)/qemu-img \
@@ -312,7 +312,7 @@ tarbin:
 	$(datadir)/pxe-e1000.bin \
 	$(docdir)/qemu-doc.html \
 	$(docdir)/qemu-tech.html \
-	$(mandir)/man1/qemu.1 \
+	$(mandir)/man1/qebek.1 \
 	$(mandir)/man1/qemu-img.1 \
 	$(mandir)/man8/qemu-nbd.8
 

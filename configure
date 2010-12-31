@@ -1,5 +1,9 @@
 #!/bin/sh
 #
+# qebek configure script (c) 2010 Chengyu Song
+#
+# based on
+#
 # qemu configure script (c) 2003 Fabrice Bellard
 #
 # set temporary file name
@@ -11,9 +15,9 @@ else
     TMPDIR1="/tmp"
 fi
 
-TMPC="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}.c"
-TMPO="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}.o"
-TMPE="${TMPDIR1}/qemu-conf-${RANDOM}-$$-${RANDOM}.exe"
+TMPC="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}.c"
+TMPO="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}.o"
+TMPE="${TMPDIR1}/qebek-conf-${RANDOM}-$$-${RANDOM}.exe"
 
 trap "rm -f $TMPC $TMPO $TMPE ; exit" EXIT INT QUIT TERM
 
@@ -65,7 +69,7 @@ path_of() {
 
 # default parameters
 cpu=""
-interp_prefix="/usr/gnemul/qemu-%M"
+interp_prefix="/usr/gnemul/qebek-%M"
 static="no"
 sparc_cpu=""
 cross_prefix=""
@@ -287,11 +291,11 @@ mingw32="no"
 EXESUF=""
 prefix="/usr/local"
 mandir="\${prefix}/share/man"
-datadir="\${prefix}/share/qemu"
-docdir="\${prefix}/share/doc/qemu"
+datadir="\${prefix}/share/qebek"
+docdir="\${prefix}/share/doc/qebek"
 bindir="\${prefix}/bin"
 sysconfdir="\${prefix}/etc"
-confsuffix="/qemu"
+confsuffix="/qebek"
 slirp="yes"
 fmod_lib=""
 fmod_inc=""
@@ -815,7 +819,7 @@ echo "  --mandir=PATH            install man pages in PATH"
 echo "  --datadir=PATH           install firmware in PATH"
 echo "  --docdir=PATH            install documentation in PATH"
 echo "  --bindir=PATH            install binaries in PATH"
-echo "  --sysconfdir=PATH        install config in PATH/qemu"
+echo "  --sysconfdir=PATH        install config in PATH/qebek"
 echo "  --enable-debug-tcg       enable TCG debugging"
 echo "  --disable-debug-tcg      disable TCG debugging (default)"
 echo "  --enable-debug           enable common debug build options"
@@ -880,7 +884,7 @@ echo "  --fmod-lib               path to FMOD library"
 echo "  --fmod-inc               path to FMOD includes"
 echo "  --oss-lib                path to OSS library"
 echo "  --enable-uname-release=R Return R for uname -r in usermode emulation"
-echo "  --sparc_cpu=V            Build qemu for Sparc architecture v7, v8, v8plus, v8plusa, v9"
+echo "  --sparc_cpu=V            Build qebek for Sparc architecture v7, v8, v8plus, v8plusa, v9"
 echo "  --disable-uuid           disable uuid support"
 echo "  --enable-uuid            enable uuid support"
 echo "  --disable-vde            disable support for vde network"
@@ -2327,8 +2331,10 @@ fi
 if test "$uuid" = "yes" ; then
   echo "CONFIG_UUID=y" >> $config_host_mak
 fi
-qemu_version=`head $source_path/VERSION`
-echo "VERSION=$qemu_version" >>$config_host_mak
+qemu_version=`head $source_path/QEMU_VERSION`
+qebek_version=`head $source_path/VERSION`
+echo "QEMU_VERSION=$qemu_version" >>$config_host_mak
+echo "VERSION=$qebek_version" >>$config_host_mak
 echo "PKGVERSION=$pkgversion" >>$config_host_mak
 echo "SRC_PATH=$source_path" >> $config_host_mak
 echo "TARGET_DIRS=$target_list" >> $config_host_mak

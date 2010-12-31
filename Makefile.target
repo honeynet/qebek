@@ -23,9 +23,9 @@ QEMU_PROG=qemu-$(TARGET_ARCH2)
 else
 # system emulator name
 ifeq ($(TARGET_ARCH), i386)
-QEMU_PROG=qemu$(EXESUF)
+QEMU_PROG=qebek$(EXESUF)
 else
-QEMU_PROG=qemu-system-$(TARGET_ARCH2)$(EXESUF)
+QEMU_PROG=qebek-system-$(TARGET_ARCH2)$(EXESUF)
 endif
 endif
 
