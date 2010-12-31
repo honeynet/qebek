@@ -55,7 +55,8 @@ BOOLEAN InitConsoleSpy(void)
 
 BOOLEAN IsHandleStd(CPUX86State *env, CONST HANDLE Handle)
 {
-	target_ulong pkthread = 0xffdff124, pteb, ppeb, pproc_param;
+	target_ulong pkthread = env->segs[R_FS].base + 0x124;
+    target_ulong pteb, ppeb, pproc_param;
 	target_ulong kthread, teb, peb, proc_param;
 	uint32_t stdin_handle, stdout_handle, stderr_handle;
 		

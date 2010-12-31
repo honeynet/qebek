@@ -48,7 +48,7 @@ typedef struct qebek_bp_slot
 #define QEBEK_BP_BITS 12
 #define QEBEK_BP_SIZE (1 << QEBEK_BP_BITS)
 #define QEBEK_BP_MAX (QEBEK_BP_SIZE / sizeof(struct qebek_bp_slot *))
-#define QEBEK_BP_MASK (QEBEK_BP_SIZE - 1)
+#define QEBEK_BP_MASK (QEBEK_BP_MAX - 1)
 #if TARGET_LONG_BITS == 32
 #define QEBEK_BP_HASH(X) ((X >> 2) & QEBEK_BP_MASK)
 #else

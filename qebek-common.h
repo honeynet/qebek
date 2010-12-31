@@ -21,32 +21,8 @@
 
 #ifndef QEBEK_COMMON_H
 #define QEBEK_COMMON_H
+
 #include "cpu.h"
-
-#ifndef IN
-#define IN
-#endif
-
-#ifndef OUT
-#define OUT
-#endif
-
-#ifndef VOID
-#define VOID void
-#endif
-
-typedef void *PVOID;
-
-#ifndef CONST
-#define CONST const
-#endif
-
-typedef unsigned char BOOLEAN;
-typedef target_ulong ULONG;
-typedef target_ulong HANDLE;
-typedef unsigned short USHORT;
-typedef unsigned int UINT;
-typedef unsigned char UCHAR;
 
 #ifndef False
 #define False 0
@@ -54,14 +30,6 @@ typedef unsigned char UCHAR;
 
 #ifndef True
 #define True 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef TRUE
-#define TRUE 1
 #endif
 
 #ifndef min
@@ -76,7 +44,6 @@ typedef unsigned char UCHAR;
 #define PROCNAMELEN 20
 #endif
 
-#define SEBEK_MAGIC   208 // this is in network order. 0xD0D0D000 in host order on x86
 #define SEBEK_PROTOCOL_VER 3
 
 #define SYS_SOCKET      1               /* sys_socket(2)                */
@@ -114,9 +81,6 @@ typedef unsigned char UCHAR;
 #define SEBEK_TYPE_WRITE 1
 #define SEBEK_TYPE_SOCKET 2
 #define SEBEK_TYPE_OPEN 3
-
-extern uint32_t qebek_g_ip;
-extern uint32_t qebek_g_magic;
 
 typedef struct sebek_hdr{
     uint32_t  magic		__attribute__((packed));

@@ -22,6 +22,8 @@
 #ifndef QEBEK_NT_CONSOLESPY_H
 #define QEBEK_NT_CONSOLESPY_H
 
+#include "qebek-nt-def.h"
+
 extern uint16_t index_NtRequestWaitReplyPort;
 extern uint16_t index_NtSecureConnectPort;
 extern uint16_t index_NtClose;

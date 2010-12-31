@@ -22,6 +22,7 @@
 #include "qemu-common.h"
 #include "osdep.h"
 #include "qebek-common.h"
+#include "qebek-nt-def.h"
 #include "qebek-nt-console-helper.h"
 
 static NT_LIST_ENTRY s_PortHandleList;

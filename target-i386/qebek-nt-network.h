@@ -22,6 +22,7 @@
 #ifndef QEBEK_NT_NETWORK_H
 #define QEBEK_NT_NETWORK_H
 
+#include "qebek-nt-def.h"
 #include "qebek-nt-network-helper.h"
 
 BOOLEAN InitNetwork(void);

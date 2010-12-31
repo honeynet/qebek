@@ -27,6 +27,8 @@
 #include "qebek-nt-network.h"
 #include "qebek-nt-network-helper.h"
 
+extern uint32_t qebek_g_ip;
+
 uint16_t index_NtDeviceIoControlFile;
 uint16_t index_NtWaitForSingleObject;
 

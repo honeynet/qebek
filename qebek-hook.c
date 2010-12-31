@@ -32,15 +32,19 @@ int qebek_syscall_init = 0;
 void qebek_hook_syscall(CPUState *env)
 {
 #if defined(TARGET_I386)
-	target_ulong pkthread = 0xffdff124, psdt, pssdt; //structure pointer
+    target_ulong pkthread, psdt, pssdt; //structure pointer
 	target_ulong kthread, sdt, ssdt; //virtual address
-#endif 
-	
+#endif
+
 	switch(qebek_os_major)
 	{
 	case QEBEK_OS_windows:
 
 #if defined(TARGET_I386)
+
+        pkthread = 0xffdff000 + 0x124; //FIXME
+        //fprintf(stderr, "qebek_hook_syscall: pkthread %08x\n", pkthread);
+
 		if(!qebek_read_ulong(env, pkthread, &kthread))
 		{
 			fprintf(stderr, "qebek_hook_syscall: failed to read kthread\n");
