@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "exec.h"
 #include "exec-all.h"
 #include "host-utils.h"
@@ -351,6 +352,10 @@ static void switch_tss(int tss_selector,
         new_segs[R_GS] = 0;
         new_trap = 0;
     }
+    /* XXX: avoid a compiler warning, see
+     http://support.amd.com/us/Processor_TechDocs/24593.pdf
+     chapters 12.2.5 and 13.2.4 on how to implement TSS Trap bit */
+    (void)new_trap;
 
     /* NOTE: we must avoid memory exceptions during the task switch,
        so we make dummy accesses before */

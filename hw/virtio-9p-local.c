@@ -12,20 +12,13 @@
  */
 #include "virtio.h"
 #include "virtio-9p.h"
+#include "virtio-9p-xattr.h"
 #include <arpa/inet.h>
 #include <pwd.h>
 #include <grp.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <attr/xattr.h>
-
-static const char *rpath(FsContext *ctx, const char *path)
-{
-    /* FIXME: so wrong... */
-    static char buffer[4096];
-    snprintf(buffer, sizeof(buffer), "%s/%s", ctx->fs_root, path);
-    return buffer;
-}
 
 
 static int local_lstat(FsContext *fs_ctx, const char *path, struct stat *stbuf)
@@ -101,8 +94,14 @@ static int local_post_create_passthrough(FsContext *fs_ctx, const char *path,
     if (chmod(rpath(fs_ctx, path), credp->fc_mode & 07777) < 0) {
         return -1;
     }
-    if (chown(rpath(fs_ctx, path), credp->fc_uid, credp->fc_gid) < 0) {
-        return -1;
+    if (lchown(rpath(fs_ctx, path), credp->fc_uid, credp->fc_gid) < 0) {
+        /*
+         * If we fail to change ownership and if we are
+         * using security model none. Ignore the error
+         */
+        if (fs_ctx->fs_sm != SM_NONE) {
+            return -1;
+        }
     }
     return 0;
 }
@@ -122,7 +121,8 @@ static ssize_t local_readlink(FsContext *fs_ctx, const char *path,
         } while (tsize == -1 && errno == EINTR);
         close(fd);
         return tsize;
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         tsize = readlink(rpath(fs_ctx, path), buf, bufsz);
     }
     return tsize;
@@ -168,28 +168,42 @@ static void local_seekdir(FsContext *ctx, DIR *dir, off_t off)
     return seekdir(dir, off);
 }
 
-static ssize_t local_readv(FsContext *ctx, int fd, const struct iovec *iov,
-                            int iovcnt)
+static ssize_t local_preadv(FsContext *ctx, int fd, const struct iovec *iov,
+                            int iovcnt, off_t offset)
 {
-    return readv(fd, iov, iovcnt);
+#ifdef CONFIG_PREADV
+    return preadv(fd, iov, iovcnt, offset);
+#else
+    int err = lseek(fd, offset, SEEK_SET);
+    if (err == -1) {
+        return err;
+    } else {
+        return readv(fd, iov, iovcnt);
+    }
+#endif
 }
 
-static off_t local_lseek(FsContext *ctx, int fd, off_t offset, int whence)
+static ssize_t local_pwritev(FsContext *ctx, int fd, const struct iovec *iov,
+                            int iovcnt, off_t offset)
 {
-    return lseek(fd, offset, whence);
-}
-
-static ssize_t local_writev(FsContext *ctx, int fd, const struct iovec *iov,
-                            int iovcnt)
-{
-    return writev(fd, iov, iovcnt);
+#ifdef CONFIG_PREADV
+    return pwritev(fd, iov, iovcnt, offset);
+#else
+    int err = lseek(fd, offset, SEEK_SET);
+    if (err == -1) {
+        return err;
+    } else {
+        return writev(fd, iov, iovcnt);
+    }
+#endif
 }
 
 static int local_chmod(FsContext *fs_ctx, const char *path, FsCred *credp)
 {
     if (fs_ctx->fs_sm == SM_MAPPED) {
         return local_set_xattr(rpath(fs_ctx, path), credp);
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         return chmod(rpath(fs_ctx, path), credp->fc_mode);
     }
     return -1;
@@ -211,7 +225,8 @@ static int local_mknod(FsContext *fs_ctx, const char *path, FsCred *credp)
             serrno = errno;
             goto err_end;
         }
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         err = mknod(rpath(fs_ctx, path), credp->fc_mode, credp->fc_rdev);
         if (err == -1) {
             return err;
@@ -247,7 +262,8 @@ static int local_mkdir(FsContext *fs_ctx, const char *path, FsCred *credp)
             serrno = errno;
             goto err_end;
         }
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         err = mkdir(rpath(fs_ctx, path), credp->fc_mode);
         if (err == -1) {
             return err;
@@ -316,7 +332,8 @@ static int local_open2(FsContext *fs_ctx, const char *path, int flags,
             serrno = errno;
             goto err_end;
         }
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         fd = open(rpath(fs_ctx, path), flags, credp->fc_mode);
         if (fd == -1) {
             return fd;
@@ -372,15 +389,23 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
             serrno = errno;
             goto err_end;
         }
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         err = symlink(oldpath, rpath(fs_ctx, newpath));
         if (err) {
             return err;
         }
         err = lchown(rpath(fs_ctx, newpath), credp->fc_uid, credp->fc_gid);
         if (err == -1) {
-            serrno = errno;
-            goto err_end;
+            /*
+             * If we fail to change ownership and if we are
+             * using security model none. Ignore the error
+             */
+            if (fs_ctx->fs_sm != SM_NONE) {
+                serrno = errno;
+                goto err_end;
+            } else
+                err = 0;
         }
     }
     return err;
@@ -426,9 +451,6 @@ static int local_rename(FsContext *ctx, const char *oldpath,
     int err;
 
     tmp = qemu_strdup(rpath(ctx, oldpath));
-    if (tmp == NULL) {
-        return -1;
-    }
 
     err = rename(tmp, rpath(ctx, newpath));
     if (err == -1) {
@@ -445,18 +467,22 @@ static int local_rename(FsContext *ctx, const char *oldpath,
 
 static int local_chown(FsContext *fs_ctx, const char *path, FsCred *credp)
 {
-    if (fs_ctx->fs_sm == SM_MAPPED) {
+    if ((credp->fc_uid == -1 && credp->fc_gid == -1) ||
+            (fs_ctx->fs_sm == SM_PASSTHROUGH)) {
+        return lchown(rpath(fs_ctx, path), credp->fc_uid, credp->fc_gid);
+    } else if (fs_ctx->fs_sm == SM_MAPPED) {
         return local_set_xattr(rpath(fs_ctx, path), credp);
-    } else if (fs_ctx->fs_sm == SM_PASSTHROUGH) {
+    } else if ((fs_ctx->fs_sm == SM_PASSTHROUGH) ||
+               (fs_ctx->fs_sm == SM_NONE)) {
         return lchown(rpath(fs_ctx, path), credp->fc_uid, credp->fc_gid);
     }
     return -1;
 }
 
-static int local_utime(FsContext *ctx, const char *path,
-                        const struct utimbuf *buf)
+static int local_utimensat(FsContext *s, const char *path,
+                           const struct timespec *buf)
 {
-    return utime(rpath(ctx, path), buf);
+    return qemu_utimensat(AT_FDCWD, rpath(s, path), buf, AT_SYMLINK_NOFOLLOW);
 }
 
 static int local_remove(FsContext *ctx, const char *path)
@@ -464,10 +490,44 @@ static int local_remove(FsContext *ctx, const char *path)
     return remove(rpath(ctx, path));
 }
 
-static int local_fsync(FsContext *ctx, int fd)
+static int local_fsync(FsContext *ctx, int fd, int datasync)
 {
-    return fsync(fd);
+    if (datasync) {
+        return qemu_fdatasync(fd);
+    } else {
+        return fsync(fd);
+    }
 }
+
+static int local_statfs(FsContext *s, const char *path, struct statfs *stbuf)
+{
+   return statfs(rpath(s, path), stbuf);
+}
+
+static ssize_t local_lgetxattr(FsContext *ctx, const char *path,
+                               const char *name, void *value, size_t size)
+{
+    return v9fs_get_xattr(ctx, path, name, value, size);
+}
+
+static ssize_t local_llistxattr(FsContext *ctx, const char *path,
+                                void *value, size_t size)
+{
+    return v9fs_list_xattr(ctx, path, value, size);
+}
+
+static int local_lsetxattr(FsContext *ctx, const char *path, const char *name,
+                           void *value, size_t size, int flags)
+{
+    return v9fs_set_xattr(ctx, path, name, value, size, flags);
+}
+
+static int local_lremovexattr(FsContext *ctx,
+                              const char *path, const char *name)
+{
+    return v9fs_remove_xattr(ctx, path, name);
+}
+
 
 FileOperations local_ops = {
     .lstat = local_lstat,
@@ -480,9 +540,8 @@ FileOperations local_ops = {
     .telldir = local_telldir,
     .readdir = local_readdir,
     .seekdir = local_seekdir,
-    .readv = local_readv,
-    .lseek = local_lseek,
-    .writev = local_writev,
+    .preadv = local_preadv,
+    .pwritev = local_pwritev,
     .chmod = local_chmod,
     .mknod = local_mknod,
     .mkdir = local_mkdir,
@@ -493,7 +552,12 @@ FileOperations local_ops = {
     .truncate = local_truncate,
     .rename = local_rename,
     .chown = local_chown,
-    .utime = local_utime,
+    .utimensat = local_utimensat,
     .remove = local_remove,
     .fsync = local_fsync,
+    .statfs = local_statfs,
+    .lgetxattr = local_lgetxattr,
+    .llistxattr = local_llistxattr,
+    .lsetxattr = local_lsetxattr,
+    .lremovexattr = local_lremovexattr,
 };

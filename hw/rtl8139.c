@@ -52,6 +52,7 @@
 #include "qemu-timer.h"
 #include "net.h"
 #include "loader.h"
+#include "sysemu.h"
 
 /* debug RTL8139 card */
 //#define DEBUG_RTL8139 1
@@ -494,6 +495,8 @@ typedef struct RTL8139State {
     QEMUTimer *timer;
     int64_t TimerExpire;
 
+    /* Support migration to/from old versions */
+    int rtl8139_mmio_io_addr_dummy;
 } RTL8139State;
 
 static void rtl8139_set_next_tctr_time(RTL8139State *s, int64_t current_time);
@@ -3125,17 +3128,11 @@ static void rtl8139_mmio_writeb(void *opaque, target_phys_addr_t addr, uint32_t 
 
 static void rtl8139_mmio_writew(void *opaque, target_phys_addr_t addr, uint32_t val)
 {
-#ifdef TARGET_WORDS_BIGENDIAN
-    val = bswap16(val);
-#endif
     rtl8139_io_writew(opaque, addr & 0xFF, val);
 }
 
 static void rtl8139_mmio_writel(void *opaque, target_phys_addr_t addr, uint32_t val)
 {
-#ifdef TARGET_WORDS_BIGENDIAN
-    val = bswap32(val);
-#endif
     rtl8139_io_writel(opaque, addr & 0xFF, val);
 }
 
@@ -3147,18 +3144,12 @@ static uint32_t rtl8139_mmio_readb(void *opaque, target_phys_addr_t addr)
 static uint32_t rtl8139_mmio_readw(void *opaque, target_phys_addr_t addr)
 {
     uint32_t val = rtl8139_io_readw(opaque, addr & 0xFF);
-#ifdef TARGET_WORDS_BIGENDIAN
-    val = bswap16(val);
-#endif
     return val;
 }
 
 static uint32_t rtl8139_mmio_readl(void *opaque, target_phys_addr_t addr)
 {
     uint32_t val = rtl8139_io_readl(opaque, addr & 0xFF);
-#ifdef TARGET_WORDS_BIGENDIAN
-    val = bswap32(val);
-#endif
     return val;
 }
 
@@ -3173,6 +3164,21 @@ static int rtl8139_post_load(void *opaque, int version_id)
     return 0;
 }
 
+static bool rtl8139_hotplug_ready_needed(void *opaque)
+{
+    return qdev_machine_modified();
+}
+
+static const VMStateDescription vmstate_rtl8139_hotplug_ready ={
+    .name = "rtl8139/hotplug_ready",
+    .version_id = 1,
+    .minimum_version_id = 1,
+    .minimum_version_id_old = 1,
+    .fields      = (VMStateField []) {
+        VMSTATE_END_OF_LIST()
+    }
+};
+
 static void rtl8139_pre_save(void *opaque)
 {
     RTL8139State* s = opaque;
@@ -3182,6 +3188,7 @@ static void rtl8139_pre_save(void *opaque)
     rtl8139_set_next_tctr_time(s, current_time);
     s->TCTR = muldiv64(current_time - s->TCTR_base, PCI_FREQUENCY,
                        get_ticks_per_sec());
+    s->rtl8139_mmio_io_addr_dummy = s->rtl8139_mmio_io_addr;
 }
 
 static const VMStateDescription vmstate_rtl8139 = {
@@ -3234,7 +3241,7 @@ static const VMStateDescription vmstate_rtl8139 = {
 
         VMSTATE_UNUSED(4),
         VMSTATE_MACADDR(conf.macaddr, RTL8139State),
-        VMSTATE_INT32(rtl8139_mmio_io_addr, RTL8139State),
+        VMSTATE_INT32(rtl8139_mmio_io_addr_dummy, RTL8139State),
 
         VMSTATE_UINT32(currTxDesc, RTL8139State),
         VMSTATE_UINT32(currCPlusRxDesc, RTL8139State),
@@ -3263,6 +3270,14 @@ static const VMStateDescription vmstate_rtl8139 = {
 
         VMSTATE_UINT32_V(cplus_enabled, RTL8139State, 4),
         VMSTATE_END_OF_LIST()
+    },
+    .subsections = (VMStateSubsection []) {
+        {
+            .vmsd = &vmstate_rtl8139_hotplug_ready,
+            .needed = rtl8139_hotplug_ready_needed,
+        }, {
+            /* empty */
+        }
     }
 };
 
@@ -3366,7 +3381,8 @@ static int pci_rtl8139_init(PCIDevice *dev)
 
     /* I/O handler for memory-mapped I/O */
     s->rtl8139_mmio_io_addr =
-        cpu_register_io_memory(rtl8139_mmio_read, rtl8139_mmio_write, s);
+        cpu_register_io_memory(rtl8139_mmio_read, rtl8139_mmio_write, s,
+                               DEVICE_LITTLE_ENDIAN);
 
     pci_register_bar(&s->dev, 0, 0x100,
                            PCI_BASE_ADDRESS_SPACE_IO,  rtl8139_ioport_map);
@@ -3387,6 +3403,9 @@ static int pci_rtl8139_init(PCIDevice *dev)
     s->TimerExpire = 0;
     s->timer = qemu_new_timer(vm_clock, rtl8139_timer, s);
     rtl8139_set_next_tctr_time(s, qemu_get_clock(vm_clock));
+
+    add_boot_device_path(s->conf.bootindex, &dev->qdev, "/ethernet-phy@0");
+
     return 0;
 }
 

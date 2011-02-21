@@ -100,9 +100,6 @@ void pc_basic_device_init(qemu_irq *isa_irq,
                           FDCtrl **floppy_controller,
                           ISADevice **rtc_state);
 void pc_init_ne2k_isa(NICInfo *nd);
-#ifdef HAS_AUDIO
-void pc_audio_init (PCIBus *pci_bus, qemu_irq *pic);
-#endif
 void pc_cmos_init(ram_addr_t ram_size, ram_addr_t above_4g_mem_size,
                   const char *boot_device,
                   BusState *ide0, BusState *ide1,
@@ -154,8 +151,7 @@ enum vga_retrace_method {
 extern enum vga_retrace_method vga_retrace_method;
 
 int isa_vga_init(void);
-int pci_vga_init(PCIBus *bus,
-                 unsigned long vga_bios_offset, int vga_bios_size);
+int pci_vga_init(PCIBus *bus);
 int isa_vga_mm_init(target_phys_addr_t vram_base,
                     target_phys_addr_t ctrl_base, int it_shift);
 

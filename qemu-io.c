@@ -61,7 +61,7 @@ static void *qemu_io_alloc(size_t len, int pattern)
 
 	if (misalign)
 		len += MISALIGN_OFFSET;
-	buf = qemu_memalign(512, len);
+	buf = qemu_blockalign(bs, len);
 	memset(buf, pattern, len);
 	if (misalign)
 		buf += MISALIGN_OFFSET;
@@ -135,7 +135,7 @@ create_iovec(QEMUIOVector *qiov, char **argv, int nr_iov, int pattern)
 
 	for (i = 0; i < nr_iov; i++) {
 		char *arg = argv[i];
-                uint64_t len;
+                int64_t len;
 
 		len = cvtnum(arg);
 		if (len < 0) {
@@ -144,7 +144,7 @@ create_iovec(QEMUIOVector *qiov, char **argv, int nr_iov, int pattern)
 		}
 
 		/* should be SIZE_T_MAX, but that doesn't exist */
-		if (len > UINT_MAX) {
+		if (len > INT_MAX) {
 			printf("too large length argument -- %s\n", arg);
 			goto fail;
 		}
@@ -326,7 +326,7 @@ read_help(void)
 " -l, -- length for pattern verification (only with -P)\n"
 " -p, -- use bdrv_pread to read the file\n"
 " -P, -- use a pattern to verify read data\n"
-" -q, -- quite mode, do not show I/O statistics\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
 " -s, -- start offset for pattern verification (only with -P)\n"
 " -v, -- dump buffer to standard output\n"
 "\n");
@@ -509,7 +509,7 @@ readv_help(void)
 " -C, -- report statistics in a machine parsable format\n"
 " -P, -- use a pattern to verify read data\n"
 " -v, -- dump buffer to standard output\n"
-" -q, -- quite mode, do not show I/O statistics\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
 "\n");
 }
 
@@ -633,7 +633,7 @@ write_help(void)
 " -p, -- use bdrv_pwrite to write the file\n"
 " -P, -- use different pattern to fill file\n"
 " -C, -- report statistics in a machine parsable format\n"
-" -q, -- quite mode, do not show I/O statistics\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
 "\n");
 }
 
@@ -765,7 +765,7 @@ writev_help(void)
 " filled with a set pattern (0xcdcdcdcd).\n"
 " -P, -- use different pattern to fill file\n"
 " -C, -- report statistics in a machine parsable format\n"
-" -q, -- quite mode, do not show I/O statistics\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
 "\n");
 }
 
@@ -1100,7 +1100,7 @@ aio_read_help(void)
 " -C, -- report statistics in a machine parsable format\n"
 " -P, -- use a pattern to verify read data\n"
 " -v, -- dump buffer to standard output\n"
-" -q, -- quite mode, do not show I/O statistics\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
 "\n");
 }
 
@@ -1131,8 +1131,10 @@ aio_read_f(int argc, char **argv)
 		case 'P':
 			ctx->Pflag = 1;
 			ctx->pattern = parse_pattern(optarg);
-			if (ctx->pattern < 0)
+			if (ctx->pattern < 0) {
+                                free(ctx);
 				return 0;
+                        }
 			break;
 		case 'q':
 			ctx->qflag = 1;
@@ -1198,7 +1200,7 @@ aio_write_help(void)
 " used to ensure all outstanding aio requests have been completed\n"
 " -P, -- use different pattern to fill file\n"
 " -C, -- report statistics in a machine parsable format\n"
-" -q, -- quite mode, do not show I/O statistics\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
 "\n");
 }
 
@@ -1394,6 +1396,93 @@ static const cmdinfo_t info_cmd = {
 	.oneline	= "prints information about the current file",
 };
 
+static void
+discard_help(void)
+{
+	printf(
+"\n"
+" discards a range of bytes from the given offset\n"
+"\n"
+" Example:\n"
+" 'discard 512 1k' - discards 1 kilobyte from 512 bytes into the file\n"
+"\n"
+" Discards a segment of the currently open file.\n"
+" -C, -- report statistics in a machine parsable format\n"
+" -q, -- quiet mode, do not show I/O statistics\n"
+"\n");
+}
+
+static int discard_f(int argc, char **argv);
+
+static const cmdinfo_t discard_cmd = {
+	.name		= "discard",
+	.altname	= "d",
+	.cfunc		= discard_f,
+	.argmin		= 2,
+	.argmax		= -1,
+	.args		= "[-Cq] off len",
+	.oneline	= "discards a number of bytes at a specified offset",
+	.help		= discard_help,
+};
+
+static int
+discard_f(int argc, char **argv)
+{
+	struct timeval t1, t2;
+	int Cflag = 0, qflag = 0;
+	int c, ret;
+	int64_t offset;
+	int count;
+
+	while ((c = getopt(argc, argv, "Cq")) != EOF) {
+		switch (c) {
+		case 'C':
+			Cflag = 1;
+			break;
+		case 'q':
+			qflag = 1;
+			break;
+		default:
+			return command_usage(&discard_cmd);
+		}
+	}
+
+	if (optind != argc - 2) {
+		return command_usage(&discard_cmd);
+	}
+
+	offset = cvtnum(argv[optind]);
+	if (offset < 0) {
+		printf("non-numeric length argument -- %s\n", argv[optind]);
+		return 0;
+	}
+
+	optind++;
+	count = cvtnum(argv[optind]);
+	if (count < 0) {
+		printf("non-numeric length argument -- %s\n", argv[optind]);
+		return 0;
+	}
+
+	gettimeofday(&t1, NULL);
+	ret = bdrv_discard(bs, offset >> BDRV_SECTOR_BITS, count >> BDRV_SECTOR_BITS);
+	gettimeofday(&t2, NULL);
+
+	if (ret < 0) {
+		printf("discard failed: %s\n", strerror(-ret));
+		goto out;
+	}
+
+	/* Finally, report back -- -C gives a parsable format */
+	if (!qflag) {
+		t2 = tsub(t2, t1);
+		print_report("discard", &t2, offset, count, count, 1, Cflag);
+	}
+
+out:
+	return 0;
+}
+
 static int
 alloc_f(int argc, char **argv)
 {
@@ -1427,11 +1516,8 @@ alloc_f(int argc, char **argv)
 
 	cvtstr(offset, s1, sizeof(s1));
 
-	if (nb_sectors == 1)
-		printf("sector allocated at offset %s\n", s1);
-	else
-		printf("%d/%d sectors allocated at offset %s\n",
-			sum_alloc, nb_sectors, s1);
+	printf("%d/%d sectors allocated at offset %s\n",
+	       sum_alloc, nb_sectors, s1);
 	return 0;
 }
 
@@ -1444,6 +1530,44 @@ static const cmdinfo_t alloc_cmd = {
 	.args		= "off [sectors]",
 	.oneline	= "checks if a sector is present in the file",
 };
+
+static int
+map_f(int argc, char **argv)
+{
+	int64_t offset;
+	int64_t nb_sectors;
+	char s1[64];
+	int num, num_checked;
+	int ret;
+	const char *retstr;
+
+	offset = 0;
+	nb_sectors = bs->total_sectors;
+
+	do {
+		num_checked = MIN(nb_sectors, INT_MAX);
+		ret = bdrv_is_allocated(bs, offset, num_checked, &num);
+		retstr = ret ? "    allocated" : "not allocated";
+		cvtstr(offset << 9ULL, s1, sizeof(s1));
+		printf("[% 24" PRId64 "] % 8d/% 8d sectors %s at offset %s (%d)\n",
+				offset << 9ULL, num, num_checked, retstr, s1, ret);
+
+		offset += num;
+		nb_sectors -= num;
+	} while(offset < bs->total_sectors);
+
+	return 0;
+}
+
+static const cmdinfo_t map_cmd = {
+       .name           = "map",
+       .argmin         = 0,
+       .argmax         = 0,
+       .cfunc          = map_f,
+       .args           = "",
+       .oneline        = "prints the allocated areas of a file",
+};
+
 
 static int
 close_f(int argc, char **argv)
@@ -1474,8 +1598,6 @@ static int openfile(char *name, int flags, int growable)
 		}
 	} else {
 		bs = bdrv_new("hda");
-		if (!bs)
-			return 1;
 
 		if (bdrv_open(bs, name, flags, NULL) < 0) {
 			fprintf(stderr, "%s: can't open device %s\n", progname, name);
@@ -1682,7 +1804,9 @@ int main(int argc, char **argv)
 	add_command(&truncate_cmd);
 	add_command(&length_cmd);
 	add_command(&info_cmd);
+	add_command(&discard_cmd);
 	add_command(&alloc_cmd);
+	add_command(&map_cmd);
 
 	add_args_command(init_args_command);
 	add_check_command(init_check_command);

@@ -24,7 +24,9 @@ typedef char *caddr_t;
 #else
 # define ioctlsocket ioctl
 # define closesocket(s) close(s)
-# define O_BINARY 0
+# if !defined(__HAIKU__)
+#  define O_BINARY 0
+# endif
 #endif
 
 #include <sys/types.h>
@@ -235,22 +237,8 @@ void if_start(Slirp *);
 void if_start(struct ttys *);
 #endif
 
-#ifdef BAD_SPRINTF
-# define vsprintf vsprintf_len
-# define sprintf sprintf_len
- extern int vsprintf_len(char *, const char *, va_list);
- extern int sprintf_len(char *, const char *, ...);
-#endif
-
-#ifdef DECLARE_SPRINTF
-# ifndef BAD_SPRINTF
- extern int vsprintf(char *, const char *, va_list);
-# endif
- extern int vfprintf(FILE *, const char *, va_list);
-#endif
-
 #ifndef HAVE_STRERROR
- extern char *strerror(int error);
+ char *strerror(int error);
 #endif
 
 #ifndef HAVE_INDEX
@@ -261,7 +249,7 @@ void if_start(struct ttys *);
  long gethostid(void);
 #endif
 
-void lprint(const char *, ...);
+void lprint(const char *, ...) GCC_FMT_ATTR(1, 2);
 
 #ifndef _WIN32
 #include <netdb.h>

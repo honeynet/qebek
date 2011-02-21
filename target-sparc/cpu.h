@@ -2,6 +2,7 @@
 #define CPU_SPARC_H
 
 #include "config.h"
+#include "qemu-common.h"
 
 #if !defined(TARGET_SPARC64)
 #define TARGET_LONG_BITS 32
@@ -251,20 +252,24 @@ typedef struct sparc_def_t {
     uint32_t maxtl;
 } sparc_def_t;
 
-#define CPU_FEATURE_FLOAT    (1 << 0)
-#define CPU_FEATURE_FLOAT128 (1 << 1)
-#define CPU_FEATURE_SWAP     (1 << 2)
-#define CPU_FEATURE_MUL      (1 << 3)
-#define CPU_FEATURE_DIV      (1 << 4)
-#define CPU_FEATURE_FLUSH    (1 << 5)
-#define CPU_FEATURE_FSQRT    (1 << 6)
-#define CPU_FEATURE_FMUL     (1 << 7)
-#define CPU_FEATURE_VIS1     (1 << 8)
-#define CPU_FEATURE_VIS2     (1 << 9)
-#define CPU_FEATURE_FSMULD   (1 << 10)
-#define CPU_FEATURE_HYPV     (1 << 11)
-#define CPU_FEATURE_CMT      (1 << 12)
-#define CPU_FEATURE_GL       (1 << 13)
+#define CPU_FEATURE_FLOAT        (1 << 0)
+#define CPU_FEATURE_FLOAT128     (1 << 1)
+#define CPU_FEATURE_SWAP         (1 << 2)
+#define CPU_FEATURE_MUL          (1 << 3)
+#define CPU_FEATURE_DIV          (1 << 4)
+#define CPU_FEATURE_FLUSH        (1 << 5)
+#define CPU_FEATURE_FSQRT        (1 << 6)
+#define CPU_FEATURE_FMUL         (1 << 7)
+#define CPU_FEATURE_VIS1         (1 << 8)
+#define CPU_FEATURE_VIS2         (1 << 9)
+#define CPU_FEATURE_FSMULD       (1 << 10)
+#define CPU_FEATURE_HYPV         (1 << 11)
+#define CPU_FEATURE_CMT          (1 << 12)
+#define CPU_FEATURE_GL           (1 << 13)
+#define CPU_FEATURE_TA0_SHUTDOWN (1 << 14) /* Shutdown on "ta 0x0" */
+#define CPU_FEATURE_ASR17        (1 << 15)
+#define CPU_FEATURE_CACHE_CTRL   (1 << 16)
+
 #ifndef TARGET_SPARC64
 #define CPU_DEFAULT_FEATURES (CPU_FEATURE_FLOAT | CPU_FEATURE_SWAP |  \
                               CPU_FEATURE_MUL | CPU_FEATURE_DIV |     \
@@ -436,21 +441,24 @@ typedef struct CPUSPARCState {
 #define SOFTINT_REG_MASK (SOFTINT_STIMER|SOFTINT_INTRMASK|SOFTINT_TIMER)
 #endif
     sparc_def_t *def;
+
+    void *irq_manager;
+    void (*qemu_irq_ack) (void *irq_manager, int intno);
+
+    /* Leon3 cache control */
+    uint32_t cache_control;
 } CPUSPARCState;
 
 #ifndef NO_CPU_IO_DEFS
 /* helper.c */
 CPUSPARCState *cpu_sparc_init(const char *cpu_model);
 void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu);
-void sparc_cpu_list (FILE *f, int (*cpu_fprintf)(FILE *f, const char *fmt,
-                                                 ...));
-void cpu_lock(void);
-void cpu_unlock(void);
+void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf);
 int cpu_sparc_handle_mmu_fault(CPUSPARCState *env1, target_ulong address, int rw,
                                int mmu_idx, int is_softmmu);
 #define cpu_handle_mmu_fault cpu_sparc_handle_mmu_fault
 target_ulong mmu_probe(CPUSPARCState *env, target_ulong address, int mmulev);
-void dump_mmu(CPUSPARCState *env);
+void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUState *env);
 
 /* translate.c */
 void gen_intermediate_code_init(CPUSPARCState *env);
@@ -470,9 +478,13 @@ void cpu_put_cwp64(CPUState *env1, int cwp);
 int cpu_cwp_inc(CPUState *env1, int cwp);
 int cpu_cwp_dec(CPUState *env1, int cwp);
 void cpu_set_cwp(CPUState *env1, int new_cwp);
+void leon3_irq_manager(void *irq_manager, int intno);
 
 /* sun4m.c, sun4u.c */
 void cpu_check_irqs(CPUSPARCState *env);
+
+/* leon3.c */
+void leon3_irq_ack(void *irq_manager, int intno);
 
 #if defined (TARGET_SPARC64)
 

@@ -46,6 +46,7 @@
 #include "pci.h"
 #include "net.h"
 #include "eeprom93xx.h"
+#include "sysemu.h"
 
 #define KiB 1024
 
@@ -540,8 +541,8 @@ static void e100_pci_reset(EEPRO100State * s, E100PCIDeviceInfo *e100_device)
     if (e100_device->power_management) {
         /* Power Management Capabilities */
         int cfg_offset = 0xdc;
-        int r = pci_add_capability_at_offset(&s->dev, PCI_CAP_ID_PM,
-                                             cfg_offset, PCI_PM_SIZEOF);
+        int r = pci_add_capability(&s->dev, PCI_CAP_ID_PM,
+                                   cfg_offset, PCI_PM_SIZEOF);
         assert(r >= 0);
         pci_set_word(pci_conf + cfg_offset + PCI_PM_PMC, 0x7e21);
 #if 0 /* TODO: replace dummy code for power management emulation. */
@@ -1290,7 +1291,7 @@ static void eepro100_write_port(EEPRO100State * s, uint32_t val)
 
 static uint8_t eepro100_read1(EEPRO100State * s, uint32_t addr)
 {
-    uint8_t val;
+    uint8_t val = 0;
     if (addr <= sizeof(s->mem) - sizeof(val)) {
         memcpy(&val, &s->mem[addr], sizeof(val));
     }
@@ -1333,7 +1334,7 @@ static uint8_t eepro100_read1(EEPRO100State * s, uint32_t addr)
 
 static uint16_t eepro100_read2(EEPRO100State * s, uint32_t addr)
 {
-    uint16_t val;
+    uint16_t val = 0;
     if (addr <= sizeof(s->mem) - sizeof(val)) {
         memcpy(&val, &s->mem[addr], sizeof(val));
     }
@@ -1356,7 +1357,7 @@ static uint16_t eepro100_read2(EEPRO100State * s, uint32_t addr)
 
 static uint32_t eepro100_read4(EEPRO100State * s, uint32_t addr)
 {
-    uint32_t val;
+    uint32_t val = 0;
     if (addr <= sizeof(s->mem) - sizeof(val)) {
         memcpy(&val, &s->mem[addr], sizeof(val));
     }
@@ -1878,7 +1879,8 @@ static int e100_nic_init(PCIDevice *pci_dev)
 
     /* Handler for memory-mapped I/O */
     s->mmio_index =
-        cpu_register_io_memory(pci_mmio_read, pci_mmio_write, s);
+        cpu_register_io_memory(pci_mmio_read, pci_mmio_write, s,
+                               DEVICE_NATIVE_ENDIAN);
 
     pci_register_bar(&s->dev, 0, PCI_MEM_SIZE,
                            PCI_BASE_ADDRESS_SPACE_MEMORY |
@@ -1906,6 +1908,8 @@ static int e100_nic_init(PCIDevice *pci_dev)
     memcpy(s->vmstate, &vmstate_eepro100, sizeof(vmstate_eepro100));
     s->vmstate->name = s->nic->nc.model;
     vmstate_register(&pci_dev->qdev, -1, s->vmstate, s);
+
+    add_boot_device_path(s->conf.bootindex, &pci_dev->qdev, "/ethernet-phy@0");
 
     return 0;
 }
@@ -2048,17 +2052,9 @@ static void eepro100_register_devices(void)
     size_t i;
     for (i = 0; i < ARRAY_SIZE(e100_devices); i++) {
         PCIDeviceInfo *pci_dev = &e100_devices[i].pci;
-        switch (e100_devices[i].device_id) {
-            case PCI_DEVICE_ID_INTEL_82551IT:
-                pci_dev->romfile = "gpxe-eepro100-80861209.rom";
-                break;
-            case PCI_DEVICE_ID_INTEL_82557:
-                pci_dev->romfile = "gpxe-eepro100-80861229.rom";
-                break;
-            case 0x2449:
-                pci_dev->romfile = "gpxe-eepro100-80862449.rom";
-                break;
-        }
+        /* We use the same rom file for all device ids.
+           QEMU fixes the device id during rom load. */
+        pci_dev->romfile = "gpxe-eepro100-80861209.rom";
         pci_dev->init = e100_nic_init;
         pci_dev->exit = pci_nic_uninit;
         pci_dev->qdev.props = e100_properties;

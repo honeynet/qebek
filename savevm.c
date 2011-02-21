@@ -78,7 +78,6 @@
 #include "sysemu.h"
 #include "qemu-timer.h"
 #include "qemu-char.h"
-#include "blockdev.h"
 #include "audio/audio.h"
 #include "migration.h"
 #include "qemu_socket.h"
@@ -611,7 +610,7 @@ int qemu_file_rate_limit(QEMUFile *f)
     return 0;
 }
 
-size_t qemu_file_get_rate_limit(QEMUFile *f)
+int64_t qemu_file_get_rate_limit(QEMUFile *f)
 {
     if (f->get_rate_limit)
         return f->get_rate_limit(f->opaque);
@@ -619,7 +618,7 @@ size_t qemu_file_get_rate_limit(QEMUFile *f)
     return 0;
 }
 
-size_t qemu_file_set_rate_limit(QEMUFile *f, size_t new_rate)
+int64_t qemu_file_set_rate_limit(QEMUFile *f, int64_t new_rate)
 {
     /* any failed or completed migration keeps its state to allow probing of
      * migration data, but has no associated file anymore */
@@ -674,6 +673,27 @@ uint64_t qemu_get_be64(QEMUFile *f)
     v |= qemu_get_be32(f);
     return v;
 }
+
+/* bool */
+
+static int get_bool(QEMUFile *f, void *pv, size_t size)
+{
+    bool *v = pv;
+    *v = qemu_get_byte(f);
+    return 0;
+}
+
+static void put_bool(QEMUFile *f, void *pv, size_t size)
+{
+    bool *v = pv;
+    qemu_put_byte(f, *v);
+}
+
+const VMStateInfo vmstate_info_bool = {
+    .name = "bool",
+    .get  = get_bool,
+    .put  = put_bool,
+};
 
 /* 8 bit int */
 
@@ -1380,19 +1400,13 @@ static int vmstate_load(QEMUFile *f, SaveStateEntry *se, int version_id)
     return vmstate_load_state(f, se->vmsd, se->opaque, version_id);
 }
 
-static int vmstate_save(QEMUFile *f, SaveStateEntry *se)
+static void vmstate_save(QEMUFile *f, SaveStateEntry *se)
 {
-    if (se->no_migrate) {
-        return -1;
-    }
-
     if (!se->vmsd) {         /* Old style */
         se->save_state(f, se->opaque);
-        return 0;
+        return;
     }
     vmstate_save_state(f,se->vmsd, se->opaque);
-
-    return 0;
 }
 
 #define QEMU_VM_FILE_MAGIC           0x5145564d
@@ -1405,6 +1419,20 @@ static int vmstate_save(QEMUFile *f, SaveStateEntry *se)
 #define QEMU_VM_SECTION_END          0x03
 #define QEMU_VM_SECTION_FULL         0x04
 #define QEMU_VM_SUBSECTION           0x05
+
+bool qemu_savevm_state_blocked(Monitor *mon)
+{
+    SaveStateEntry *se;
+
+    QTAILQ_FOREACH(se, &savevm_handlers, entry) {
+        if (se->no_migrate) {
+            monitor_printf(mon, "state blocked by non-migratable device '%s'\n",
+                           se->idstr);
+            return true;
+        }
+    }
+    return false;
+}
 
 int qemu_savevm_state_begin(Monitor *mon, QEMUFile *f, int blk_enable,
                             int shared)
@@ -1487,7 +1515,6 @@ int qemu_savevm_state_iterate(Monitor *mon, QEMUFile *f)
 int qemu_savevm_state_complete(Monitor *mon, QEMUFile *f)
 {
     SaveStateEntry *se;
-    int r;
 
     cpu_synchronize_all_states();
 
@@ -1520,11 +1547,7 @@ int qemu_savevm_state_complete(Monitor *mon, QEMUFile *f)
         qemu_put_be32(f, se->instance_id);
         qemu_put_be32(f, se->version_id);
 
-        r = vmstate_save(f, se);
-        if (r < 0) {
-            monitor_printf(mon, "cannot migrate with device '%s'\n", se->idstr);
-            return r;
-        }
+        vmstate_save(f, se);
     }
 
     qemu_put_byte(f, QEMU_VM_EOF);
@@ -1554,7 +1577,10 @@ static int qemu_savevm_state(Monitor *mon, QEMUFile *f)
     saved_vm_running = vm_running;
     vm_stop(0);
 
-    bdrv_flush_all();
+    if (qemu_savevm_state_blocked(mon)) {
+        ret = -EINVAL;
+        goto out;
+    }
 
     ret = qemu_savevm_state_begin(mon, f, 0, 0);
     if (ret < 0)
@@ -1612,22 +1638,29 @@ static const VMStateDescription *vmstate_get_subsection(const VMStateSubsection 
 static int vmstate_subsection_load(QEMUFile *f, const VMStateDescription *vmsd,
                                    void *opaque)
 {
+    const VMStateSubsection *sub = vmsd->subsections;
+
+    if (!sub || !sub->needed) {
+        return 0;
+    }
+
     while (qemu_peek_byte(f) == QEMU_VM_SUBSECTION) {
         char idstr[256];
         int ret;
-        uint8_t version_id, subsection, len;
+        uint8_t version_id, len;
         const VMStateDescription *sub_vmsd;
 
-        subsection = qemu_get_byte(f);
+        qemu_get_byte(f); /* subsection */
         len = qemu_get_byte(f);
         qemu_get_buffer(f, (uint8_t *)idstr, len);
         idstr[len] = 0;
         version_id = qemu_get_be32(f);
 
-        sub_vmsd = vmstate_get_subsection(vmsd->subsections, idstr);
+        sub_vmsd = vmstate_get_subsection(sub, idstr);
         if (sub_vmsd == NULL) {
             return -ENOENT;
         }
+        assert(!sub_vmsd->subsections);
         ret = vmstate_load_state(f, sub_vmsd, opaque, version_id);
         if (ret) {
             return ret;
@@ -1651,6 +1684,7 @@ static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
             qemu_put_byte(f, len);
             qemu_put_buffer(f, (uint8_t *)vmsd->name, len);
             qemu_put_be32(f, vmsd->version_id);
+            assert(!vmsd->subsections);
             vmstate_save_state(f, vmsd, opaque);
         }
         sub++;
@@ -1672,6 +1706,10 @@ int qemu_loadvm_state(QEMUFile *f)
     uint8_t section_type;
     unsigned int v;
     int ret;
+
+    if (qemu_savevm_state_blocked(default_mon)) {
+        return -EINVAL;
+    }
 
     v = qemu_get_be32(f);
     if (v != QEMU_VM_FILE_MAGIC)
@@ -1837,8 +1875,10 @@ void do_savevm(Monitor *mon, const QDict *qdict)
     uint32_t vm_state_size;
 #ifdef _WIN32
     struct _timeb tb;
+    struct tm *ptm;
 #else
     struct timeval tv;
+    struct tm tm;
 #endif
     const char *name = qdict_get_try_str(qdict, "name");
 
@@ -1862,22 +1902,11 @@ void do_savevm(Monitor *mon, const QDict *qdict)
         monitor_printf(mon, "No block device can accept snapshots\n");
         return;
     }
-    /* ??? Should this occur after vm_stop?  */
-    qemu_aio_flush();
 
     saved_vm_running = vm_running;
     vm_stop(0);
 
     memset(sn, 0, sizeof(*sn));
-    if (name) {
-        ret = bdrv_snapshot_find(bs, old_sn, name);
-        if (ret >= 0) {
-            pstrcpy(sn->name, sizeof(sn->name), old_sn->name);
-            pstrcpy(sn->id_str, sizeof(sn->id_str), old_sn->id_str);
-        } else {
-            pstrcpy(sn->name, sizeof(sn->name), name);
-        }
-    }
 
     /* fill auxiliary fields */
 #ifdef _WIN32
@@ -1890,6 +1919,25 @@ void do_savevm(Monitor *mon, const QDict *qdict)
     sn->date_nsec = tv.tv_usec * 1000;
 #endif
     sn->vm_clock_nsec = qemu_get_clock(vm_clock);
+
+    if (name) {
+        ret = bdrv_snapshot_find(bs, old_sn, name);
+        if (ret >= 0) {
+            pstrcpy(sn->name, sizeof(sn->name), old_sn->name);
+            pstrcpy(sn->id_str, sizeof(sn->id_str), old_sn->id_str);
+        } else {
+            pstrcpy(sn->name, sizeof(sn->name), name);
+        }
+    } else {
+#ifdef _WIN32
+        ptm = localtime(&tb.time);
+        strftime(sn->name, sizeof(sn->name), "vm-%Y%m%d%H%M%S", ptm);
+#else
+        /* cast below needed for OpenBSD where tv_sec is still 'long' */
+        localtime_r((const time_t *)&tv.tv_sec, &tm);
+        strftime(sn->name, sizeof(sn->name), "vm-%Y%m%d%H%M%S", &tm);
+#endif
+    }
 
     /* Delete old snapshots of the same name */
     if (name && del_existing_snapshots(mon, name) < 0) {
@@ -1932,12 +1980,27 @@ void do_savevm(Monitor *mon, const QDict *qdict)
 
 int load_vmstate(const char *name)
 {
-    BlockDriverState *bs, *bs1;
+    BlockDriverState *bs, *bs_vm_state;
     QEMUSnapshotInfo sn;
     QEMUFile *f;
     int ret;
 
-    /* Verify if there is a device that doesn't support snapshots and is writable */
+    bs_vm_state = bdrv_snapshots();
+    if (!bs_vm_state) {
+        error_report("No block device supports snapshots");
+        return -ENOTSUP;
+    }
+
+    /* Don't even try to load empty VM states */
+    ret = bdrv_snapshot_find(bs_vm_state, &sn, name);
+    if (ret < 0) {
+        return ret;
+    } else if (sn.vm_state_size == 0) {
+        return -EINVAL;
+    }
+
+    /* Verify if there is any device that doesn't support snapshots and is
+    writable and check if the requested snapshot is available too. */
     bs = NULL;
     while ((bs = bdrv_next(bs))) {
 
@@ -1950,63 +2013,45 @@ int load_vmstate(const char *name)
                                bdrv_get_device_name(bs));
             return -ENOTSUP;
         }
-    }
 
-    bs = bdrv_snapshots();
-    if (!bs) {
-        error_report("No block device supports snapshots");
-        return -EINVAL;
+        ret = bdrv_snapshot_find(bs, &sn, name);
+        if (ret < 0) {
+            error_report("Device '%s' does not have the requested snapshot '%s'",
+                           bdrv_get_device_name(bs), name);
+            return ret;
+        }
     }
 
     /* Flush all IO requests so they don't interfere with the new state.  */
     qemu_aio_flush();
 
-    bs1 = NULL;
-    while ((bs1 = bdrv_next(bs1))) {
-        if (bdrv_can_snapshot(bs1)) {
-            ret = bdrv_snapshot_goto(bs1, name);
+    bs = NULL;
+    while ((bs = bdrv_next(bs))) {
+        if (bdrv_can_snapshot(bs)) {
+            ret = bdrv_snapshot_goto(bs, name);
             if (ret < 0) {
-                switch(ret) {
-                case -ENOTSUP:
-                    error_report("%sSnapshots not supported on device '%s'",
-                                 bs != bs1 ? "Warning: " : "",
-                                 bdrv_get_device_name(bs1));
-                    break;
-                case -ENOENT:
-                    error_report("%sCould not find snapshot '%s' on device '%s'",
-                                 bs != bs1 ? "Warning: " : "",
-                                 name, bdrv_get_device_name(bs1));
-                    break;
-                default:
-                    error_report("%sError %d while activating snapshot on '%s'",
-                                 bs != bs1 ? "Warning: " : "",
-                                 ret, bdrv_get_device_name(bs1));
-                    break;
-                }
-                /* fatal on snapshot block device */
-                if (bs == bs1)
-                    return 0;
+                error_report("Error %d while activating snapshot '%s' on '%s'",
+                             ret, name, bdrv_get_device_name(bs));
+                return ret;
             }
         }
     }
 
-    /* Don't even try to load empty VM states */
-    ret = bdrv_snapshot_find(bs, &sn, name);
-    if ((ret >= 0) && (sn.vm_state_size == 0))
-        return -EINVAL;
-
     /* restore the VM state */
-    f = qemu_fopen_bdrv(bs, 0);
+    f = qemu_fopen_bdrv(bs_vm_state, 0);
     if (!f) {
         error_report("Could not open VM state file");
         return -EINVAL;
     }
+
     ret = qemu_loadvm_state(f);
+
     qemu_fclose(f);
     if (ret < 0) {
         error_report("Error %d while loading VM state", ret);
         return ret;
     }
+
     return 0;
 }
 
@@ -2042,8 +2087,10 @@ void do_delvm(Monitor *mon, const QDict *qdict)
 void do_info_snapshots(Monitor *mon)
 {
     BlockDriverState *bs, *bs1;
-    QEMUSnapshotInfo *sn_tab, *sn;
-    int nb_sns, i;
+    QEMUSnapshotInfo *sn_tab, *sn, s, *sn_info = &s;
+    int nb_sns, i, ret, available;
+    int total;
+    int *available_snapshots;
     char buf[256];
 
     bs = bdrv_snapshots();
@@ -2051,27 +2098,52 @@ void do_info_snapshots(Monitor *mon)
         monitor_printf(mon, "No available block device supports snapshots\n");
         return;
     }
-    monitor_printf(mon, "Snapshot devices:");
-    bs1 = NULL;
-    while ((bs1 = bdrv_next(bs1))) {
-        if (bdrv_can_snapshot(bs1)) {
-            if (bs == bs1)
-                monitor_printf(mon, " %s", bdrv_get_device_name(bs1));
-        }
-    }
-    monitor_printf(mon, "\n");
 
     nb_sns = bdrv_snapshot_list(bs, &sn_tab);
     if (nb_sns < 0) {
         monitor_printf(mon, "bdrv_snapshot_list: error %d\n", nb_sns);
         return;
     }
-    monitor_printf(mon, "Snapshot list (from %s):\n",
-                   bdrv_get_device_name(bs));
-    monitor_printf(mon, "%s\n", bdrv_snapshot_dump(buf, sizeof(buf), NULL));
-    for(i = 0; i < nb_sns; i++) {
-        sn = &sn_tab[i];
-        monitor_printf(mon, "%s\n", bdrv_snapshot_dump(buf, sizeof(buf), sn));
+
+    if (nb_sns == 0) {
+        monitor_printf(mon, "There is no snapshot available.\n");
+        return;
     }
+
+    available_snapshots = qemu_mallocz(sizeof(int) * nb_sns);
+    total = 0;
+    for (i = 0; i < nb_sns; i++) {
+        sn = &sn_tab[i];
+        available = 1;
+        bs1 = NULL;
+
+        while ((bs1 = bdrv_next(bs1))) {
+            if (bdrv_can_snapshot(bs1) && bs1 != bs) {
+                ret = bdrv_snapshot_find(bs1, sn_info, sn->id_str);
+                if (ret < 0) {
+                    available = 0;
+                    break;
+                }
+            }
+        }
+
+        if (available) {
+            available_snapshots[total] = i;
+            total++;
+        }
+    }
+
+    if (total > 0) {
+        monitor_printf(mon, "%s\n", bdrv_snapshot_dump(buf, sizeof(buf), NULL));
+        for (i = 0; i < total; i++) {
+            sn = &sn_tab[available_snapshots[i]];
+            monitor_printf(mon, "%s\n", bdrv_snapshot_dump(buf, sizeof(buf), sn));
+        }
+    } else {
+        monitor_printf(mon, "There is no suitable snapshot available\n");
+    }
+
     qemu_free(sn_tab);
+    qemu_free(available_snapshots);
+
 }

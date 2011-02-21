@@ -3,10 +3,14 @@
 #include "scsi.h"
 #include "scsi-defs.h"
 #include "qdev.h"
+#include "blockdev.h"
+
+static char *scsibus_get_fw_dev_path(DeviceState *dev);
 
 static struct BusInfo scsi_bus_info = {
     .name  = "SCSI",
     .size  = sizeof(SCSIBus),
+    .get_fw_dev_path = scsibus_get_fw_dev_path,
     .props = (Property[]) {
         DEFINE_PROP_UINT32("scsi-id", SCSIDevice, id, -1),
         DEFINE_PROP_END_OF_LIST(),
@@ -83,7 +87,8 @@ void scsi_qdev_register(SCSIDeviceInfo *info)
 }
 
 /* handle legacy '-drive if=scsi,...' cmd line args */
-SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockDriverState *bdrv, int unit)
+SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockDriverState *bdrv,
+                                      int unit, bool removable)
 {
     const char *driver;
     DeviceState *dev;
@@ -91,6 +96,9 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockDriverState *bdrv, int 
     driver = bdrv_is_sg(bdrv) ? "scsi-generic" : "scsi-disk";
     dev = qdev_create(&bus->qbus, driver);
     qdev_prop_set_uint32(dev, "scsi-id", unit);
+    if (qdev_prop_exists(dev, "removable")) {
+        qdev_prop_set_bit(dev, "removable", removable);
+    }
     if (qdev_prop_set_drive(dev, "drive", bdrv) < 0) {
         qdev_free(dev);
         return NULL;
@@ -107,29 +115,19 @@ int scsi_bus_legacy_handle_cmdline(SCSIBus *bus)
     int res = 0, unit;
 
     loc_push_none(&loc);
-    for (unit = 0; unit < MAX_SCSI_DEVS; unit++) {
+    for (unit = 0; unit < bus->ndev; unit++) {
         dinfo = drive_get(IF_SCSI, bus->busnr, unit);
         if (dinfo == NULL) {
             continue;
         }
         qemu_opts_loc_restore(dinfo->opts);
-        if (!scsi_bus_legacy_add_drive(bus, dinfo->bdrv, unit)) {
+        if (!scsi_bus_legacy_add_drive(bus, dinfo->bdrv, unit, false)) {
             res = -1;
             break;
         }
     }
     loc_pop(&loc);
     return res;
-}
-
-void scsi_dev_clear_sense(SCSIDevice *dev)
-{
-    memset(&dev->sense, 0, sizeof(dev->sense));
-}
-
-void scsi_dev_set_sense(SCSIDevice *dev, uint8_t key)
-{
-    dev->sense.key = key;
 }
 
 SCSIRequest *scsi_req_alloc(size_t size, SCSIDevice *d, uint32_t tag, uint32_t lun)
@@ -207,6 +205,8 @@ static int scsi_req_length(SCSIRequest *req, uint8_t *cmd)
     case SEEK_6:
     case WRITE_FILEMARKS:
     case SPACE:
+    case RESERVE:
+    case RELEASE:
     case ERASE:
     case ALLOW_MEDIUM_REMOVAL:
     case VERIFY:
@@ -318,7 +318,6 @@ static void scsi_req_xfer_mode(SCSIRequest *req)
     case WRITE_BUFFER:
     case FORMAT_UNIT:
     case REASSIGN_BLOCKS:
-    case RESERVE:
     case SEARCH_EQUAL:
     case SEARCH_HIGH:
     case SEARCH_LOW:
@@ -525,4 +524,24 @@ void scsi_req_complete(SCSIRequest *req)
     req->bus->complete(req->bus, SCSI_REASON_DONE,
                        req->tag,
                        req->status);
+}
+
+static char *scsibus_get_fw_dev_path(DeviceState *dev)
+{
+    SCSIDevice *d = (SCSIDevice*)dev;
+    SCSIBus *bus = scsi_bus_from_device(d);
+    char path[100];
+    int i;
+
+    for (i = 0; i < bus->ndev; i++) {
+        if (bus->devs[i] == d) {
+            break;
+        }
+    }
+
+    assert(i != bus->ndev);
+
+    snprintf(path, sizeof(path), "%s@%x", qdev_fw_name(dev), i);
+
+    return strdup(path);
 }

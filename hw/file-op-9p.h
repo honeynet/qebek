@@ -24,8 +24,19 @@
 
 typedef enum
 {
-    SM_PASSTHROUGH = 1, /* uid/gid set on fileserver files */
-    SM_MAPPED,  /* uid/gid part of xattr */
+    /*
+     * Server will try to set uid/gid.
+     * On failure ignore the error.
+     */
+    SM_NONE = 0,
+    /*
+     * uid/gid set on fileserver files
+     */
+    SM_PASSTHROUGH = 1,
+    /*
+     * uid/gid part of xattr
+     */
+    SM_MAPPED,
 } SecModel;
 
 typedef struct FsCred
@@ -36,14 +47,17 @@ typedef struct FsCred
     dev_t   fc_rdev;
 } FsCred;
 
+struct xattr_operations;
+
 typedef struct FsContext
 {
     char *fs_root;
     SecModel fs_sm;
     uid_t uid;
+    struct xattr_operations **xops;
 } FsContext;
 
-extern void cred_init(FsCred *);
+void cred_init(FsCred *);
 
 typedef struct FileOperations
 {
@@ -52,7 +66,7 @@ typedef struct FileOperations
     int (*chmod)(FsContext *, const char *, FsCred *);
     int (*chown)(FsContext *, const char *, FsCred *);
     int (*mknod)(FsContext *, const char *, FsCred *);
-    int (*utime)(FsContext *, const char *, const struct utimbuf *);
+    int (*utimensat)(FsContext *, const char *, const struct timespec *);
     int (*remove)(FsContext *, const char *);
     int (*symlink)(FsContext *, const char *, const char *, FsCred *);
     int (*link)(FsContext *, const char *, const char *);
@@ -66,14 +80,28 @@ typedef struct FileOperations
     off_t (*telldir)(FsContext *, DIR *);
     struct dirent *(*readdir)(FsContext *, DIR *);
     void (*seekdir)(FsContext *, DIR *, off_t);
-    ssize_t (*readv)(FsContext *, int, const struct iovec *, int);
-    ssize_t (*writev)(FsContext *, int, const struct iovec *, int);
-    off_t (*lseek)(FsContext *, int, off_t, int);
+    ssize_t (*preadv)(FsContext *, int, const struct iovec *, int, off_t);
+    ssize_t (*pwritev)(FsContext *, int, const struct iovec *, int, off_t);
     int (*mkdir)(FsContext *, const char *, FsCred *);
     int (*fstat)(FsContext *, int, struct stat *);
     int (*rename)(FsContext *, const char *, const char *);
     int (*truncate)(FsContext *, const char *, off_t);
-    int (*fsync)(FsContext *, int);
+    int (*fsync)(FsContext *, int, int);
+    int (*statfs)(FsContext *s, const char *path, struct statfs *stbuf);
+    ssize_t (*lgetxattr)(FsContext *, const char *,
+                         const char *, void *, size_t);
+    ssize_t (*llistxattr)(FsContext *, const char *, void *, size_t);
+    int (*lsetxattr)(FsContext *, const char *,
+                     const char *, void *, size_t, int);
+    int (*lremovexattr)(FsContext *, const char *, const char *);
     void *opaque;
 } FileOperations;
+
+static inline const char *rpath(FsContext *ctx, const char *path)
+{
+    /* FIXME: so wrong... */
+    static char buffer[4096];
+    snprintf(buffer, sizeof(buffer), "%s/%s", ctx->fs_root, path);
+    return buffer;
+}
 #endif

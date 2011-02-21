@@ -171,6 +171,12 @@ int load_multiboot(void *fw_cfg,
         uint64_t elf_low, elf_high;
         int kernel_size;
         fclose(f);
+
+        if (((struct elf64_hdr*)header)->e_machine == EM_X86_64) {
+            fprintf(stderr, "Cannot load x86-64 image, give a 32bit one.\n");
+            exit(1);
+        }
+
         kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
                                &elf_low, &elf_high, 0, ELF_MACHINE, 0);
         if (kernel_size < 0) {
@@ -252,7 +258,7 @@ int load_multiboot(void *fw_cfg,
 
         do {
             char *next_space;
-            uint32_t mb_mod_length;
+            int mb_mod_length;
             uint32_t offs = mbs.mb_buf_size;
 
             next_initrd = strchr(initrd_filename, ',');
@@ -300,7 +306,7 @@ int load_multiboot(void *fw_cfg,
                                 | MULTIBOOT_FLAGS_MODULES
                                 | MULTIBOOT_FLAGS_MMAP);
     stl_p(bootinfo + MBI_MEM_LOWER,   640);
-    stl_p(bootinfo + MBI_MEM_UPPER,   ram_size / 1024);
+    stl_p(bootinfo + MBI_MEM_UPPER,   (ram_size / 1024) - 1024);
     stl_p(bootinfo + MBI_BOOT_DEVICE, 0x8001ffff); /* XXX: use the -boot switch? */
     stl_p(bootinfo + MBI_MMAP_ADDR,   ADDR_E820_MAP);
 
@@ -325,7 +331,8 @@ int load_multiboot(void *fw_cfg,
     fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, mb_bootinfo_data,
                      sizeof(bootinfo));
 
-    option_rom[nb_option_roms] = "multiboot.bin";
+    option_rom[nb_option_roms].name = "multiboot.bin";
+    option_rom[nb_option_roms].bootindex = 0;
     nb_option_roms++;
 
     return 1; /* yes, we are multiboot */

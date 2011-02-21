@@ -342,7 +342,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
         munmap(ptr, size);
 
         /* ENOMEM if we checked the whole of the target address space.  */
-        if (addr == -1ul) {
+        if (addr == (abi_ulong)-1) {
             return (abi_ulong)-1;
         } else if (addr == 0) {
             if (wrapped) {
@@ -697,7 +697,9 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
                                          old_size, new_size,
                                          flags | MREMAP_FIXED,
                                          g2h(mmap_start));
-            mmap_reserve(old_addr, old_size);
+            if ( RESERVED_VA ) {
+                mmap_reserve(old_addr, old_size);
+            }
         }
     } else {
         int prot = 0;

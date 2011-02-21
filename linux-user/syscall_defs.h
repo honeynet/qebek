@@ -49,7 +49,7 @@
 #define TARGET_IOC_TYPEBITS	8
 
 #if defined(TARGET_I386) || defined(TARGET_ARM) || defined(TARGET_SPARC) \
-    || defined(TARGET_M68K) || defined(TARGET_SH4) || defined(TARGET_CRIS)
+    || defined(TARGET_M68K) || defined(TARGET_SH4) || defined(TARGET_CRIS) || defined(TARGET_PPC) || defined(TARGET_MIPS)
     /* 16 bit uid wrappers emulation */
 #define USE_UID16
 #endif
@@ -783,6 +783,7 @@ struct target_pollfd {
 #define TARGET_BLKGETSIZE64 TARGET_IOR(0x12,114,sizeof(uint64_t)) /* return device size in bytes (u64 *arg) */
 #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
 #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
+#define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
 
 /* cdrom commands */
 #define TARGET_CDROMPAUSE		0x5301 /* Pause Audio Operation */
@@ -1282,7 +1283,10 @@ struct target_stat {
 /* FIXME: Microblaze no-mmu user-space has a difference stat64 layout...  */
 struct __attribute__((__packed__)) target_stat64 {
 	uint64_t st_dev;
-        uint64_t st_ino;
+#define TARGET_STAT64_HAS_BROKEN_ST_INO 1
+	uint32_t pad0;
+	uint32_t __st_ino;
+
 	uint32_t st_mode;
 	uint32_t st_nlink;
 	uint32_t st_uid;
@@ -1296,13 +1300,12 @@ struct __attribute__((__packed__)) target_stat64 {
 	int64_t st_blocks;	/* Number 512-byte blocks allocated. */
 
 	int	       target_st_atime;
-        unsigned int   target_st_atime_nsec;
+	unsigned int   target_st_atime_nsec;
 	int	       target_st_mtime;
-        unsigned int   target_st_mtime_nsec;
+	unsigned int   target_st_mtime_nsec;
 	int            target_st_ctime;
-        unsigned int   target_st_ctime_nsec;
-        uint32_t   __unused4;
-        uint32_t   __unused5;
+	unsigned int   target_st_ctime_nsec;
+	uint64_t st_ino;
 };
 
 #elif defined(TARGET_M68K)

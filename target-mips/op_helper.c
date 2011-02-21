@@ -1359,8 +1359,7 @@ void helper_mtc0_cause (target_ulong arg1)
 void helper_mtc0_ebase (target_ulong arg1)
 {
     /* vectored interrupts not implemented */
-    /* Multi-CPU not implemented */
-    env->CP0_EBase = 0x80000000 | (arg1 & 0x3FFFF000);
+    env->CP0_EBase = (env->CP0_EBase & ~0x3FFFF000) | (arg1 & 0x3FFFF000);
 }
 
 void helper_mtc0_config0 (target_ulong arg1)
@@ -1555,40 +1554,28 @@ void helper_mttdsp(target_ulong arg1)
 }
 
 /* MIPS MT functions */
-target_ulong helper_dmt(target_ulong arg1)
+target_ulong helper_dmt(void)
 {
     // TODO
-    arg1 = 0;
-    // rt = arg1
-
-    return arg1;
+     return 0;
 }
 
-target_ulong helper_emt(target_ulong arg1)
+target_ulong helper_emt(void)
 {
     // TODO
-    arg1 = 0;
-    // rt = arg1
-
-    return arg1;
+    return 0;
 }
 
-target_ulong helper_dvpe(target_ulong arg1)
+target_ulong helper_dvpe(void)
 {
     // TODO
-    arg1 = 0;
-    // rt = arg1
-
-    return arg1;
+    return 0;
 }
 
-target_ulong helper_evpe(target_ulong arg1)
+target_ulong helper_evpe(void)
 {
     // TODO
-    arg1 = 0;
-    // rt = arg1
-
-    return arg1;
+    return 0;
 }
 #endif /* !CONFIG_USER_ONLY */
 
@@ -1599,8 +1586,10 @@ void helper_fork(target_ulong arg1, target_ulong arg2)
     // TODO: store to TC register
 }
 
-target_ulong helper_yield(target_ulong arg1)
+target_ulong helper_yield(target_ulong arg)
 {
+    target_long arg1 = arg;
+
     if (arg1 < 0) {
         /* No scheduling policy implemented. */
         if (arg1 != -2) {
@@ -2888,10 +2877,10 @@ static int float64_is_unordered(int sig, float64 a, float64 b STATUS_PARAM)
 {
     if (float64_is_signaling_nan(a) ||
         float64_is_signaling_nan(b) ||
-        (sig && (float64_is_nan(a) || float64_is_nan(b)))) {
+        (sig && (float64_is_quiet_nan(a) || float64_is_quiet_nan(b)))) {
         float_raise(float_flag_invalid, status);
         return 1;
-    } else if (float64_is_nan(a) || float64_is_nan(b)) {
+    } else if (float64_is_quiet_nan(a) || float64_is_quiet_nan(b)) {
         return 1;
     } else {
         return 0;
@@ -2946,10 +2935,10 @@ static flag float32_is_unordered(int sig, float32 a, float32 b STATUS_PARAM)
 {
     if (float32_is_signaling_nan(a) ||
         float32_is_signaling_nan(b) ||
-        (sig && (float32_is_nan(a) || float32_is_nan(b)))) {
+        (sig && (float32_is_quiet_nan(a) || float32_is_quiet_nan(b)))) {
         float_raise(float_flag_invalid, status);
         return 1;
-    } else if (float32_is_nan(a) || float32_is_nan(b)) {
+    } else if (float32_is_quiet_nan(a) || float32_is_quiet_nan(b)) {
         return 1;
     } else {
         return 0;

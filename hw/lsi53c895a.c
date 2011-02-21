@@ -600,7 +600,7 @@ static void lsi_queue_command(LSIState *s)
 {
     lsi_request *p = s->current;
 
-    DPRINTF("Queueing tag=0x%x\n", s->current_tag);
+    DPRINTF("Queueing tag=0x%x\n", p->tag);
     assert(s->current != NULL);
     assert(s->current->dma_len == 0);
     QTAILQ_INSERT_TAIL(&s->queue, s->current, next);
@@ -864,6 +864,7 @@ static void lsi_do_msgout(LSIState *s)
         case 0x01:
             len = lsi_get_msgbyte(s);
             msg = lsi_get_msgbyte(s);
+            (void)len; /* avoid a warning about unused variable*/
             DPRINTF("Extended message 0x%x (len %d)\n", msg, len);
             switch (msg) {
             case 1:
@@ -880,7 +881,7 @@ static void lsi_do_msgout(LSIState *s)
             break;
         case 0x20: /* SIMPLE queue */
             s->select_tag |= lsi_get_msgbyte(s) | LSI_TAG_VALID;
-            DPRINTF("SIMPLE queue tag=0x%x\n", s->current_tag & 0xff);
+            DPRINTF("SIMPLE queue tag=0x%x\n", s->select_tag & 0xff);
             break;
         case 0x21: /* HEAD of queue */
             BADF("HEAD queue not implemented\n");
@@ -1929,7 +1930,7 @@ static uint32_t lsi_ram_readw(void *opaque, target_phys_addr_t addr)
     val = s->script_ram[addr >> 2];
     if (addr & 2)
         val >>= 16;
-    return le16_to_cpu(val);
+    return val;
 }
 
 static uint32_t lsi_ram_readl(void *opaque, target_phys_addr_t addr)
@@ -1937,7 +1938,7 @@ static uint32_t lsi_ram_readl(void *opaque, target_phys_addr_t addr)
     LSIState *s = opaque;
 
     addr &= 0x1fff;
-    return le32_to_cpu(s->script_ram[addr >> 2]);
+    return s->script_ram[addr >> 2];
 }
 
 static CPUReadMemoryFunc * const lsi_ram_readfn[3] = {
@@ -2172,16 +2173,17 @@ static int lsi_scsi_init(PCIDevice *dev)
     pci_conf[PCI_INTERRUPT_PIN] = 0x01;
 
     s->mmio_io_addr = cpu_register_io_memory(lsi_mmio_readfn,
-                                             lsi_mmio_writefn, s);
+                                             lsi_mmio_writefn, s,
+                                             DEVICE_NATIVE_ENDIAN);
     s->ram_io_addr = cpu_register_io_memory(lsi_ram_readfn,
-                                            lsi_ram_writefn, s);
+                                            lsi_ram_writefn, s,
+                                            DEVICE_NATIVE_ENDIAN);
 
-    /* TODO: use dev and get rid of cast below */
-    pci_register_bar((struct PCIDevice *)s, 0, 256,
+    pci_register_bar(&s->dev, 0, 256,
                            PCI_BASE_ADDRESS_SPACE_IO, lsi_io_mapfunc);
-    pci_register_bar((struct PCIDevice *)s, 1, 0x400,
+    pci_register_bar(&s->dev, 1, 0x400,
                            PCI_BASE_ADDRESS_SPACE_MEMORY, lsi_mmio_mapfunc);
-    pci_register_bar((struct PCIDevice *)s, 2, 0x2000,
+    pci_register_bar(&s->dev, 2, 0x2000,
                            PCI_BASE_ADDRESS_SPACE_MEMORY, lsi_ram_mapfunc);
     QTAILQ_INIT(&s->queue);
 

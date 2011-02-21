@@ -37,6 +37,7 @@
 #include "elf.h"
 #include "vt82c686.h"
 #include "mc146818rtc.h"
+#include "blockdev.h"
 
 #define DEBUG_FULONG2E_INIT
 
@@ -75,7 +76,8 @@ static struct _loaderparams {
     const char *initrd_filename;
 } loaderparams;
 
-static void prom_set(uint32_t* prom_buf, int index, const char *string, ...)
+static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
+                                        const char *string, ...)
 {
     va_list ap;
     int32_t table_addr;
@@ -140,13 +142,13 @@ static int64_t load_kernel (CPUState *env)
     prom_size = ENVP_NB_ENTRIES * (sizeof(int32_t) + ENVP_ENTRY_SIZE);
     prom_buf = qemu_malloc(prom_size);
 
-    prom_set(prom_buf, index++, loaderparams.kernel_filename);
+    prom_set(prom_buf, index++, "%s", loaderparams.kernel_filename);
     if (initrd_size > 0) {
-        prom_set(prom_buf, index++, "rd_start=0x" PRIx64 " rd_size=%li %s",
+        prom_set(prom_buf, index++, "rd_start=0x%" PRIx64 " rd_size=%li %s",
                  cpu_mips_phys_to_kseg0(NULL, initrd_offset), initrd_size,
                  loaderparams.kernel_cmdline);
     } else {
-        prom_set(prom_buf, index++, loaderparams.kernel_cmdline);
+        prom_set(prom_buf, index++, "%s", loaderparams.kernel_cmdline);
     }
 
     /* Setup minimum environment variables */
@@ -216,13 +218,11 @@ uint8_t eeprom_spd[0x80] = {
 };
 
 /* Audio support */
-#ifdef HAS_AUDIO
 static void audio_init (PCIBus *pci_bus)
 {
-    vt82c686b_ac97_init(pci_bus, (FULONG2E_VIA_SLOT << 3) + 5);
-    vt82c686b_mc97_init(pci_bus, (FULONG2E_VIA_SLOT << 3) + 6);
+    vt82c686b_ac97_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 5));
+    vt82c686b_mc97_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 6));
 }
-#endif
 
 /* Network support */
 static void network_init (void)
@@ -257,19 +257,17 @@ static void mips_fulong2e_init(ram_addr_t ram_size, const char *boot_device,
 {
     char *filename;
     unsigned long ram_offset, bios_offset;
-    unsigned long bios_size;
+    long bios_size;
     int64_t kernel_entry;
     qemu_irq *i8259;
     qemu_irq *cpu_exit_irq;
     int via_devfn;
     PCIBus *pci_bus;
-    ISADevice *isa_dev;
     uint8_t *eeprom_buf;
     i2c_bus *smbus;
     int i;
     DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
     DeviceState *eeprom;
-    ISADevice *rtc_state;
     CPUState *env;
 
     /* init CPUs */
@@ -295,7 +293,7 @@ static void mips_fulong2e_init(ram_addr_t ram_size, const char *boot_device,
     ram_offset = qemu_ram_alloc(NULL, "fulong2e.ram", ram_size);
     bios_offset = qemu_ram_alloc(NULL, "fulong2e.bios", bios_size);
 
-    cpu_register_physical_memory(0, ram_size, IO_MEM_RAM);
+    cpu_register_physical_memory(0, ram_size, ram_offset);
     cpu_register_physical_memory(0x1fc00000LL,
 					   bios_size, bios_offset | IO_MEM_ROM);
 
@@ -349,18 +347,18 @@ static void mips_fulong2e_init(ram_addr_t ram_size, const char *boot_device,
         hd[i] = drive_get(IF_IDE, i / MAX_IDE_DEVS, i % MAX_IDE_DEVS);
     }
 
-    via_devfn = vt82c686b_init(pci_bus, FULONG2E_VIA_SLOT << 3);
+    via_devfn = vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 0));
     if (via_devfn < 0) {
         fprintf(stderr, "vt82c686b_init error \n");
         exit(1);
     }
 
     isa_bus_irqs(i8259);
-    vt82c686b_ide_init(pci_bus, hd, (FULONG2E_VIA_SLOT << 3) + 1);
-    usb_uhci_vt82c686b_init(pci_bus, (FULONG2E_VIA_SLOT << 3) + 2);
-    usb_uhci_vt82c686b_init(pci_bus, (FULONG2E_VIA_SLOT << 3) + 3);
+    vt82c686b_ide_init(pci_bus, hd, PCI_DEVFN(FULONG2E_VIA_SLOT, 1));
+    usb_uhci_vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 2));
+    usb_uhci_vt82c686b_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 3));
 
-    smbus = vt82c686b_pm_init(pci_bus, (FULONG2E_VIA_SLOT << 3) + 4,
+    smbus = vt82c686b_pm_init(pci_bus, PCI_DEVFN(FULONG2E_VIA_SLOT, 4),
                               0xeee1, NULL);
     eeprom_buf = qemu_mallocz(8 * 256); /* XXX: make this persistent */
     memcpy(eeprom_buf, eeprom_spd, sizeof(eeprom_spd));
@@ -376,9 +374,9 @@ static void mips_fulong2e_init(ram_addr_t ram_size, const char *boot_device,
     DMA_init(0, cpu_exit_irq);
 
     /* Super I/O */
-    isa_dev = isa_create_simple("i8042");
+    isa_create_simple("i8042");
 
-    rtc_state = rtc_init(2000, NULL);
+    rtc_init(2000, NULL);
 
     for(i = 0; i < MAX_SERIAL_PORTS; i++) {
         if (serial_hds[i]) {
@@ -391,9 +389,7 @@ static void mips_fulong2e_init(ram_addr_t ram_size, const char *boot_device,
     }
 
     /* Sound card */
-#ifdef HAS_AUDIO
     audio_init(pci_bus);
-#endif
     /* Network card */
     network_init();
 }

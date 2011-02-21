@@ -187,7 +187,7 @@ typedef struct {
     uint32_t phy_int_mask;
 
     int eeprom_writable;
-    uint8_t eeprom[8];
+    uint8_t eeprom[128];
 
     int tx_fifo_size;
     LAN9118Packet *txp;
@@ -1003,7 +1003,7 @@ static void lan9118_writel(void *opaque, target_phys_addr_t offset,
         s->afc_cfg = val & 0x00ffffff;
         break;
     case CSR_E2P_CMD:
-        lan9118_eeprom_cmd(s, (val >> 28) & 7, val & 0xff);
+        lan9118_eeprom_cmd(s, (val >> 28) & 7, val & 0x7f);
         break;
     case CSR_E2P_DATA:
         s->e2p_data = val & 0xff;
@@ -1124,7 +1124,8 @@ static int lan9118_init1(SysBusDevice *dev)
     int i;
 
     s->mmio_index = cpu_register_io_memory(lan9118_readfn,
-                                           lan9118_writefn, s);
+                                           lan9118_writefn, s,
+                                           DEVICE_NATIVE_ENDIAN);
     sysbus_init_mmio(dev, 0x100, s->mmio_index);
     sysbus_init_irq(dev, &s->irq);
     qemu_macaddr_default_if_unset(&s->conf.macaddr);

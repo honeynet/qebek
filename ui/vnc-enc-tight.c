@@ -111,16 +111,16 @@ static bool tight_can_send_png_rect(VncState *vs, int w, int h)
  * compression (by applying "gradient" filter or JPEG coder).
  */
 
-static uint
+static unsigned int
 tight_detect_smooth_image24(VncState *vs, int w, int h)
 {
     int off;
     int x, y, d, dx;
-    uint c;
-    uint stats[256];
+    unsigned int c;
+    unsigned int stats[256];
     int pixels = 0;
     int pix, left[3];
-    uint errors;
+    unsigned int errors;
     unsigned char *buf = vs->tight.tight.buffer;
 
     /*
@@ -177,17 +177,17 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
 
 #define DEFINE_DETECT_FUNCTION(bpp)                                     \
                                                                         \
-    static uint                                                         \
+    static unsigned int                                                 \
     tight_detect_smooth_image##bpp(VncState *vs, int w, int h) {        \
         bool endian;                                                    \
         uint##bpp##_t pix;                                              \
         int max[3], shift[3];                                           \
         int x, y, d, dx;                                                \
-        uint c;                                                         \
-        uint stats[256];                                                \
+        unsigned int c;                                                 \
+        unsigned int stats[256];                                        \
         int pixels = 0;                                                 \
         int sample, sum, left[3];                                       \
-        uint errors;                                                    \
+        unsigned int errors;                                            \
         unsigned char *buf = vs->tight.tight.buffer;                    \
                                                                         \
         endian = ((vs->clientds.flags & QEMU_BIG_ENDIAN_FLAG) !=        \
@@ -209,7 +209,7 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
                      d < w - x - VNC_TIGHT_DETECT_SUBROW_WIDTH; d++) {  \
                 pix = ((uint##bpp##_t *)buf)[(y+d)*w+x+d];              \
                 if (endian) {                                           \
-                    pix = bswap_##bpp(pix);                             \
+                    pix = bswap##bpp(pix);                              \
                 }                                                       \
                 for (c = 0; c < 3; c++) {                               \
                     left[c] = (int)(pix >> shift[c] & max[c]);          \
@@ -218,7 +218,7 @@ tight_detect_smooth_image24(VncState *vs, int w, int h)
                      dx++) {                                            \
                     pix = ((uint##bpp##_t *)buf)[(y+d)*w+x+d+dx];       \
                     if (endian) {                                       \
-                        pix = bswap_##bpp(pix);                         \
+                        pix = bswap##bpp(pix);                          \
                     }                                                   \
                     sum = 0;                                            \
                     for (c = 0; c < 3; c++) {                           \
@@ -267,7 +267,7 @@ DEFINE_DETECT_FUNCTION(32)
 static int
 tight_detect_smooth_image(VncState *vs, int w, int h)
 {
-    uint errors;
+    unsigned int errors;
     int compression = vs->tight.compression;
     int quality = vs->tight.quality;
 
@@ -281,7 +281,7 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
         return 0;
     }
 
-    if (vs->tight.quality != -1) {
+    if (vs->tight.quality != (uint8_t)-1) {
         if (w * h < VNC_TIGHT_JPEG_MIN_RECT_SIZE) {
             return 0;
         }
@@ -294,7 +294,7 @@ tight_detect_smooth_image(VncState *vs, int w, int h)
     if (vs->clientds.pf.bytes_per_pixel == 4) {
         if (vs->tight.pixel24) {
             errors = tight_detect_smooth_image24(vs, w, h);
-            if (vs->tight.quality != -1) {
+            if (vs->tight.quality != (uint8_t)-1) {
                 return (errors < tight_conf[quality].jpeg_threshold24);
             }
             return (errors < tight_conf[compression].gradient_threshold24);
@@ -443,7 +443,7 @@ static int tight_fill_palette(VncState *vs, int x, int y,
              * Should never happen, but don't break everything          \
              * if it does, use the first color instead                  \
              */                                                         \
-            if (idx == -1) {                                            \
+            if (idx == (uint8_t)-1) {                                   \
                 idx = 0;                                                \
             }                                                           \
             while (rep >= 0) {                                          \
@@ -608,7 +608,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
             for (x = 0; x < w; x++) {                                   \
                 pix = *buf;                                             \
                 if (endian) {                                           \
-                    pix = bswap_##bpp(pix);                             \
+                    pix = bswap##bpp(pix);                              \
                 }                                                       \
                 diff = 0;                                               \
                 for (c = 0; c < 3; c++) {                               \
@@ -628,7 +628,7 @@ tight_filter_gradient24(VncState *vs, uint8_t *buf, int w, int h)
                         << shift[c];                                    \
                 }                                                       \
                 if (endian) {                                           \
-                    diff = bswap_##bpp(diff);                           \
+                    diff = bswap##bpp(diff);                            \
                 }                                                       \
                 *buf++ = diff;                                          \
             }                                                           \
@@ -641,7 +641,7 @@ DEFINE_GRADIENT_FILTER_FUNCTION(32)
 /*
  * Check if a rectangle is all of the same color. If needSameColor is
  * set to non-zero, then also check that its color equals to the
- * *colorPtr value. The result is 1 if the test is successfull, and in
+ * *colorPtr value. The result is 1 if the test is successful, and in
  * that case new color will be stored in *colorPtr.
  */
 
@@ -905,7 +905,7 @@ static void tight_pack24(VncState *vs, uint8_t *buf, size_t count, size_t *ret)
 static int send_full_color_rect(VncState *vs, int x, int y, int w, int h)
 {
     int stream = 0;
-    size_t bytes;
+    ssize_t bytes;
 
 #ifdef CONFIG_VNC_PNG
     if (tight_can_send_png_rect(vs, w, h)) {
@@ -949,7 +949,7 @@ static int send_solid_rect(VncState *vs)
 static int send_mono_rect(VncState *vs, int x, int y,
                           int w, int h, uint32_t bg, uint32_t fg)
 {
-    size_t bytes;
+    ssize_t bytes;
     int stream = 1;
     int level = tight_conf[vs->tight.compression].mono_zlib_level;
 
@@ -1029,7 +1029,7 @@ static bool send_gradient_rect(VncState *vs, int x, int y, int w, int h)
 {
     int stream = 3;
     int level = tight_conf[vs->tight.compression].gradient_zlib_level;
-    size_t bytes;
+    ssize_t bytes;
 
     if (vs->clientds.pf.bytes_per_pixel == 1)
         return send_full_color_rect(vs, x, y, w, h);
@@ -1066,7 +1066,7 @@ static int send_palette_rect(VncState *vs, int x, int y,
     int stream = 2;
     int level = tight_conf[vs->tight.compression].idx_zlib_level;
     int colors;
-    size_t bytes;
+    ssize_t bytes;
 
 #ifdef CONFIG_VNC_PNG
     if (tight_can_send_png_rect(vs, w, h)) {
@@ -1351,7 +1351,6 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
     png_structp png_ptr;
     png_infop info_ptr;
     png_colorp png_palette = NULL;
-    size_t offset;
     int level = tight_png_conf[vs->tight.compression].png_zlib_level;
     int filters = tight_png_conf[vs->tight.compression].png_filters;
     uint8_t *buf;
@@ -1396,7 +1395,6 @@ static int send_png_rect(VncState *vs, int x, int y, int w, int h,
 
         png_set_PLTE(png_ptr, info_ptr, png_palette, palette_size(palette));
 
-        offset = vs->tight.tight.offset;
         if (vs->clientds.pf.bytes_per_pixel == 4) {
             tight_encode_indexed_rect32(vs->tight.tight.buffer, w * h, palette);
         } else {
@@ -1469,6 +1467,8 @@ static int send_sub_rect_nojpeg(VncState *vs, int x, int y, int w, int h,
         ret = send_mono_rect(vs, x, y, w, h, bg, fg);
     } else if (colors <= 256) {
         ret = send_palette_rect(vs, x, y, w, h, palette);
+    } else {
+        ret = 0;
     }
     return ret;
 }
@@ -1501,6 +1501,8 @@ static int send_sub_rect_jpeg(VncState *vs, int x, int y, int w, int h,
         } else {
             ret = send_palette_rect(vs, x, y, w, h, palette);
         }
+    } else {
+        ret = 0;
     }
     return ret;
 }
@@ -1522,7 +1524,7 @@ static int send_sub_rect(VncState *vs, int x, int y, int w, int h)
     colors = tight_fill_palette(vs, x, y, w * h, &fg, &bg, &palette);
 
 #ifdef CONFIG_VNC_JPEG
-    if (vs->tight.quality != -1) {
+    if (vs->tight.quality != (uint8_t)-1) {
         ret = send_sub_rect_jpeg(vs, x, y, w, h, bg, fg, colors, palette);
     } else {
         ret = send_sub_rect_nojpeg(vs, x, y, w, h, bg, fg, colors, palette);

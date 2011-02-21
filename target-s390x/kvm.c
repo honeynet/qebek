@@ -70,7 +70,11 @@
 #define SCLP_CMDW_READ_SCP_INFO         0x00020001
 #define SCLP_CMDW_READ_SCP_INFO_FORCED  0x00120001
 
-int kvm_arch_init(KVMState *s, int smp_cpus)
+const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+    KVM_CAP_LAST_INFO
+};
+
+int kvm_arch_init(KVMState *s)
 {
     return 0;
 }
@@ -119,7 +123,7 @@ int kvm_arch_put_registers(CPUState *env, int level)
 
 int kvm_arch_get_registers(CPUState *env)
 {
-    uint32_t ret;
+    int ret;
     struct kvm_regs regs;
     int i;
 

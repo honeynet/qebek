@@ -1504,7 +1504,6 @@ static int memtox(char *buf, const char *mem, int len)
 
 static const char *get_feature_xml(const char *p, const char **newp)
 {
-    extern const char *const xml_builtin[][2];
     size_t len;
     int i;
     const char *name;
@@ -2392,6 +2391,12 @@ void gdb_exit(CPUState *env, int code)
 
   snprintf(buf, sizeof(buf), "W%02x", (uint8_t)code);
   put_packet(s, buf);
+
+#ifndef CONFIG_USER_ONLY
+  if (s->chr) {
+      qemu_chr_close(s->chr);
+  }
+#endif
 }
 
 #ifdef CONFIG_USER_ONLY

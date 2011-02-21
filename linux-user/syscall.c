@@ -83,6 +83,9 @@ int __clone2(int (*fn)(void *), void *child_stack_base,
 #include <linux/kd.h>
 #include <linux/mtio.h>
 #include <linux/fs.h>
+#if defined(CONFIG_FIEMAP)
+#include <linux/fiemap.h>
+#endif
 #include <linux/fb.h>
 #include <linux/vt.h>
 #include "linux_loop.h"
@@ -1374,15 +1377,66 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
 
     switch(level) {
     case TARGET_SOL_SOCKET:
-    	level = SOL_SOCKET;
-	switch (optname) {
-	case TARGET_SO_LINGER:
-	case TARGET_SO_RCVTIMEO:
-	case TARGET_SO_SNDTIMEO:
-	case TARGET_SO_PEERCRED:
-	case TARGET_SO_PEERNAME:
-	    /* These don't just return a single integer */
-	    goto unimplemented;
+        level = SOL_SOCKET;
+        switch (optname) {
+        /* These don't just return a single integer */
+        case TARGET_SO_LINGER:
+        case TARGET_SO_RCVTIMEO:
+        case TARGET_SO_SNDTIMEO:
+        case TARGET_SO_PEERCRED:
+        case TARGET_SO_PEERNAME:
+            goto unimplemented;
+        /* Options with 'int' argument.  */
+        case TARGET_SO_DEBUG:
+            optname = SO_DEBUG;
+            goto int_case;
+        case TARGET_SO_REUSEADDR:
+            optname = SO_REUSEADDR;
+            goto int_case;
+        case TARGET_SO_TYPE:
+            optname = SO_TYPE;
+            goto int_case;
+        case TARGET_SO_ERROR:
+            optname = SO_ERROR;
+            goto int_case;
+        case TARGET_SO_DONTROUTE:
+            optname = SO_DONTROUTE;
+            goto int_case;
+        case TARGET_SO_BROADCAST:
+            optname = SO_BROADCAST;
+            goto int_case;
+        case TARGET_SO_SNDBUF:
+            optname = SO_SNDBUF;
+            goto int_case;
+        case TARGET_SO_RCVBUF:
+            optname = SO_RCVBUF;
+            goto int_case;
+        case TARGET_SO_KEEPALIVE:
+            optname = SO_KEEPALIVE;
+            goto int_case;
+        case TARGET_SO_OOBINLINE:
+            optname = SO_OOBINLINE;
+            goto int_case;
+        case TARGET_SO_NO_CHECK:
+            optname = SO_NO_CHECK;
+            goto int_case;
+        case TARGET_SO_PRIORITY:
+            optname = SO_PRIORITY;
+            goto int_case;
+#ifdef SO_BSDCOMPAT
+        case TARGET_SO_BSDCOMPAT:
+            optname = SO_BSDCOMPAT;
+            goto int_case;
+#endif
+        case TARGET_SO_PASSCRED:
+            optname = SO_PASSCRED;
+            goto int_case;
+        case TARGET_SO_TIMESTAMP:
+            optname = SO_TIMESTAMP;
+            goto int_case;
+        case TARGET_SO_RCVLOWAT:
+            optname = SO_RCVLOWAT;
+            goto int_case;
         default:
             goto int_case;
         }
@@ -1406,7 +1460,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
         } else {
             if (put_user_u8(val, optval_addr))
                 return -TARGET_EFAULT;
-	}
+        }
         if (put_user_u32(len, optlen))
             return -TARGET_EFAULT;
         break;
@@ -1551,8 +1605,9 @@ static abi_long do_bind(int sockfd, abi_ulong target_addr,
     void *addr;
     abi_long ret;
 
-    if (addrlen < 0)
+    if ((int)addrlen < 0) {
         return -TARGET_EINVAL;
+    }
 
     addr = alloca(addrlen+1);
 
@@ -1570,8 +1625,9 @@ static abi_long do_connect(int sockfd, abi_ulong target_addr,
     void *addr;
     abi_long ret;
 
-    if (addrlen < 0)
+    if ((int)addrlen < 0) {
         return -TARGET_EINVAL;
+    }
 
     addr = alloca(addrlen);
 
@@ -1656,8 +1712,9 @@ static abi_long do_accept(int fd, abi_ulong target_addr,
     if (get_user_u32(addrlen, target_addrlen_addr))
         return -TARGET_EINVAL;
 
-    if (addrlen < 0)
+    if ((int)addrlen < 0) {
         return -TARGET_EINVAL;
+    }
 
     if (!access_ok(VERIFY_WRITE, target_addr, addrlen))
         return -TARGET_EINVAL;
@@ -1684,8 +1741,9 @@ static abi_long do_getpeername(int fd, abi_ulong target_addr,
     if (get_user_u32(addrlen, target_addrlen_addr))
         return -TARGET_EFAULT;
 
-    if (addrlen < 0)
+    if ((int)addrlen < 0) {
         return -TARGET_EINVAL;
+    }
 
     if (!access_ok(VERIFY_WRITE, target_addr, addrlen))
         return -TARGET_EFAULT;
@@ -1712,8 +1770,9 @@ static abi_long do_getsockname(int fd, abi_ulong target_addr,
     if (get_user_u32(addrlen, target_addrlen_addr))
         return -TARGET_EFAULT;
 
-    if (addrlen < 0)
+    if ((int)addrlen < 0) {
         return -TARGET_EINVAL;
+    }
 
     if (!access_ok(VERIFY_WRITE, target_addr, addrlen))
         return -TARGET_EFAULT;
@@ -1753,8 +1812,9 @@ static abi_long do_sendto(int fd, abi_ulong msg, size_t len, int flags,
     void *host_msg;
     abi_long ret;
 
-    if (addrlen < 0)
+    if ((int)addrlen < 0) {
         return -TARGET_EINVAL;
+    }
 
     host_msg = lock_user(VERIFY_READ, msg, len, 1);
     if (!host_msg)
@@ -1792,7 +1852,7 @@ static abi_long do_recvfrom(int fd, abi_ulong msg, size_t len, int flags,
             ret = -TARGET_EFAULT;
             goto fail;
         }
-        if (addrlen < 0) {
+        if ((int)addrlen < 0) {
             ret = -TARGET_EINVAL;
             goto fail;
         }
@@ -2908,13 +2968,19 @@ enum {
 #undef STRUCT
 #undef STRUCT_SPECIAL
 
-typedef struct IOCTLEntry {
+typedef struct IOCTLEntry IOCTLEntry;
+
+typedef abi_long do_ioctl_fn(const IOCTLEntry *ie, uint8_t *buf_temp,
+                             int fd, abi_long cmd, abi_long arg);
+
+struct IOCTLEntry {
     unsigned int target_cmd;
     unsigned int host_cmd;
     const char *name;
     int access;
+    do_ioctl_fn *do_ioctl;
     const argtype arg_type[5];
-} IOCTLEntry;
+};
 
 #define IOC_R 0x0001
 #define IOC_W 0x0002
@@ -2922,9 +2988,100 @@ typedef struct IOCTLEntry {
 
 #define MAX_STRUCT_SIZE 4096
 
+#ifdef CONFIG_FIEMAP
+/* So fiemap access checks don't overflow on 32 bit systems.
+ * This is very slightly smaller than the limit imposed by
+ * the underlying kernel.
+ */
+#define FIEMAP_MAX_EXTENTS ((UINT_MAX - sizeof(struct fiemap))  \
+                            / sizeof(struct fiemap_extent))
+
+static abi_long do_ioctl_fs_ioc_fiemap(const IOCTLEntry *ie, uint8_t *buf_temp,
+                                       int fd, abi_long cmd, abi_long arg)
+{
+    /* The parameter for this ioctl is a struct fiemap followed
+     * by an array of struct fiemap_extent whose size is set
+     * in fiemap->fm_extent_count. The array is filled in by the
+     * ioctl.
+     */
+    int target_size_in, target_size_out;
+    struct fiemap *fm;
+    const argtype *arg_type = ie->arg_type;
+    const argtype extent_arg_type[] = { MK_STRUCT(STRUCT_fiemap_extent) };
+    void *argptr, *p;
+    abi_long ret;
+    int i, extent_size = thunk_type_size(extent_arg_type, 0);
+    uint32_t outbufsz;
+    int free_fm = 0;
+
+    assert(arg_type[0] == TYPE_PTR);
+    assert(ie->access == IOC_RW);
+    arg_type++;
+    target_size_in = thunk_type_size(arg_type, 0);
+    argptr = lock_user(VERIFY_READ, arg, target_size_in, 1);
+    if (!argptr) {
+        return -TARGET_EFAULT;
+    }
+    thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
+    unlock_user(argptr, arg, 0);
+    fm = (struct fiemap *)buf_temp;
+    if (fm->fm_extent_count > FIEMAP_MAX_EXTENTS) {
+        return -TARGET_EINVAL;
+    }
+
+    outbufsz = sizeof (*fm) +
+        (sizeof(struct fiemap_extent) * fm->fm_extent_count);
+
+    if (outbufsz > MAX_STRUCT_SIZE) {
+        /* We can't fit all the extents into the fixed size buffer.
+         * Allocate one that is large enough and use it instead.
+         */
+        fm = malloc(outbufsz);
+        if (!fm) {
+            return -TARGET_ENOMEM;
+        }
+        memcpy(fm, buf_temp, sizeof(struct fiemap));
+        free_fm = 1;
+    }
+    ret = get_errno(ioctl(fd, ie->host_cmd, fm));
+    if (!is_error(ret)) {
+        target_size_out = target_size_in;
+        /* An extent_count of 0 means we were only counting the extents
+         * so there are no structs to copy
+         */
+        if (fm->fm_extent_count != 0) {
+            target_size_out += fm->fm_mapped_extents * extent_size;
+        }
+        argptr = lock_user(VERIFY_WRITE, arg, target_size_out, 0);
+        if (!argptr) {
+            ret = -TARGET_EFAULT;
+        } else {
+            /* Convert the struct fiemap */
+            thunk_convert(argptr, fm, arg_type, THUNK_TARGET);
+            if (fm->fm_extent_count != 0) {
+                p = argptr + target_size_in;
+                /* ...and then all the struct fiemap_extents */
+                for (i = 0; i < fm->fm_mapped_extents; i++) {
+                    thunk_convert(p, &fm->fm_extents[i], extent_arg_type,
+                                  THUNK_TARGET);
+                    p += extent_size;
+                }
+            }
+            unlock_user(argptr, arg, target_size_out);
+        }
+    }
+    if (free_fm) {
+        free(fm);
+    }
+    return ret;
+}
+#endif
+
 static IOCTLEntry ioctl_entries[] = {
 #define IOCTL(cmd, access, ...) \
-    { TARGET_ ## cmd, cmd, #cmd, access, {  __VA_ARGS__ } },
+    { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+#define IOCTL_SPECIAL(cmd, access, dofn, ...)                      \
+    { TARGET_ ## cmd, cmd, #cmd, access, dofn, {  __VA_ARGS__ } },
 #include "ioctls.h"
     { 0, 0, },
 };
@@ -2954,6 +3111,10 @@ static abi_long do_ioctl(int fd, abi_long cmd, abi_long arg)
 #if defined(DEBUG)
     gemu_log("ioctl: cmd=0x%04lx (%s)\n", (long)cmd, ie->name);
 #endif
+    if (ie->do_ioctl) {
+        return ie->do_ioctl(ie, buf_temp, fd, cmd, arg);
+    }
+
     switch(arg_type[0]) {
     case TYPE_NULL:
         /* no argument */
@@ -3578,11 +3739,12 @@ static int do_fork(CPUState *env, unsigned int flags, abi_ulong newsp,
 {
     int ret;
     TaskState *ts;
-    uint8_t *new_stack;
     CPUState *new_env;
 #if defined(CONFIG_USE_NPTL)
     unsigned int nptl_flags;
     sigset_t sigmask;
+#else
+    uint8_t *new_stack;
 #endif
 
     /* Emulate vfork() with fork() */
@@ -3595,9 +3757,8 @@ static int do_fork(CPUState *env, unsigned int flags, abi_ulong newsp,
         new_thread_info info;
         pthread_attr_t attr;
 #endif
-        ts = qemu_mallocz(sizeof(TaskState) + NEW_STACK_SIZE);
+        ts = qemu_mallocz(sizeof(TaskState));
         init_task_state(ts);
-        new_stack = ts->stack;
         /* we create a new CPU instance. */
         new_env = cpu_copy(env);
 #if defined(TARGET_I386) || defined(TARGET_SPARC) || defined(TARGET_PPC)
@@ -3633,7 +3794,8 @@ static int do_fork(CPUState *env, unsigned int flags, abi_ulong newsp,
             info.parent_tidptr = parent_tidptr;
 
         ret = pthread_attr_init(&attr);
-        ret = pthread_attr_setstack(&attr, new_stack, NEW_STACK_SIZE);
+        ret = pthread_attr_setstacksize(&attr, NEW_STACK_SIZE);
+        ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
         /* It is not safe to deliver signals until the child has finished
            initializing, so temporarily block all signals.  */
         sigfillset(&sigmask);
@@ -3661,6 +3823,7 @@ static int do_fork(CPUState *env, unsigned int flags, abi_ulong newsp,
         if (flags & CLONE_NPTL_FLAGS2)
             return -EINVAL;
         /* This is probably going to die very quickly, but do it anyway.  */
+        new_stack = qemu_mallocz (NEW_STACK_SIZE);
 #ifdef __ia64__
         ret = __clone2(clone_func, new_stack, NEW_STACK_SIZE, flags, new_env);
 #else
@@ -4234,7 +4397,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
               sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
                         NULL, NULL, 0);
           }
-          /* TODO: Free CPU state.  */
+          thread_env = NULL;
+          qemu_free(cpu_env);
+          qemu_free(ts);
           pthread_exit(NULL);
       }
 #endif
@@ -7303,6 +7468,29 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
     case TARGET_NR_fallocate:
         ret = get_errno(fallocate(arg1, arg2, arg3, arg4));
         break;
+#endif
+#if defined(CONFIG_SYNC_FILE_RANGE)
+#if defined(TARGET_NR_sync_file_range)
+    case TARGET_NR_sync_file_range:
+#if TARGET_ABI_BITS == 32
+        ret = get_errno(sync_file_range(arg1, target_offset64(arg2, arg3),
+                                        target_offset64(arg4, arg5), arg6));
+#else
+        ret = get_errno(sync_file_range(arg1, arg2, arg3, arg4));
+#endif
+        break;
+#endif
+#if defined(TARGET_NR_sync_file_range2)
+    case TARGET_NR_sync_file_range2:
+        /* This is like sync_file_range but the arguments are reordered */
+#if TARGET_ABI_BITS == 32
+        ret = get_errno(sync_file_range(arg1, target_offset64(arg3, arg4),
+                                        target_offset64(arg5, arg6), arg2));
+#else
+        ret = get_errno(sync_file_range(arg1, arg3, arg4, arg2));
+#endif
+        break;
+#endif
 #endif
     default:
     unimplemented:

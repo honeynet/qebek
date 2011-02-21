@@ -177,7 +177,7 @@ static inline unsigned int tb_jmp_cache_hash_func(target_ulong pc)
 
 static inline unsigned int tb_phys_hash_func(tb_page_addr_t pc)
 {
-    return pc & (CODE_GEN_PHYS_HASH_SIZE - 1);
+    return (pc >> 2) & (CODE_GEN_PHYS_HASH_SIZE - 1);
 }
 
 TranslationBlock *tb_alloc(target_ulong pc);
@@ -192,7 +192,7 @@ extern TranslationBlock *tb_phys_hash[CODE_GEN_PHYS_HASH_SIZE];
 #if defined(USE_DIRECT_JUMP)
 
 #if defined(_ARCH_PPC)
-extern void ppc_tb_set_jmp_target(unsigned long jmp_addr, unsigned long addr);
+void ppc_tb_set_jmp_target(unsigned long jmp_addr, unsigned long addr);
 #define tb_set_jmp_target1 ppc_tb_set_jmp_target
 #elif defined(__i386__) || defined(__x86_64__)
 static inline void tb_set_jmp_target1(unsigned long jmp_addr, unsigned long addr)
@@ -204,9 +204,7 @@ static inline void tb_set_jmp_target1(unsigned long jmp_addr, unsigned long addr
 #elif defined(__arm__)
 static inline void tb_set_jmp_target1(unsigned long jmp_addr, unsigned long addr)
 {
-#if QEMU_GNUC_PREREQ(4, 1)
-    void __clear_cache(char *beg, char *end);
-#else
+#if !QEMU_GNUC_PREREQ(4, 1)
     register unsigned long _beg __asm ("a1");
     register unsigned long _end __asm ("a2");
     register unsigned long _flg __asm ("a3");
@@ -218,7 +216,7 @@ static inline void tb_set_jmp_target1(unsigned long jmp_addr, unsigned long addr
         | (((addr - (jmp_addr + 8)) >> 2) & 0xffffff);
 
 #if QEMU_GNUC_PREREQ(4, 1)
-    __clear_cache((char *) jmp_addr, (char *) jmp_addr + 4);
+    __builtin___clear_cache((char *) jmp_addr, (char *) jmp_addr + 4);
 #else
     /* flush icache */
     _beg = jmp_addr;
@@ -334,7 +332,7 @@ static inline tb_page_addr_t get_page_addr_code(CPUState *env1, target_ulong add
     }
     p = (void *)(unsigned long)addr
         + env1->tlb_table[mmu_idx][page_index].addend;
-    return qemu_ram_addr_from_host(p);
+    return qemu_ram_addr_from_host_nofail(p);
 }
 #endif
 

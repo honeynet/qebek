@@ -20,6 +20,9 @@
  */
 
 #include "qemu-common.h"
+#include "cpu-common.h"
+#include "cpu.h"
+#include "targphys.h"
 #include <netinet/in.h>
 #include <sys/time.h>
 #include "qebek-common.h"

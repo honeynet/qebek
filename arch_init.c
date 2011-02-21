@@ -23,6 +23,7 @@
  */
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #ifndef _WIN32
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -82,12 +83,12 @@ const uint32_t arch_type = QEMU_ARCH;
 /***********************************************************/
 /* ram save/restore */
 
-#define RAM_SAVE_FLAG_FULL	0x01 /* Obsolete, not used anymore */
-#define RAM_SAVE_FLAG_COMPRESS	0x02
-#define RAM_SAVE_FLAG_MEM_SIZE	0x04
-#define RAM_SAVE_FLAG_PAGE	0x08
-#define RAM_SAVE_FLAG_EOS	0x10
-#define RAM_SAVE_FLAG_CONTINUE	0x20
+#define RAM_SAVE_FLAG_FULL     0x01 /* Obsolete, not used anymore */
+#define RAM_SAVE_FLAG_COMPRESS 0x02
+#define RAM_SAVE_FLAG_MEM_SIZE 0x04
+#define RAM_SAVE_FLAG_PAGE     0x08
+#define RAM_SAVE_FLAG_EOS      0x10
+#define RAM_SAVE_FLAG_CONTINUE 0x20
 
 static int is_dup_page(uint8_t *page, uint8_t ch)
 {
@@ -212,6 +213,39 @@ uint64_t ram_bytes_total(void)
     return total;
 }
 
+static int block_compar(const void *a, const void *b)
+{
+    RAMBlock * const *ablock = a;
+    RAMBlock * const *bblock = b;
+    if ((*ablock)->offset < (*bblock)->offset) {
+        return -1;
+    } else if ((*ablock)->offset > (*bblock)->offset) {
+        return 1;
+    }
+    return 0;
+}
+
+static void sort_ram_list(void)
+{
+    RAMBlock *block, *nblock, **blocks;
+    int n;
+    n = 0;
+    QLIST_FOREACH(block, &ram_list.blocks, next) {
+        ++n;
+    }
+    blocks = qemu_malloc(n * sizeof *blocks);
+    n = 0;
+    QLIST_FOREACH_SAFE(block, &ram_list.blocks, next, nblock) {
+        blocks[n++] = block;
+        QLIST_REMOVE(block, next);
+    }
+    qsort(blocks, n, sizeof *blocks, block_compar);
+    while (--n >= 0) {
+        QLIST_INSERT_HEAD(&ram_list.blocks, blocks[n], next);
+    }
+    qemu_free(blocks);
+}
+
 int ram_save_live(Monitor *mon, QEMUFile *f, int stage, void *opaque)
 {
     ram_addr_t addr;
@@ -234,6 +268,7 @@ int ram_save_live(Monitor *mon, QEMUFile *f, int stage, void *opaque)
         bytes_transferred = 0;
         last_block = NULL;
         last_offset = 0;
+        sort_ram_list();
 
         /* Make sure all dirty bits are set */
         QLIST_FOREACH(block, &ram_list.blocks, next) {
@@ -390,13 +425,16 @@ int ram_load(QEMUFile *f, void *opaque, int version_id)
                 host = qemu_get_ram_ptr(addr);
             else
                 host = host_from_stream_offset(f, addr, flags);
+            if (!host) {
+                return -EINVAL;
+            }
 
             ch = qemu_get_byte(f);
             memset(host, ch, TARGET_PAGE_SIZE);
 #ifndef _WIN32
             if (ch == 0 &&
                 (!kvm_enabled() || kvm_has_sync_mmu())) {
-                madvise(host, TARGET_PAGE_SIZE, MADV_DONTNEED);
+                qemu_madvise(host, TARGET_PAGE_SIZE, QEMU_MADV_DONTNEED);
             }
 #endif
         } else if (flags & RAM_SAVE_FLAG_PAGE) {
@@ -423,7 +461,18 @@ void qemu_service_io(void)
 }
 
 #ifdef HAS_AUDIO
-struct soundhw soundhw[] = {
+struct soundhw {
+    const char *name;
+    const char *descr;
+    int enabled;
+    int isa;
+    union {
+        int (*init_isa) (qemu_irq *pic);
+        int (*init_pci) (PCIBus *bus);
+    } init;
+};
+
+static struct soundhw soundhw[] = {
 #ifdef HAS_AUDIO_CHOICE
 #if defined(TARGET_I386) || defined(TARGET_MIPS)
     {
@@ -499,6 +548,16 @@ struct soundhw soundhw[] = {
     },
 #endif
 
+#ifdef CONFIG_HDA
+    {
+        "hda",
+        "Intel HD Audio",
+        0,
+        0,
+        { .init_pci = intel_hda_and_codec_init }
+    },
+#endif
+
 #endif /* HAS_AUDIO_CHOICE */
 
     { NULL, NULL, 0, 0, { NULL } }
@@ -562,8 +621,30 @@ void select_soundhw(const char *optarg)
         }
     }
 }
+
+void audio_init(qemu_irq *isa_pic, PCIBus *pci_bus)
+{
+    struct soundhw *c;
+
+    for (c = soundhw; c->name; ++c) {
+        if (c->enabled) {
+            if (c->isa) {
+                if (isa_pic) {
+                    c->init.init_isa(isa_pic);
+                }
+            } else {
+                if (pci_bus) {
+                    c->init.init_pci(pci_bus);
+                }
+            }
+        }
+    }
+}
 #else
 void select_soundhw(const char *optarg)
+{
+}
+void audio_init(qemu_irq *isa_pic, PCIBus *pci_bus)
 {
 }
 #endif

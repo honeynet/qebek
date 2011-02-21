@@ -58,7 +58,7 @@ int kvm_check_extension(KVMState *s, unsigned int extension)
     return 0;
 }
 
-int kvm_init(int smp_cpus)
+int kvm_init(void)
 {
     return -ENOSYS;
 }
@@ -95,6 +95,11 @@ int kvm_has_vcpu_events(void)
 }
 
 int kvm_has_robust_singlestep(void)
+{
+    return 0;
+}
+
+int kvm_has_many_ioeventfds(void)
 {
     return 0;
 }
@@ -140,4 +145,9 @@ int kvm_set_ioeventfd_pio_word(int fd, uint16_t addr, uint16_t val, bool assign)
 int kvm_set_ioeventfd_mmio_long(int fd, uint32_t adr, uint32_t val, bool assign)
 {
     return -ENOSYS;
+}
+
+int kvm_on_sigbus(int code, void *addr)
+{
+    return 1;
 }

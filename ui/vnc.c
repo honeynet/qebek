@@ -214,13 +214,17 @@ static int vnc_server_info_put(QDict *qdict)
 
 static void vnc_client_cache_auth(VncState *client)
 {
+#if defined(CONFIG_VNC_TLS) || defined(CONFIG_VNC_SASL)
     QDict *qdict;
+#endif
 
     if (!client->info) {
         return;
     }
 
+#if defined(CONFIG_VNC_TLS) || defined(CONFIG_VNC_SASL)
     qdict = qobject_to_qdict(client->info);
+#endif
 
 #ifdef CONFIG_VNC_TLS
     if (client->tls.session &&
@@ -1500,7 +1504,7 @@ static void do_key_event(VncState *vs, int down, int keycode, int sym)
         break;
     }
 
-    if (vs->vd->lock_key_sync &&
+    if (down && vs->vd->lock_key_sync &&
         keycode_is_keypad(vs->vd->kbd_layout, keycode)) {
         /* If the numlock state needs to change then simulate an additional
            keypress before sending this one.  This will happen if the user
@@ -1519,7 +1523,7 @@ static void do_key_event(VncState *vs, int down, int keycode, int sym)
         }
     }
 
-    if (vs->vd->lock_key_sync &&
+    if (down && vs->vd->lock_key_sync &&
         ((sym >= 'A' && sym <= 'Z') || (sym >= 'a' && sym <= 'z'))) {
         /* If the capslock state needs to change then simulate an additional
            keypress before sending this one.  This will happen if the user
@@ -2078,18 +2082,15 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
     unsigned char response[VNC_AUTH_CHALLENGE_SIZE];
     int i, j, pwlen;
     unsigned char key[8];
+    time_t now = time(NULL);
 
-    if (!vs->vd->password || !vs->vd->password[0]) {
+    if (!vs->vd->password) {
         VNC_DEBUG("No password configured on server");
-        vnc_write_u32(vs, 1); /* Reject auth */
-        if (vs->minor >= 8) {
-            static const char err[] = "Authentication failed";
-            vnc_write_u32(vs, sizeof(err));
-            vnc_write(vs, err, sizeof(err));
-        }
-        vnc_flush(vs);
-        vnc_client_error(vs);
-        return 0;
+        goto reject;
+    }
+    if (vs->vd->expires < now) {
+        VNC_DEBUG("Password is expired");
+        goto reject;
     }
 
     memcpy(response, vs->challenge, VNC_AUTH_CHALLENGE_SIZE);
@@ -2105,14 +2106,7 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
     /* Compare expected vs actual challenge response */
     if (memcmp(response, data, VNC_AUTH_CHALLENGE_SIZE) != 0) {
         VNC_DEBUG("Client challenge reponse did not match\n");
-        vnc_write_u32(vs, 1); /* Reject auth */
-        if (vs->minor >= 8) {
-            static const char err[] = "Authentication failed";
-            vnc_write_u32(vs, sizeof(err));
-            vnc_write(vs, err, sizeof(err));
-        }
-        vnc_flush(vs);
-        vnc_client_error(vs);
+        goto reject;
     } else {
         VNC_DEBUG("Accepting VNC challenge response\n");
         vnc_write_u32(vs, 0); /* Accept auth */
@@ -2120,6 +2114,17 @@ static int protocol_client_auth_vnc(VncState *vs, uint8_t *data, size_t len)
 
         start_client_init(vs);
     }
+    return 0;
+
+reject:
+    vnc_write_u32(vs, 1); /* Reject auth */
+    if (vs->minor >= 8) {
+        static const char err[] = "Authentication failed";
+        vnc_write_u32(vs, sizeof(err));
+        vnc_write(vs, err, sizeof(err));
+    }
+    vnc_flush(vs);
+    vnc_client_error(vs);
     return 0;
 }
 
@@ -2432,6 +2437,7 @@ void vnc_display_init(DisplayState *ds)
 
     vs->ds = ds;
     QTAILQ_INIT(&vs->clients);
+    vs->expires = TIME_MAX;
 
     if (keyboard_layout)
         vs->kbd_layout = init_keyboard_layout(name2keysym, keyboard_layout);
@@ -2478,7 +2484,7 @@ void vnc_display_close(DisplayState *ds)
 #endif
 }
 
-int vnc_display_password(DisplayState *ds, const char *password)
+int vnc_display_disable_login(DisplayState *ds)
 {
     VncDisplay *vs = ds ? (VncDisplay *)ds->opaque : vnc_display;
 
@@ -2488,18 +2494,43 @@ int vnc_display_password(DisplayState *ds, const char *password)
 
     if (vs->password) {
         qemu_free(vs->password);
-        vs->password = NULL;
-    }
-    if (password && password[0]) {
-        if (!(vs->password = qemu_strdup(password)))
-            return -1;
-        if (vs->auth == VNC_AUTH_NONE) {
-            vs->auth = VNC_AUTH_VNC;
-        }
-    } else {
-        vs->auth = VNC_AUTH_NONE;
     }
 
+    vs->password = NULL;
+    vs->auth = VNC_AUTH_VNC;
+
+    return 0;
+}
+
+int vnc_display_password(DisplayState *ds, const char *password)
+{
+    VncDisplay *vs = ds ? (VncDisplay *)ds->opaque : vnc_display;
+
+    if (!vs) {
+        return -1;
+    }
+
+    if (!password) {
+        /* This is not the intention of this interface but err on the side
+           of being safe */
+        return vnc_display_disable_login(ds);
+    }
+
+    if (vs->password) {
+        qemu_free(vs->password);
+        vs->password = NULL;
+    }
+    vs->password = qemu_strdup(password);
+    vs->auth = VNC_AUTH_VNC;
+
+    return 0;
+}
+
+int vnc_display_pw_expire(DisplayState *ds, time_t expires)
+{
+    VncDisplay *vs = ds ? (VncDisplay *)ds->opaque : vnc_display;
+
+    vs->expires = expires;
     return 0;
 }
 
@@ -2523,7 +2554,9 @@ int vnc_display_open(DisplayState *ds, const char *display)
     int sasl = 0;
     int saslErr;
 #endif
+#if defined(CONFIG_VNC_TLS) || defined(CONFIG_VNC_SASL)
     int acl = 0;
+#endif
     int lock_key_sync = 1;
 
     if (!vnc_display)
@@ -2581,8 +2614,10 @@ int vnc_display_open(DisplayState *ds, const char *display)
                 return -1;
             }
 #endif
+#if defined(CONFIG_VNC_TLS) || defined(CONFIG_VNC_SASL)
         } else if (strncmp(options, "acl", 3) == 0) {
             acl = 1;
+#endif
         } else if (strncmp(options, "lossy", 5) == 0) {
             vs->lossy = true;
         }

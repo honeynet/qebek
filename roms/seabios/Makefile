@@ -1,0 +1,1 @@
+/home/csong/opensource/sebek_virtualized/qebek/trunk/roms/seabios/Makefile

@@ -45,10 +45,6 @@
  (0 << CP0C3_VEIC) | (0 << CP0C3_VInt) | (0 << CP0C3_SP) |        \
  (0 << CP0C3_SM) | (0 << CP0C3_TL))
 
-/* Define a implementation number of 1.
-   Define a major version 1, minor version 0. */
-#define MIPS_FCR0 ((0 << FCR0_S) | (0x1 << FCR0_PRID) | (0x10 << FCR0_REV))
-
 /* MMU types, the first four entries have the same layout as the
    CP0C0_MT field.  */
 enum mips_mmu_types {
@@ -504,7 +500,7 @@ static const mips_def_t *cpu_mips_find_by_name (const char *name)
     return NULL;
 }
 
-void mips_cpu_list (FILE *f, int (*cpu_fprintf)(FILE *f, const char *fmt, ...))
+void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf)
 {
     int i;
 

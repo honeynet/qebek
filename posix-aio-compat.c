@@ -24,7 +24,9 @@
 
 #include "qemu-queue.h"
 #include "osdep.h"
+#include "sysemu.h"
 #include "qemu-common.h"
+#include "trace.h"
 #include "block_int.h"
 
 #include "block/raw-posix-aio.h"
@@ -127,7 +129,7 @@ static ssize_t handle_aiocb_ioctl(struct qemu_paiocb *aiocb)
 
     /*
      * This looks weird, but the aio code only consideres a request
-     * successfull if it has written the number full number of bytes.
+     * successful if it has written the number full number of bytes.
      *
      * Now we overload aio_nbytes as aio_ioctl_cmd for the ioctl command,
      * so in fact we return the ioctl command here to make posix_aio_read()
@@ -269,7 +271,7 @@ static ssize_t handle_aiocb_rw(struct qemu_paiocb *aiocb)
      * Ok, we have to do it the hard way, copy all segments into
      * a single aligned buffer.
      */
-    buf = qemu_memalign(512, aiocb->aio_nbytes);
+    buf = qemu_blockalign(aiocb->common.bs, aiocb->aio_nbytes);
     if (aiocb->aio_type & QEMU_AIO_WRITE) {
         char *p = buf;
         int i;
@@ -583,6 +585,7 @@ BlockDriverAIOCB *paio_submit(BlockDriverState *bs, int fd,
     acb->next = posix_aio_state->first_aio;
     posix_aio_state->first_aio = acb;
 
+    trace_paio_submit(acb, opaque, sector_num, nb_sectors, type);
     qemu_paio_submit(acb);
     return &acb->common;
 }

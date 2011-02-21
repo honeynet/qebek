@@ -34,6 +34,7 @@
 #include "xilinx.h"
 #include "loader.h"
 #include "elf.h"
+#include "blockdev.h"
 
 #define LMB_BRAM_SIZE  (128 * 1024)
 #define FLASH_SIZE     (16 * 1024 * 1024)
@@ -179,11 +180,22 @@ petalogix_s3adsp1800_init(ram_addr_t ram_size,
         }
         /* Always boot into physical ram.  */
         boot_info.bootstrap_pc = ddr_base + (entry & 0x0fffffff);
+
+        /* If it wasn't an ELF image, try an u-boot image.  */
         if (kernel_size < 0) {
-            /* If we failed loading ELF's try a raw image.  */
+            target_phys_addr_t uentry, loadaddr;
+
+            kernel_size = load_uimage(kernel_filename, &uentry, &loadaddr, 0);
+            boot_info.bootstrap_pc = uentry;
+            high = (loadaddr + kernel_size + 3) & ~3;
+        }
+
+        /* Not an ELF image nor an u-boot image, try a RAW image.  */
+        if (kernel_size < 0) {
             kernel_size = load_image_targphys(kernel_filename, ddr_base,
                                               ram_size);
             boot_info.bootstrap_pc = ddr_base;
+            high = (ddr_base + kernel_size + 3) & ~3;
         }
 
         boot_info.cmdline = high + 4096;

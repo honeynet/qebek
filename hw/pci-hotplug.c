@@ -31,6 +31,7 @@
 #include "scsi.h"
 #include "virtio-blk.h"
 #include "qemu-config.h"
+#include "blockdev.h"
 
 #if defined(TARGET_I386)
 static PCIDevice *qemu_pci_hot_add_nic(Monitor *mon,
@@ -51,7 +52,7 @@ static PCIDevice *qemu_pci_hot_add_nic(Monitor *mon,
         return NULL;
     }
 
-    opts = qemu_opts_parse(&qemu_net_opts, opts_str ? opts_str : "", 0);
+    opts = qemu_opts_parse(qemu_find_opts("net"), opts_str ? opts_str : "", 0);
     if (!opts) {
         return NULL;
     }
@@ -89,7 +90,8 @@ static int scsi_hot_add(Monitor *mon, DeviceState *adapter,
      * specified).
      */
     dinfo->unit = qemu_opt_get_number(dinfo->opts, "unit", -1);
-    scsidev = scsi_bus_legacy_add_drive(scsibus, dinfo->bdrv, dinfo->unit);
+    dinfo->bus = scsibus->busnr;
+    scsidev = scsi_bus_legacy_add_drive(scsibus, dinfo->bdrv, dinfo->unit, false);
     if (!scsidev) {
         return -1;
     }
@@ -145,7 +147,7 @@ void drive_hot_add(Monitor *mon, const QDict *qdict)
 
 err:
     if (dinfo)
-        drive_uninit(dinfo);
+        drive_put_ref(dinfo);
     return;
 }
 
