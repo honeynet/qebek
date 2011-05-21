@@ -1,1 +1,1 @@
-/home/csong/opensource/sebek_virtualized/qebek/trunk/roms/vgabios/Makefile
+/Users/csong/opensource/qebek/roms/vgabios/Makefile

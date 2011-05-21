@@ -1,1 +1,1 @@
-/home/csong/opensource/sebek_virtualized/qebek/trunk/Makefile.hw
+/Users/csong/opensource/qebek/Makefile.hw

@@ -1,1 +1,1 @@
-/home/csong/opensource/sebek_virtualized/qebek/trunk/roms/seabios/Makefile
+/Users/csong/opensource/qebek/roms/seabios/Makefile

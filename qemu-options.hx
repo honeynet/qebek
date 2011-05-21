@@ -2345,7 +2345,7 @@ Tell Qebek the guest OS is Windows 2000.
 ETEXI
 
 DEF("winxp", 0, QEBEK_OPTION_winxp,
-    "-win2k honeypot's OS is Windows XP [default]", QEMU_ARCH_I386)
+    "-winxp honeypot's OS is Windows XP [default]", QEMU_ARCH_I386)
 STEXI
 @item -winxp
 @findex -winxp
@@ -2353,7 +2353,7 @@ Tell Qebek the guest OS is Windows XP. This is the default OS.
 ETEXI
 
 DEF("win2k3", 0, QEBEK_OPTION_win2k3,
-    "-win2k honeypot's OS is Windows Server 2003", QEMU_ARCH_I386)
+    "-win2k3 honeypot's OS is Windows Server 2003", QEMU_ARCH_I386)
 STEXI
 @item -win2k3
 @findex -win2k3
@@ -2361,7 +2361,7 @@ Tell Qebek the guest OS is Windows Server 2003.
 ETEXI
 
 DEF("vista", 0, QEBEK_OPTION_vista,
-    "-win2k honeypot's OS is Windows Vista", QEMU_ARCH_I386)
+    "-vista honeypot's OS is Windows Vista", QEMU_ARCH_I386)
 STEXI
 @item -vista
 @findex -vista
@@ -2369,7 +2369,7 @@ Tell Qebek the guest OS is Windows Vista.
 ETEXI
 
 DEF("win2k8", 0, QEBEK_OPTION_win2k8,
-    "-win2k honeypot's OS is Windows Server 2008", QEMU_ARCH_I386)
+    "-win2k8 honeypot's OS is Windows Server 2008", QEMU_ARCH_I386)
 STEXI
 @item -win2k8
 @findex -win2k8
@@ -2377,7 +2377,7 @@ Tell Qebek the guest OS is Windows Server 2008.
 ETEXI
 
 DEF("win7", 0, QEBEK_OPTION_win7,
-    "-win2k honeypot's OS is Windows 7", QEMU_ARCH_I386)
+    "-win7 honeypot's OS is Windows 7", QEMU_ARCH_I386)
 STEXI
 @item -win7
 @findex -win7
