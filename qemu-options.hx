@@ -2384,7 +2384,7 @@ STEXI
 Tell Qebek the guest OS is Windows 7.
 ETEXI
 
-DEF("sbk_magic", 0, QEBEK_OPTION_magic,
+DEF("sbk_magic", HAS_ARG, QEBEK_OPTION_magic,
     "-sbk_magic magic number in Sebek header (OPTIONAL)", QEMU_ARCH_I386)
 STEXI
 @item -sbk_magic
@@ -2392,7 +2392,7 @@ STEXI
 Set the magic number in Sebek header (OPTIONAL).
 ETEXI
 
-DEF("sbk_ip", 0, QEBEK_OPTION_ip,
+DEF("sbk_ip", HAS_ARG, QEBEK_OPTION_ip,
     "-sbk_ip honeypot's IP address", QEMU_ARCH_I386)
 STEXI
 @item -sbk_ip
